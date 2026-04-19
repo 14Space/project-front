@@ -15,7 +15,7 @@ export default function Footer() {
       
       <div className="container" style={{ padding: '60px 20px', display: 'flex', gap: '40px' }}>
         <div style={{ flex: 1 }}>
-          <img src="https://telemart.ua/images/logo.svg" alt="FRAME" style={{ height: '40px', filter: 'brightness(0) invert(1)', marginBottom: '24px' }} />
+          <img src="/logo_FRAME.png" alt="FRAME" style={{ height: '40px', marginBottom: '24px' }} />
           <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
             <a href="#" style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><MessageCircle size={20} /></a>
             <a href="#" style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><Camera size={20} /></a>
@@ -56,7 +56,7 @@ export default function Footer() {
       </div>
       
       <div style={{ borderTop: '1px solid #333', padding: '24px 0', textAlign: 'center', fontSize: '12px', color: '#888' }}>
-        © 2024 FRAME. Все права защищены.
+        © FRAME Since 2026
       </div>
     </footer>
   );
