@@ -1,14 +1,16 @@
 import { MessageCircle, Camera, Video, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer style={{ backgroundColor: '#1D1D1D', color: '#ccc', fontSize: '14px' }}>
       <div style={{ backgroundColor: '#A6CE39', padding: '30px 0', color: '#fff' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700 }}>Подпишись на рассылку и получай спецпредложения</div>
+          <div style={{ fontSize: '20px', fontWeight: 700 }}>{t('footer.newsletterTitle')}</div>
           <div style={{ display: 'flex', gap: '16px', width: '500px' }}>
-            <input type="email" placeholder="Введите свой e-mail" style={{ flex: 1, padding: '12px 20px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.5)', background: 'transparent', color: '#fff', outline: 'none' }} />
-            <button style={{ backgroundColor: '#fff', color: '#111', padding: '0 24px', borderRadius: '30px', fontWeight: 600 }}>Подписаться на рассылку</button>
+            <input type="email" placeholder={t('footer.newsletterPlaceholder')} style={{ flex: 1, padding: '12px 20px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.5)', background: 'transparent', color: '#fff', outline: 'none' }} />
+            <button style={{ backgroundColor: '#fff', color: '#111', padding: '0 24px', borderRadius: '30px', fontWeight: 600 }}>{t('footer.newsletterButton')}</button>
           </div>
         </div>
       </div>
@@ -25,32 +27,32 @@ export default function Footer() {
         </div>
         
         <div style={{ flex: 1 }}>
-          <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '16px' }}>Покупателям</h4>
+          <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '16px' }}>{t('footer.sections.customers')}</h4>
           <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <li><a href="#">Доставка</a></li>
-            <li><a href="#">Оплата</a></li>
-            <li><a href="#">Гарантия</a></li>
-            <li><a href="#">Возврат товара</a></li>
+            <li><a href="#">{t('footer.links.delivery')}</a></li>
+            <li><a href="#">{t('footer.links.payment')}</a></li>
+            <li><a href="#">{t('footer.links.warranty')}</a></li>
+            <li><a href="#">{t('footer.links.return')}</a></li>
           </ul>
         </div>
 
         <div style={{ flex: 1 }}>
-          <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '16px' }}>О компании</h4>
+          <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '16px' }}>{t('footer.sections.about')}</h4>
           <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <li><a href="#">О нас</a></li>
-            <li><a href="#">Контакты</a></li>
-            <li><a href="#">Вакансии</a></li>
-            <li><a href="#">Отзывы</a></li>
+            <li><a href="#">{t('footer.links.aboutUs')}</a></li>
+            <li><a href="#">{t('footer.links.contacts')}</a></li>
+            <li><a href="#">{t('footer.links.vacancies')}</a></li>
+            <li><a href="#">{t('footer.links.reviews')}</a></li>
           </ul>
         </div>
         
         <div style={{ flex: 1 }}>
-          <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '16px' }}>Категории</h4>
+          <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '16px' }}>{t('footer.sections.categories')}</h4>
           <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <li><a href="#" style={{ color: '#A6CE39' }}>Компьютеры</a></li>
-            <li><a href="#">Видеокарты</a></li>
-            <li><a href="#">Процессоры</a></li>
-            <li><a href="#">Ноутбуки</a></li>
+            <li><a href="#" style={{ color: '#A6CE39' }}>{t('footer.links.computers')}</a></li>
+            <li><a href="#">{t('footer.links.gpus')}</a></li>
+            <li><a href="#">{t('footer.links.cpus')}</a></li>
+            <li><a href="#">{t('footer.links.laptops')}</a></li>
           </ul>
         </div>
       </div>

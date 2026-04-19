@@ -1,4 +1,5 @@
 import { ShoppingCart, Heart, Scale } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ProductCardProps {
   image: string;
@@ -10,6 +11,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ image, title, code, oldPrice, price, status }: ProductCardProps) {
+  const { t } = useTranslation();
   return (
     <div style={{ 
       backgroundColor: 'var(--card-bg)', 
@@ -33,7 +35,7 @@ export default function ProductCard({ image, title, code, oldPrice, price, statu
       <div style={{ display: 'flex', justifyContent: 'center', height: '180px' }}>
         <img src={image} alt={title} style={{ objectFit: 'contain', height: '100%', maxWidth: '100%' }} />
       </div>
-      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Код товара: {code}</div>
+      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{t('common.productCode')}: {code}</div>
       <div style={{ fontSize: '14px', fontWeight: 500, lineHeight: '1.4', height: '40px', overflow: 'hidden' }}>{title}</div>
       
       <div style={{ fontWeight: 600, fontSize: '14px', color: status === 'В наличии' ? '#A6CE39' : '#888' }}>{status}</div>

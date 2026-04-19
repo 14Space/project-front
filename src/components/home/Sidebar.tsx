@@ -1,19 +1,21 @@
 import { Laptop, Cpu, Monitor, Keyboard, Mouse, Gamepad2, Smartphone, HardDrive, Speaker } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const categories = [
-  { icon: <Cpu size={20} />, name: 'Компьютеры' },
-  { icon: <Laptop size={20} />, name: 'Ноутбуки' },
-  { icon: <HardDrive size={20} />, name: 'Комплектующие' },
-  { icon: <Mouse size={20} />, name: 'Игровая периферия' },
-  { icon: <Monitor size={20} />, name: 'Мониторы' },
-  { icon: <Gamepad2 size={20} />, name: 'Товары для геймеров' },
-  { icon: <Speaker size={20} />, name: 'Аудио' },
-  { icon: <Keyboard size={20} />, name: 'Офисная периферия' },
-  { icon: <Smartphone size={20} />, name: 'Гаджеты' },
-  { icon: <Laptop size={20} />, name: 'Уценка' },
+  { icon: <Cpu size={20} />, key: 'sidebar.computers' },
+  { icon: <Laptop size={20} />, key: 'sidebar.laptops' },
+  { icon: <HardDrive size={20} />, key: 'sidebar.components' },
+  { icon: <Mouse size={20} />, key: 'sidebar.gaming' },
+  { icon: <Monitor size={20} />, key: 'sidebar.monitors' },
+  { icon: <Gamepad2 size={20} />, key: 'sidebar.gamerGoods' },
+  { icon: <Speaker size={20} />, key: 'sidebar.audio' },
+  { icon: <Keyboard size={20} />, key: 'sidebar.office' },
+  { icon: <Smartphone size={20} />, key: 'sidebar.gadgets' },
+  { icon: <Laptop size={20} />, key: 'sidebar.sale' },
 ];
 
 export default function Sidebar() {
+  const { t } = useTranslation();
   return (
     <aside style={{ 
       width: '280px', 
@@ -47,7 +49,7 @@ export default function Sidebar() {
           }}
           >
             <span style={{ color: '#999' }}>{cat.icon}</span>
-            {cat.name}
+            {t(cat.key)}
           </li>
         ))}
       </ul>

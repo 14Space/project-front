@@ -1,0 +1,89 @@
+{
+  "header": {
+    "catalog": "Catalog",
+    "search": "I want to find..."
+  },
+  "common": {
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "compare": "Compare",
+    "cart": "Cart",
+    "inStock": "In stock",
+    "preOrder": "Pre-order",
+    "used": "Used",
+    "buy": "Buy",
+    "productCode": "Product code"
+  },
+  "sidebar": {
+    "computers": "Computers",
+    "laptops": "Laptops",
+    "components": "Components",
+    "gaming": "Gaming Peripherals",
+    "monitors": "Monitors",
+    "gamerGoods": "Gamer Products",
+    "audio": "Audio",
+    "office": "Office Peripherals",
+    "gadgets": "Gadgets",
+    "sale": "Sale"
+  },
+  "home": {
+    "popularCategories": "Popular Categories",
+    "categories": {
+      "gpus": "Video Cards",
+      "cpus": "Processors",
+      "mobos": "Motherboards",
+      "ram": "RAM",
+      "ssd": "SSD",
+      "psu": "Power Supplies",
+      "cases": "Cases",
+      "cooling": "Cooling"
+    },
+    "promotions": "Hot Deals",
+    "advantages": {
+      "sectionTitle": "Why choose FRAME",
+      "reviews": "8000+ Reviews",
+      "reviewsDesc": "Real customer reviews",
+      "warranty": "Official Warranty",
+      "warrantyDesc": "From manufacturer",
+      "delivery": "Fast delivery",
+      "deliveryDesc": "All over Moldova",
+      "support": "24/7 Support",
+      "supportDesc": "Always in touch"
+    },
+    "blog": {
+      "title": "Blog & News",
+      "allPosts": "All articles →"
+    },
+    "seo": {
+      "title": "FRAME - from PC to Goal",
+      "p1": "We understand: computer equipment is more than just devices. It is a tool for achieving your goals.",
+      "p2": "Some are looking for maximum performance for esports victories, some for stability for business tasks, some for power for creativity and design, and some for the perfect streaming setup.",
+      "p3": "We help not just to choose 'hardware', but to assemble a solution for a specific task. Our team of computer enthusiasts and technology experts works on the Job to be done principle: first we find out what a PC or gadget is for, and then we offer the best solution for your scenario.",
+      "p4": "We are more than a hardware store. We are a partner on the way to your goal."
+    }
+  },
+  "footer": {
+    "newsletterTitle": "Subscribe to our newsletter and get special offers",
+    "newsletterPlaceholder": "Enter your e-mail",
+    "newsletterButton": "Subscribe",
+    "sections": {
+      "customers": "Customers",
+      "about": "Company",
+      "categories": "Categories"
+    },
+    "links": {
+      "delivery": "Delivery",
+      "payment": "Payment",
+      "warranty": "Warranty",
+      "return": "Return policy",
+      "aboutUs": "About Us",
+      "contacts": "Contacts",
+      "vacancies": "Vacancies",
+      "reviews": "Reviews",
+      "computers": "Computers",
+      "gpus": "Video Cards",
+      "cpus": "Processors",
+      "laptops": "Laptops"
+    }
+  }
+}

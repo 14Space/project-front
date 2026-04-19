@@ -1,19 +1,23 @@
+import { useTranslation } from 'react-i18next';
+
 export default function PopularCategories() {
+  const { t } = useTranslation();
+  
   const categories = [
-    { title: 'Видеокарты' },
-    { title: 'Процессоры' },
-    { title: 'Материнские платы' },
-    { title: 'Оперативная память' },
-    { title: 'SSD накопители' },
-    { title: 'Блоки питания' },
-    { title: 'Корпуса' },
-    { title: 'Охлаждение' }
+    { title: t('home.categories.gpus') },
+    { title: t('home.categories.cpus') },
+    { title: t('home.categories.mobos') },
+    { title: t('home.categories.ram') },
+    { title: t('home.categories.ssd') },
+    { title: t('home.categories.psu') },
+    { title: t('home.categories.cases') },
+    { title: t('home.categories.cooling') }
   ];
 
   return (
     <section className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container">
-        <h2 className="title">Популярные категории</h2>
+        <h2 className="title">{t('home.popularCategories')}</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
           {categories.map((cat, idx) => (
             <div key={idx} style={{ 
