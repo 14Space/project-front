@@ -17,26 +17,37 @@
   "sidebar": {
     "computers": "Computers",
     "laptops": "Laptops",
-    "components": "Components",
+    "components": "PC Components",
     "gaming": "Gaming Peripherals",
     "monitors": "Monitors",
-    "gamerGoods": "Gamer Products",
-    "audio": "Audio",
-    "office": "Office Peripherals",
-    "gadgets": "Gadgets",
-    "sale": "Sale"
+    "peripherals": "Peripherals",
+    "consoleGaming": "Console Gaming",
+    "networking": "Networking",
+    "furniture": "Furniture & Accessories",
+    "merch": "Merch & Gifts",
+    "services": "Services"
   },
   "home": {
+    "quickActions": {
+      "pcBuild": "PC Build",
+      "pcBuildDesc": "PC Configurator",
+      "orderStatus": "Order Status",
+      "orderStatusDesc": "Track your order",
+      "support": "Support",
+      "supportDesc": "We are here 24/7",
+      "warranty": "Warranty",
+      "warrantyDesc": "Up to 36 months!"
+    },
     "popularCategories": "Popular Categories",
     "categories": {
-      "gpus": "Video Cards",
-      "cpus": "Processors",
-      "mobos": "Motherboards",
-      "ram": "RAM",
-      "ssd": "SSD",
-      "psu": "Power Supplies",
-      "cases": "Cases",
-      "cooling": "Cooling"
+      "nvidia": "NVIDIA Video Cards",
+      "amd_gpu": "AMD Video Cards",
+      "intel_cpu": "Intel Processors",
+      "amd_cpu": "AMD Processors",
+      "intel_mobo": "Intel Motherboards",
+      "amd_mobo": "AMD Motherboards",
+      "ddr5": "DDR5 RAM",
+      "ddr4": "DDR4 RAM"
     },
     "promotions": "Hot Deals",
     "advantages": {

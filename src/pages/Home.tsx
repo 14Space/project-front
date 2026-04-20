@@ -12,8 +12,8 @@ export default function Home() {
       <Hero />
       <QuickActions />
       <PopularCategories />
-      <Advantages />
       <Promotions />
+      <Advantages />
       <Blog />
       <SeoText />
     </div>

@@ -17,26 +17,37 @@
   "sidebar": {
     "computers": "Компьютеры",
     "laptops": "Ноутбуки",
-    "components": "Комплектующие",
+    "components": "Комплектующие для ПК",
     "gaming": "Игровая периферия",
     "monitors": "Мониторы",
-    "gamerGoods": "Товары для геймеров",
-    "audio": "Аудио",
-    "office": "Офисная периферия",
-    "gadgets": "Гаджеты",
-    "sale": "Уценка"
+    "peripherals": "Периферия",
+    "consoleGaming": "Консольный гейминг",
+    "networking": "Сетевое оборудование",
+    "furniture": "Мебель и аксессуары",
+    "merch": "Мерч и подарки",
+    "services": "Услуги"
   },
   "home": {
+    "quickActions": {
+      "pcBuild": "Сборка ПК",
+      "pcBuildDesc": "Конфигуратор ПК",
+      "orderStatus": "Статус заказа",
+      "orderStatusDesc": "Отследить посылку",
+      "support": "Поддержка",
+      "supportDesc": "Мы тут 24/7",
+      "warranty": "Гарантия",
+      "warrantyDesc": "Аж до 36 месяцев!"
+    },
     "popularCategories": "Популярные категории",
     "categories": {
-      "gpus": "Видеокарты",
-      "cpus": "Процессоры",
-      "mobos": "Материнские платы",
-      "ram": "Оперативная память",
-      "ssd": "SSD накопители",
-      "psu": "Блоки питания",
-      "cases": "Корпуса",
-      "cooling": "Охлаждение"
+      "nvidia": "Видеокарты NVIDIA",
+      "amd_gpu": "Видеокарты AMD",
+      "intel_cpu": "Процессоры Intel",
+      "amd_cpu": "Процессоры AMD",
+      "intel_mobo": "Материнские платы для Intel",
+      "amd_mobo": "Материнские платы для AMD",
+      "ddr5": "Оперативная память DDR5",
+      "ddr4": "Оперативная память DDR4"
     },
     "promotions": "Горячие предложения",
     "advantages": {
@@ -63,9 +74,9 @@
     }
   },
   "footer": {
-    "newsletterTitle": "Подпишись на рассылку и получай спецпредложения",
-    "newsletterPlaceholder": "Введите свой e-mail",
-    "newsletterButton": "Подписаться на рассылку",
+    "newsletterTitle": "Подпишитесь на рассылку и получайте выгодные предложения",
+    "newsletterPlaceholder": "Введите ваш e-mail",
+    "newsletterButton": "Подписаться",
     "sections": {
       "customers": "Покупателям",
       "about": "О компании",
