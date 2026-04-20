@@ -1,6 +1,6 @@
 import Hero from '../components/home/Hero';
 import QuickActions from '../components/home/QuickActions';
-import PopularCategories from '../components/home/PopularCategories';
+// import PopularCategories from '../components/home/PopularCategories'; // Временно скрываем
 import Advantages from '../components/home/Advantages';
 import Promotions from '../components/home/Promotions';
 import Blog from '../components/home/Blog';
@@ -11,7 +11,7 @@ export default function Home() {
     <div className="home-page">
       <Hero />
       <QuickActions />
-      <PopularCategories />
+      {/* <PopularCategories /> */}
       <Promotions />
       <Advantages />
       <Blog />
