@@ -1,6 +1,6 @@
 import Hero from '../components/home/Hero';
 import QuickActions from '../components/home/QuickActions';
-// import PopularCategories from '../components/home/PopularCategories'; // Временно скрываем
+// import PopularCategories from '../components/home/PopularCategories';
 import Advantages from '../components/home/Advantages';
 import Promotions from '../components/home/Promotions';
 import Blog from '../components/home/Blog';
@@ -13,9 +13,10 @@ export default function Home() {
       <QuickActions />
       {/* <PopularCategories /> */}
       <Promotions />
-      <Advantages />
+      {/* Блог должен быть вторым после акций */}
       <Blog />
-      <SeoText />
+      <Advantages />
+      {/* <SeoText /> */}
     </div>
   );
 }

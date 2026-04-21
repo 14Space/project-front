@@ -1,4 +1,4 @@
-import { Wrench, PackageSearch, Headphones, ShieldCheck } from 'lucide-react';
+import { Wrench, PackageSearch, Repeat, Headphones } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function QuickActions() {
@@ -7,8 +7,8 @@ export default function QuickActions() {
   const actions = [
     { icon: <Wrench size={32} />, title: t('home.quickActions.pcBuild'), desc: t('home.quickActions.pcBuildDesc') },
     { icon: <PackageSearch size={32} />, title: t('home.quickActions.orderStatus'), desc: t('home.quickActions.orderStatusDesc') },
-    { icon: <Headphones size={32} />, title: t('home.quickActions.support'), desc: t('home.quickActions.supportDesc') },
-    { icon: <ShieldCheck size={32} />, title: t('home.quickActions.warranty'), desc: t('home.quickActions.warrantyDesc') }
+    { icon: <Repeat size={32} />, title: t('home.quickActions.tradeIn'), desc: t('home.quickActions.tradeInDesc') },
+    { icon: <Headphones size={32} />, title: t('home.quickActions.support'), desc: t('home.quickActions.supportDesc') }
   ];
 
   return (
