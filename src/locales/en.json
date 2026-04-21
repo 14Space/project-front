@@ -33,10 +33,10 @@
       "pcBuildDesc": "PC Configurator",
       "orderStatus": "Order Status",
       "orderStatusDesc": "Track your order",
+      "tradeIn": "Trade-In",
+      "tradeInDesc": "Trade in your old one - get a discount",
       "support": "Support",
-      "supportDesc": "We are here 24/7",
-      "warranty": "Warranty",
-      "warrantyDesc": "Up to 36 months!"
+      "supportDesc": "We are here 24/7"
     },
     "popularCategories": "Popular Categories",
     "categories": {
@@ -52,14 +52,16 @@
     "promotions": "Hot Deals",
     "advantages": {
       "sectionTitle": "Why choose FRAME",
-      "reviews": "8000+ Reviews",
+      "reviews": "800+ Reviews",
       "reviewsDesc": "Real customer reviews",
       "warranty": "Official Warranty",
       "warrantyDesc": "From manufacturer",
       "delivery": "Fast delivery",
       "deliveryDesc": "All over Moldova",
       "support": "24/7 Support",
-      "supportDesc": "Always in touch"
+      "supportDesc": "Always in touch",
+      "promotions": "Hot Deals",
+      "promotionsDesc": "Best prices in the market"
     },
     "blog": {
       "title": "Blog & News",
@@ -80,7 +82,8 @@
     "sections": {
       "customers": "Customers",
       "about": "Company",
-      "categories": "Categories"
+      "categories": "Categories",
+      "socialTitle": "Let's be friends"
     },
     "links": {
       "delivery": "Delivery",
@@ -95,6 +98,25 @@
       "gpus": "Video Cards",
       "cpus": "Processors",
       "laptops": "Laptops"
-    }
+    },
+    "contactDetails": {
+      "workTimeTitle": "Working hours",
+      "monFri": "Mon-Fri",
+      "satSun": "Sat-Sun",
+      "supportTitle": "Customer support",
+      "salesTitle": "Commercial questions",
+      "corpTitle": "Corporate sales",
+      "hrTitle": "Careers",
+      "showroomsTitle": "Our Showrooms in Moldova",
+      "showroomsList": {
+        "botanica": { "city": "Chisinau (Botanica)", "address": "21, Arborilor str.", "mall": "Shopping MallDova", "shop": "FRAME Showroom" },
+        "ciocana": { "city": "Chisinau (Ciocana)", "address": "42/6, Mihail Sadoveanu str.", "mall": "Port Mall", "shop": "FRAME Showroom" },
+        "riscani": { "city": "Chisinau (Riscani)", "address": "7/1, Studentilor str.", "mall": "FRAME Showroom", "shop": "FRAME Showroom" },
+        "balti": { "city": "Balti", "address": "1, Nicolae Iorga str.", "mall": "Evimall", "shop": "FRAME Showroom" }
+      },
+      "showroomPrefix": "Showroom in",
+      "allWeek": "Mon-Sun"
+    },
+    "copyright": "© FRAME since 2026. All rights reserved"
   }
 }

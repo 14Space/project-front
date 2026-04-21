@@ -7,10 +7,10 @@ interface ProductCardProps {
   code: string;
   oldPrice?: number;
   price: number;
-  status: string;
+  inStock?: boolean;
 }
 
-export default function ProductCard({ image, title, code, oldPrice, price, status }: ProductCardProps) {
+export default function ProductCard({ image, title, code, oldPrice, price, inStock = true }: ProductCardProps) {
   const { t } = useTranslation();
   return (
     <div style={{ 
@@ -38,7 +38,9 @@ export default function ProductCard({ image, title, code, oldPrice, price, statu
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{t('common.productCode')}: {code}</div>
       <div style={{ fontSize: '14px', fontWeight: 500, lineHeight: '1.4', height: '40px', overflow: 'hidden' }}>{title}</div>
       
-      <div style={{ fontWeight: 600, fontSize: '14px', color: status === 'В наличии' ? '#A6CE39' : '#888' }}>{status}</div>
+      <div style={{ fontWeight: 600, fontSize: '14px', color: inStock ? '#A6CE39' : '#888' }}>
+        {inStock ? t('common.inStock') : t('common.outOfStock')}
+      </div>
       
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>

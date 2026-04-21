@@ -1,4 +1,4 @@
-import { CheckCircle2, ShieldCheck, Truck, HeadphonesIcon } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, Truck, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Advantages() {
@@ -7,7 +7,7 @@ export default function Advantages() {
     { icon: <CheckCircle2 size={40} />, title: t('home.advantages.reviews'), desc: t('home.advantages.reviewsDesc') },
     { icon: <ShieldCheck size={40} />, title: t('home.advantages.warranty'), desc: t('home.advantages.warrantyDesc') },
     { icon: <Truck size={40} />, title: t('home.advantages.delivery'), desc: t('home.advantages.deliveryDesc') },
-    { icon: <HeadphonesIcon size={40} />, title: t('home.advantages.support'), desc: t('home.advantages.supportDesc') }
+    { icon: <Zap size={40} />, title: t('home.advantages.promotions'), desc: t('home.advantages.promotionsDesc') }
   ];
 
   return (

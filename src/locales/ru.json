@@ -33,10 +33,10 @@
       "pcBuildDesc": "Конфигуратор ПК",
       "orderStatus": "Статус заказа",
       "orderStatusDesc": "Отследить посылку",
+      "tradeIn": "Обмен и выкуп",
+      "tradeInDesc": "Сдай старое - получи скидку",
       "support": "Поддержка",
-      "supportDesc": "Мы тут 24/7",
-      "warranty": "Гарантия",
-      "warrantyDesc": "Аж до 36 месяцев!"
+      "supportDesc": "Мы тут 24/7"
     },
     "popularCategories": "Популярные категории",
     "categories": {
@@ -52,14 +52,16 @@
     "promotions": "Горячие предложения",
     "advantages": {
       "sectionTitle": "Почему выбирают FRAME",
-      "reviews": "8000+ Отзывов",
+      "reviews": "800+ Отзывов",
       "reviewsDesc": "Реальные отзывы покупателей",
       "warranty": "Официальная гарантия",
       "warrantyDesc": "От производителя",
       "delivery": "Быстрая доставка",
       "deliveryDesc": "По всей Молдове",
       "support": "Поддержка 24/7",
-      "supportDesc": "Всегда на связи"
+      "supportDesc": "Всегда на связи",
+      "promotions": "Акции и скидки",
+      "promotionsDesc": "Лучшие цены на рынке"
     },
     "blog": {
       "title": "Блог и новости",
@@ -74,13 +76,14 @@
     }
   },
   "footer": {
-    "newsletterTitle": "Подпишитесь на рассылку и получайте выгодные предложения",
+    "newsletterTitle": "Подпишись на рассылку и получай выгодные предложения",
     "newsletterPlaceholder": "Введите ваш e-mail",
     "newsletterButton": "Подписаться",
     "sections": {
       "customers": "Покупателям",
       "about": "О компании",
-      "categories": "Категории"
+      "categories": "Категории",
+      "socialTitle": "Давайте дружить"
     },
     "links": {
       "delivery": "Доставка",
@@ -95,6 +98,25 @@
       "gpus": "Видеокарты",
       "cpus": "Процессоры",
       "laptops": "Ноутбуки"
-    }
+    },
+    "contactDetails": {
+      "workTimeTitle": "Режим работы",
+      "monFri": "Пн-Пт",
+      "satSun": "Сб-Вс",
+      "supportTitle": "Поддержка клиентов",
+      "salesTitle": "Коммерческие вопросы",
+      "corpTitle": "Безналичный расчет",
+      "hrTitle": "Работа в компании",
+      "showroomsTitle": "Наши шоурумы в Молдове",
+      "showroomsList": {
+        "botanica": { "city": "Кишинев (Ботаника)", "address": "ул. Арборилор, 21", "mall": "ТЦ «Shopping MallDova»", "shop": "Шоурум FRAME" },
+        "ciocana": { "city": "Кишинев (Чеканы)", "address": "ул. Михаил Садовяну, 42/6", "mall": "ТЦ «Port Mall»", "shop": "Шоурум FRAME" },
+        "riscani": { "city": "Кишинев (Рышкановка)", "address": "ул. Студенцилор, 7/1", "mall": "Шоурум FRAME", "shop": "Шоурум FRAME" },
+        "balti": { "city": "Бельцы", "address": "ул. Николае Йорги, 1", "mall": "ТЦ «Evimall»", "shop": "Шоурум FRAME" }
+      },
+      "showroomPrefix": "Шоурум в",
+      "allWeek": "Пн-Вс"
+    },
+    "copyright": "© FRAME с 2026. Все права зарегестрированы"
   }
 }
