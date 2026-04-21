@@ -1,24 +1,23 @@
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
+import CatalogModal from '../components/catalog/CatalogModal'
 
 export default function MainLayout() {
+    const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+
     return (
         <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-color)' }}>
-            {/* 
-                Wrap Header and Main into a single container.
-                Sticky elements are limited to their parent's height.
-                When this container ends (at the footer), the header will scroll away.
-            */}
             <div className="content-wrapper" style={{ position: 'relative' }}>
                 <div style={{ 
                     position: 'sticky', 
                     top: 0, 
-                    zIndex: 50,
+                    zIndex: 100, // Higher z-index for header
                     backgroundColor: 'var(--header-bg)',
                     borderBottom: '1px solid var(--border-color)'
                 }}>
-                    <Header />
+                    <Header onCatalogClick={() => setIsCatalogOpen(true)} />
                 </div>
 
                 <main className="flex-1" style={{ position: 'relative' }}>
@@ -26,8 +25,12 @@ export default function MainLayout() {
                 </main>
             </div>
 
-            {/* Footer is outside the sticky container, so it will "push" the content-wrapper up */}
             <Footer />
+
+            <CatalogModal 
+                isOpen={isCatalogOpen} 
+                onClose={() => setIsCatalogOpen(false)} 
+            />
         </div>
     )
-}
+}
