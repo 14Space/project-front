@@ -247,8 +247,6 @@ export default function Footer() {
                   <span style={{ color: '#ccc', fontSize: '14px', fontWeight: 500 }}>{item.name}</span>
                 </div>
               ))}
-
-
             </div>
           </div>
 

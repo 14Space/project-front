@@ -8,7 +8,6 @@
     "favorites": "Favorites",
     "compare": "Compare",
     "cart": "Cart",
-    "back": "Back",
     "inStock": "In stock",
     "preOrder": "Pre-order",
     "used": "Used",
@@ -16,184 +15,17 @@
     "productCode": "Product code"
   },
   "sidebar": {
-    "computers": {
-      "title": "Computers",
-      "sub": [
-        {
-          "title": "Purpose",
-          "items": ["Gaming PCs", "Work & Study", "Workstations"]
-        },
-        {
-          "title": "Form-factor",
-          "items": ["Desktop PCs", "Monoblocks", "Mini PCs"]
-        },
-        {
-          "title": "By Brands",
-          "items": ["Apple", "MSI", "HP", "Lenovo", "Shop Builds"]
-        }
-      ]
-    },
-    "laptops": {
-      "title": "Laptops",
-      "sub": [
-        {
-          "title": "Purpose",
-          "items": ["For Gaming", "For Creators", "For Business", "For Home"]
-        },
-        {
-          "title": "Screen Diagonal",
-          "items": ["Up to 14\"", "15–16\"", "17\"+"]
-        },
-        {
-          "title": "By Brands",
-          "items": ["Apple", "MSI", "HP", "Lenovo", "Shop Builds"]
-        }
-      ]
-    },
-    "components": {
-      "title": "PC Components",
-      "sub": [
-        {
-          "title": "Main Components",
-          "items": ["Processors", "Motherboards", "Video Cards", "RAM"]
-        },
-        {
-          "title": "Data Storage",
-          "items": ["SSD Drives", "HDD Storage"]
-        },
-        {
-          "title": "Power & Cooling",
-          "items": ["Power Supplies", "CPU Coolers", "Liquid Cooling Systems", "Case Fans"]
-        },
-        {
-          "title": "Cases",
-          "items": ["Gaming Cases", "Office Cases", "Mini-ITX"]
-        }
-      ]
-    },
-    "monitors": {
-      "title": "Monitors",
-      "sub": [
-        {
-          "title": "Purpose",
-          "items": ["Gaming", "For Color Work", "For Office & Home"]
-        },
-        {
-          "title": "Diagonal",
-          "items": ["Up to 24 inches", "27 inches", "32 inches", "Ultrawide"]
-        },
-        {
-          "title": "Screen Features",
-          "items": ["4K Resolution", "Curved Screen", "OLED", "Mini-LED Panels"]
-        },
-        {
-          "title": "By Brands",
-          "items": ["Samsung", "LG", "AOC", "MSI", "Gigabyte"]
-        }
-      ]
-    },
-    "peripherals": {
-      "title": "Peripherals",
-      "sub": [
-        {
-          "title": "Input Devices",
-          "items": ["Keyboards", "Mice", "Mouse Pads"]
-        },
-        {
-          "title": "Audio",
-          "items": ["Headphones & Headsets", "Computer Speakers", "Streaming Microphones"]
-        },
-        {
-          "title": "Other",
-          "items": ["Webcams", "Graphics Tablets", "USB Hubs & Card Readers"]
-        }
-      ]
-    },
-    "consoleGaming": {
-      "title": "Console Gaming",
-      "sub": [
-        {
-          "title": "Platforms",
-          "items": ["PlayStation", "Xbox", "Nintendo", "Handheld Consoles"]
-        },
-        {
-          "title": "Games",
-          "items": ["PS Games", "Xbox Games", "Nintendo Games"]
-        },
-        {
-          "title": "Accessories",
-          "items": ["Gamepads & Joysticks", "Charging Stations", "Racing Wheels & Flight Simulators", "Console Headsets"]
-        }
-      ]
-    },
-    "networking": {
-      "title": "Networking",
-      "sub": [
-        {
-          "title": "For Home",
-          "items": ["Wi-Fi Routers", "Range Extenders", "Mesh Systems"]
-        },
-        {
-          "title": "Wired Network",
-          "items": ["Switches", "Network Cards", "Patch Cords & Cables"]
-        },
-        {
-          "title": "Smart Home & Security",
-          "items": ["IP Cameras", "Smart Plugs", "Network Storage"]
-        }
-      ]
-    },
-    "furniture": {
-      "title": "Furniture & Accessories",
-      "sub": [
-        {
-          "title": "Chairs",
-          "items": ["Gaming Chairs", "Ergonomic Office Chairs"]
-        },
-        {
-          "title": "Desks",
-          "items": ["Computer Desks", "Standing Desks", "Gaming Desks"]
-        },
-        {
-          "title": "Workspace Organization",
-          "items": ["Monitor Mounts", "Laptop Stands", "Cable Management", "Headphone Stands"]
-        }
-      ]
-    },
-    "merch": {
-      "title": "Merch & Gifts",
-      "sub": [
-        {
-          "title": "Apparel & Style",
-          "items": ["T-shirts", "Hoodies", "Backpacks", "Pins"]
-        },
-        {
-          "title": "Souvenirs",
-          "items": ["Figures", "Mugs", "Keychains"]
-        },
-        {
-          "title": "Gift Ideas",
-          "items": ["Gift Cards", "Board Games"]
-        }
-      ]
-    },
-    "services": {
-      "title": "Services",
-      "sub": [
-        {
-          "title": "Build & Upgrade",
-          "items": ["Custom PC Build", "Component Installation", "Professional Cable Management"]
-        },
-        {
-          "title": "Maintenance",
-          "items": ["Dust Cleaning", "Thermal Paste Replacement", "Diagnostics"]
-        },
-        {
-          "title": "Software",
-          "items": ["OS Installation", "Software Setup", "Virus Cleaning"]
-        }
-      ]
-    }
+    "computers": "Computers",
+    "laptops": "Laptops",
+    "components": "PC Components",
+    "gaming": "Gaming Peripherals",
+    "monitors": "Monitors",
+    "peripherals": "Peripherals",
+    "consoleGaming": "Console Gaming",
+    "networking": "Networking",
+    "furniture": "Furniture & Accessories",
+    "merch": "Merch & Gifts",
+    "services": "Services"
   },
   "home": {
     "quickActions": {
