@@ -1,18 +1,6 @@
-import { Laptop, Cpu, Monitor, Keyboard, Mouse, Gamepad2, Gift, HardDrive, Wifi, Armchair, Wrench } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const categories = [
-  { icon: <Cpu size={20} />, key: 'sidebar.computers' },
-  { icon: <Laptop size={20} />, key: 'sidebar.laptops' },
-  { icon: <HardDrive size={20} />, key: 'sidebar.components' },
-  { icon: <Monitor size={20} />, key: 'sidebar.monitors' },
-  { icon: <Mouse size={20} />, key: 'sidebar.peripherals' },
-  { icon: <Gamepad2 size={20} />, key: 'sidebar.consoleGaming' },
-  { icon: <Wifi size={20} />, key: 'sidebar.networking' },
-  { icon: <Armchair size={20} />, key: 'sidebar.furniture' },
-  { icon: <Gift size={20} />, key: 'sidebar.merch' },
-  { icon: <Wrench size={20} />, key: 'sidebar.services' },
-];
+import { CATEGORIES } from '../../constants/categories';
 
 interface SidebarProps {
   height?: string;
@@ -32,14 +20,14 @@ export default function Sidebar({ height }: SidebarProps) {
       flexDirection: 'column'
     }}>
       <ul style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}>
-        {categories.map((cat, idx) => (
+        {CATEGORIES.map((cat, idx) => (
           <li key={idx} style={{ 
             display: 'flex', 
             alignItems: 'center', 
             gap: '12px', 
             padding: '0 16px', 
             flex: 1,
-            borderBottom: idx !== categories.length - 1 ? '1px solid var(--border-color)' : 'none',
+            borderBottom: idx !== CATEGORIES.length - 1 ? '1px solid var(--border-color)' : 'none',
             cursor: 'pointer',
             transition: 'background-color 0.2s, color 0.2s',
             fontWeight: 500,

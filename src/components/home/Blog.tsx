@@ -14,7 +14,7 @@ export default function Blog() {
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
            <h2 className="title" style={{ margin: 0 }}>{t('home.blog.title')}</h2>
-           <button style={{ color: '#A6CE39', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>{t('home.blog.allPosts')}</button>
+            <button className="blog-all-link">{t('home.blog.allPosts')}</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           {posts.map((post, idx) => (

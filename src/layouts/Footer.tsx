@@ -221,16 +221,21 @@ export default function Footer() {
                 { name: 'Discord' },
                 { name: 'TikTok' }
               ].map((item) => (
-                <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-                  <div style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    borderRadius: '50%', 
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden'
-                  }}>
+                <div key={item.name} className="footer-social-link">
+                  <div 
+                    className="social-icon-wrapper"
+                    style={{ 
+                      width: '32px', 
+                      height: '32px', 
+                      borderRadius: '50%', 
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      border: '1px solid transparent',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
                     <img 
                       src={`/icons/icon-${item.name.toLowerCase()}.png`} 
                       alt={item.name}
@@ -244,7 +249,7 @@ export default function Footer() {
                       }}
                     />
                   </div>
-                  <span style={{ color: '#ccc', fontSize: '14px', fontWeight: 500 }}>{item.name}</span>
+                  <span style={{ color: '#ccc', fontSize: '14px', fontWeight: 500, transition: 'all 0.2s ease' }}>{item.name}</span>
                 </div>
               ))}
             </div>
