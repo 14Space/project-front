@@ -10,16 +10,22 @@ interface CatalogProps {
 
 export default function Catalog({ isOpen, onClose }: CatalogProps) {
   const { t } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState<string | null>(CATEGORIES[0].id);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [lockedCategory, setLockedCategory] = useState<string | null>(null);
 
-  // Lock body scroll when catalog is open - disabled to keep original header stickiness
+  // Reset when catalog is closed
   useEffect(() => {
-    // Scroll locking disabled to avoid breaking sticky header
+    if (!isOpen) {
+      setActiveCategory(null);
+      setLockedCategory(null);
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const currentCategoryData = activeCategory ? t(`catalog.${activeCategory}`, { returnObjects: true }) as any : null;
+  // Если мы ни на что не наводимся, показываем зафиксированную категорию
+  const displayCategory = activeCategory || lockedCategory;
+  const currentCategoryData = displayCategory ? t(`catalog.${displayCategory}`, { returnObjects: true }) as any : null;
 
   return (
     <div 
@@ -34,7 +40,7 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
         zIndex: 1000,
         display: 'flex',
         justifyContent: 'center',
-        paddingTop: '24px',
+        paddingTop: '20px',
         animation: 'fadeIn 0.2s ease-out'
       }}
       onClick={onClose}
@@ -46,7 +52,6 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
         `}
       </style>
       
-      {/* Ограничитель ширины (как .container) */}
       <div style={{ width: '100%', maxWidth: '1400px', padding: '0 20px', display: 'flex' }}>
         <div 
           className="catalog-content"
@@ -78,6 +83,8 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
               <div
                 key={cat.id}
                 onMouseEnter={() => setActiveCategory(cat.id)}
+                onMouseLeave={() => setActiveCategory(null)}
+                onClick={() => setLockedCategory(cat.id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -85,8 +92,8 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                   padding: '0 16px',
                   height: '44px',
                   cursor: 'pointer',
-                  backgroundColor: activeCategory === cat.id ? 'var(--bg-secondary)' : 'transparent',
-                  color: activeCategory === cat.id ? 'var(--primary-color)' : 'var(--text-color)',
+                  backgroundColor: displayCategory === cat.id ? 'var(--bg-secondary)' : 'transparent',
+                  color: displayCategory === cat.id ? 'var(--primary-color)' : 'var(--text-color)',
                   transition: 'all 0.1s ease',
                   fontWeight: 500,
                   fontSize: '14px',
@@ -94,20 +101,20 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ color: activeCategory === cat.id ? 'var(--primary-color)' : '#999' }}>
+                  <span style={{ color: displayCategory === cat.id ? 'var(--primary-color)' : '#999' }}>
                     {cat.icon}
                   </span>
                   {t(cat.key)}
                 </div>
-                <ChevronRight size={14} style={{ opacity: activeCategory === cat.id ? 1 : 0, transition: 'opacity 0.1s' }} />
+                <ChevronRight size={14} style={{ opacity: displayCategory === cat.id ? 1 : 0, transition: 'opacity 0.1s' }} />
               </div>
             ))}
           </div>
 
           {/* Правая часть: Подкатегории */}
-          <div style={{ flex: 1, padding: '30px 40px', overflowY: 'auto', backgroundColor: 'var(--bg-secondary)' }}>
+          <div style={{ flex: 1, padding: '20px 40px', overflowY: 'auto', backgroundColor: 'var(--bg-secondary)' }}>
             {currentCategoryData && typeof currentCategoryData !== 'string' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
                 {currentCategoryData.groups?.map((group: any, idx: number) => (
                   <div key={idx}>
                     <h3 style={{ 
@@ -148,11 +155,7 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                   </div>
                 ))}
               </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)' }}>
-                <div style={{ fontSize: '16px', fontWeight: 500 }}>{t('common.noData')}</div>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

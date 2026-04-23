@@ -119,6 +119,8 @@
       "allWeek": "Пн-Вс"
     },
     "copyright": "© FRAME с 2026. Все права зарегестрированы"
+<<<<<<< Updated upstream
+=======
   },
   "catalog": {
     "computers": {
@@ -165,5 +167,31 @@
         }
       ]
     }
+  },
+  "auth": {
+    "login": "Вход",
+    "registration": "Регистрация",
+    "emailPhone": "E-mail или Телефон",
+    "password": "Пароль",
+    "remember": "Запомнить пароль",
+    "forgot": "Забыл пароль?",
+    "submitLogin": "Войти",
+    "lastName": "Фамилия",
+    "firstName": "Имя",
+    "middleName": "Отчество",
+    "phone": "Телефон",
+    "email": "E-mail",
+    "confirmPassword": "Подтверждение пароля",
+    "interestsTitle": "Меня интересуют предложения для:",
+    "gaming": "Гейминг",
+    "streaming": "Стриминг",
+    "design": "Дизайн",
+    "programming": "Программирование",
+    "office": "Офис",
+    "learning": "Обучение",
+    "other": "Другое",
+    "subscribe": "Подписаться на акции и спец. предложения интернет-магазина",
+    "submitRegister": "Зарегистрироваться"
+>>>>>>> Stashed changes
   }
 }

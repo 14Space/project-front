@@ -3,11 +3,11 @@ import HeroSlider from './HeroSlider';
 
 const MAIN_HEIGHT = '440px';
 const SIDE_WIDTH = '280px';
-const GAP = '24px';
+const GAP = '20px';
 
 export default function Hero() {
   return (
-    <section className="section" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
+    <section className="section" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
       <div className="container" style={{ 
         display: 'flex', 
         gap: GAP, 

@@ -13,8 +13,8 @@ export default function Advantages() {
   return (
     <section className="section" style={{ backgroundColor: 'var(--bg-color)' }}>
       <div className="container">
-        <h2 className="title">{t('home.advantages.sectionTitle')}</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+        <h2 className="title" style={{ marginBottom: '20px' }}>{t('home.advantages.sectionTitle')}</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
           {advs.map((adv, idx) => (
             <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '32px 16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px' }}>
               <div style={{ color: '#A6CE39', marginBottom: '16px' }}>{adv.icon}</div>
