@@ -12,7 +12,8 @@
     "preOrder": "Под заказ",
     "used": "Б/У",
     "buy": "Купить",
-    "productCode": "Код товара"
+    "productCode": "Код товара",
+    "noData": "Данные отсутствуют"
   },
   "sidebar": {
     "computers": "Компьютеры",
@@ -65,7 +66,7 @@
     },
     "blog": {
       "title": "Блог и новости",
-      "allPosts": "Все статьи →"
+      "allPosts": "Все статьи ➔"
     },
     "seo": {
       "title": "FRAME - от ПК до цели",

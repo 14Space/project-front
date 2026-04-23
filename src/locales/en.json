@@ -12,7 +12,8 @@
     "preOrder": "Pre-order",
     "used": "Used",
     "buy": "Buy",
-    "productCode": "Product code"
+    "productCode": "Product code",
+    "noData": "No data available"
   },
   "sidebar": {
     "computers": "Computers",
@@ -65,7 +66,7 @@
     },
     "blog": {
       "title": "Blog & News",
-      "allPosts": "All articles →"
+      "allPosts": "All articles ➔"
     },
     "seo": {
       "title": "FRAME - from PC to Goal",

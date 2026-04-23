@@ -1,4 +1,3 @@
-import { Laptop, Cpu, Monitor, Keyboard, Mouse, Gamepad2, Gift, HardDrive, Wifi, Armchair, Wrench } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 <<<<<<< Updated upstream
 
@@ -53,7 +52,7 @@ export default function Sidebar({ height }: SidebarProps) {
             gap: '12px', 
             padding: '0 16px', 
             flex: 1,
-            borderBottom: idx !== categories.length - 1 ? '1px solid var(--border-color)' : 'none',
+            borderBottom: idx !== CATEGORIES.length - 1 ? '1px solid var(--border-color)' : 'none',
             cursor: 'pointer',
             transition: 'background-color 0.2s, color 0.2s',
             fontWeight: 500,
