@@ -119,8 +119,6 @@
       "allWeek": "Пн-Вс"
     },
     "copyright": "© FRAME с 2026. Все права зарегестрированы"
-<<<<<<< Updated upstream
-=======
   },
   "catalog": {
     "computers": {
@@ -192,6 +190,5 @@
     "other": "Другое",
     "subscribe": "Подписаться на акции и спец. предложения интернет-магазина",
     "submitRegister": "Зарегистрироваться"
->>>>>>> Stashed changes
   }
 }

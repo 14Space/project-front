@@ -119,8 +119,6 @@
       "allWeek": "Mon-Sun"
     },
     "copyright": "© FRAME since 2026. All rights reserved"
-<<<<<<< Updated upstream
-=======
   },
   "catalog": {
     "computers": {
@@ -192,6 +190,5 @@
     "other": "Other",
     "subscribe": "Subscribe to promotions and special offers of the online store",
     "submitRegister": "Register"
->>>>>>> Stashed changes
   }
 }

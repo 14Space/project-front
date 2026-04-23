@@ -27,11 +27,7 @@ export default function Blog() {
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
            <h2 className="title" style={{ margin: 0 }}>{t('home.blog.title')}</h2>
-<<<<<<< Updated upstream
-           <button style={{ color: '#A6CE39', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>{t('home.blog.allPosts')}</button>
-=======
             <Link to="/blog" className="blog-all-link">{t('home.blog.allPosts')}</Link>
->>>>>>> Stashed changes
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
           {posts.map((post, idx) => (

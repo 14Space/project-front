@@ -227,18 +227,6 @@ export default function Footer() {
                 { name: 'Discord', url: 'https://discord.com/users/1304478428015362123' },
                 { name: 'TikTok', url: 'https://www.tiktok.com/@dataexpl0rer?_r=1&_t=ZS-95mI3WIT4zw' }
               ].map((item) => (
-<<<<<<< Updated upstream
-                <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-                  <div style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    borderRadius: '50%', 
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden'
-                  }}>
-=======
                 <a 
                   key={item.name} 
                   href={item.url} 
@@ -261,7 +249,6 @@ export default function Footer() {
                       transition: 'all 0.2s ease'
                     }}
                   >
->>>>>>> Stashed changes
                     <img 
                       src={`/icons/icon-${item.name.toLowerCase()}.png`} 
                       alt={item.name}
@@ -275,13 +262,8 @@ export default function Footer() {
                       }}
                     />
                   </div>
-<<<<<<< Updated upstream
-                  <span style={{ color: '#ccc', fontSize: '14px', fontWeight: 500 }}>{item.name}</span>
-                </div>
-=======
                   <span style={{ color: '#ccc', fontSize: '14px', fontWeight: 500, transition: 'all 0.2s ease' }}>{item.name}</span>
                 </a>
->>>>>>> Stashed changes
               ))}
             </div>
           </div>
