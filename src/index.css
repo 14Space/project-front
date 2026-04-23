@@ -5,14 +5,14 @@
   --primary-color: #A6CE39;
   --primary-hover: #96bb33;
   --bg-color: #0c0d0d;
-  --bg-secondary: #1a1d1d;
+  --bg-secondary: #0c0d0d;
   --text-color: #ffffff;
   --text-secondary: #a0a0a0;
   --border-color: #2a2a2a;
-  --header-bg: #1a1d1d;
+  --header-bg: #0c0d0d;
   --footer-bg: #080909;
   --footer-text: #cccccc;
-  --card-bg: #1a1d1d;
+  --card-bg: #0c0d0d;
 }
 
 * {

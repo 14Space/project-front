@@ -118,5 +118,79 @@
       "allWeek": "Mon-Sun"
     },
     "copyright": "© FRAME since 2026. All rights reserved"
+<<<<<<< Updated upstream
+=======
+  },
+  "catalog": {
+    "computers": {
+      "title": "Computers",
+      "groups": [
+        {
+          "title": "By usage",
+          "items": ["Gaming PCs", "For work & study", "Workstations", "Streaming PCs"]
+        },
+        {
+          "title": "FRAME Series",
+          "items": ["FRAME Gaming One", "FRAME Work Pro", "FRAME Extreme"]
+        }
+      ]
+    },
+    "laptops": {
+      "title": "Laptops",
+      "groups": [
+        {
+          "title": "Popular",
+          "items": ["Gaming Laptops", "For study", "Ultrabooks", "MacBook"]
+        }
+      ]
+    },
+    "components": {
+      "title": "Components",
+      "groups": [
+        {
+          "title": "Core",
+          "items": ["Graphics Cards", "Processors", "Motherboards", "RAM", "Power Supplies"]
+        },
+        {
+          "title": "Case & Cooling",
+          "items": ["Cases", "CPU Coolers", "Liquid Cooling", "Case Fans"]
+        }
+      ]
+    },
+    "monitors": {
+      "title": "Monitors",
+      "groups": [
+        {
+          "title": "Gaming",
+          "items": ["144Hz & above", "2K/4K Monitors", "Curved Monitors"]
+        }
+      ]
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "registration": "Registration",
+    "emailPhone": "E-mail or Phone",
+    "password": "Password",
+    "remember": "Remember password",
+    "forgot": "Forgot password?",
+    "submitLogin": "Login",
+    "lastName": "Last Name",
+    "firstName": "First Name",
+    "middleName": "Middle Name",
+    "phone": "Phone",
+    "email": "E-mail",
+    "confirmPassword": "Confirm Password",
+    "interestsTitle": "I'm interested in offers for:",
+    "gaming": "Gaming",
+    "streaming": "Streaming",
+    "design": "Design",
+    "programming": "Programming",
+    "office": "Office",
+    "learning": "Learning",
+    "other": "Other",
+    "subscribe": "Subscribe to promotions and special offers of the online store",
+    "submitRegister": "Register"
+>>>>>>> Stashed changes
   }
 }
