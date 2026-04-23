@@ -165,5 +165,30 @@
         }
       ]
     }
+  },
+  "auth": {
+    "login": "Login",
+    "registration": "Registration",
+    "emailPhone": "E-mail or Phone",
+    "password": "Password",
+    "remember": "Remember password",
+    "forgot": "Forgot password?",
+    "submitLogin": "Login",
+    "lastName": "Last Name",
+    "firstName": "First Name",
+    "middleName": "Middle Name",
+    "phone": "Phone",
+    "email": "E-mail",
+    "confirmPassword": "Confirm Password",
+    "interestsTitle": "I'm interested in offers for:",
+    "gaming": "Gaming",
+    "streaming": "Streaming",
+    "design": "Design",
+    "programming": "Programming",
+    "office": "Office",
+    "learning": "Learning",
+    "other": "Other",
+    "subscribe": "Subscribe to promotions and special offers of the online store",
+    "submitRegister": "Register"
   }
 }

@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { User, Heart, Scale, ShoppingCart, Search, Menu, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router-dom';
 import Catalog from '../components/layout/Catalog';
+import AuthModal from '../components/layout/AuthModal';
 
 export default function Header() {
   const { t, i18n } = useTranslation();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleLanguage = () => {
-    const nextLang = i18n.language === 'ru' ? 'en' : 'ru';
+    const nextLang = i18n.language.startsWith('ru') ? 'en' : 'ru';
     i18n.changeLanguage(nextLang);
   };
+
   return (
     <>
       <header 
@@ -26,11 +31,11 @@ export default function Header() {
           top: 0,
           left: 0,
           width: '100%',
-          zIndex: isCatalogOpen ? 1100 : 'auto'
+          zIndex: isCatalogOpen ? 1100 : 1000
         }}
       >
         <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-          <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
             <img src="/branding/logo-FRAME.png" alt="FRAME" style={{ height: '52px' }} />
           </div>
 
@@ -72,23 +77,28 @@ export default function Header() {
               }}
             >
               <Globe size={18} />
-              {i18n.language.toUpperCase()}
+              {i18n.language.substring(0, 2).toUpperCase()}
             </button>
-            <button className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <Link to="/compare" className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <Scale size={24} />
-            </button>
-            <button className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            </Link>
+            <Link to="/favorites" className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <Heart size={24} />
-            </button>
-            <button className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            </Link>
+            <Link to="/cart" className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <ShoppingCart size={24} />
-            </button>
-            <button className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            </Link>
+            <button 
+              onClick={() => setIsAuthOpen(true)} 
+              className="header-action-btn" 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+            >
               <User size={24} />
             </button>
           </div>
         </div>
         <Catalog isOpen={isCatalogOpen} onClose={() => setIsCatalogOpen(false)} />
+        <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       </header>
       {/* Заглушка, чтобы контент не прыгал вверх при position: fixed */}
       {isCatalogOpen && <div style={{ height: '80px' }} />}

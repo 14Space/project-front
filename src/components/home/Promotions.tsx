@@ -13,8 +13,8 @@ export default function Promotions() {
   return (
     <section className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container">
-        <h2 className="title">{t('home.promotions')}</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        <h2 className="title" style={{ marginBottom: '20px' }}>{t('home.promotions')}</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
           {products.map((p, idx) => (
             <ProductCard key={idx} {...p} />
           ))}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Phone, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -192,36 +193,48 @@ export default function Footer() {
         </div>
 
         {/* 3. Bottom Level: Links Grid */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', paddingLeft: '5px', paddingRight: '5px' }}>
-          <div style={{ width: '180px', marginRight: '110px' }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'flex-start', 
+          paddingLeft: '5px', 
+          paddingRight: '80px' // Отступ от падинга футера XXX (справа)
+        }}>
+          <div style={{ flex: 1 }}>
             <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '15px', textTransform: 'uppercase' }}>{t('footer.sections.customers')}</h4>
             <ul style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.delivery')}</a></li>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.payment')}</a></li>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.warranty')}</a></li>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.return')}</a></li>
+              <li><Link to="/delivery" className="footer-nav-link">{t('footer.links.delivery')}</Link></li>
+              <li><Link to="/payment" className="footer-nav-link">{t('footer.links.payment')}</Link></li>
+              <li><Link to="/warranty" className="footer-nav-link">{t('footer.links.warranty')}</Link></li>
+              <li><Link to="/return" className="footer-nav-link">{t('footer.links.return')}</Link></li>
             </ul>
           </div>
 
-          <div style={{ width: '180px', marginRight: '110px' }}>
+          <div style={{ flex: 1 }}>
             <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '15px', textTransform: 'uppercase' }}>{t('footer.sections.about')}</h4>
             <ul style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.aboutUs')}</a></li>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.contacts')}</a></li>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.vacancies')}</a></li>
-              <li><a href="#" className="footer-nav-link">{t('footer.links.reviews')}</a></li>
+              <li><Link to="/about" className="footer-nav-link">{t('footer.links.aboutUs')}</Link></li>
+              <li><Link to="/contacts" className="footer-nav-link">{t('footer.links.contacts')}</Link></li>
+              <li><Link to="/vacancies" className="footer-nav-link">{t('footer.links.vacancies')}</Link></li>
+              <li><Link to="/reviews" className="footer-nav-link">{t('footer.links.reviews')}</Link></li>
             </ul>
           </div>
           
-          <div style={{ width: '180px' }}>
+          <div style={{ width: '180px', marginRight: '80px' }}> {/* Отступ между блоками Давайте дружить до фрейм будет XXX */}
             <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: '20px', fontSize: '15px', textTransform: 'uppercase' }}>{t('footer.sections.socialTitle')}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
-                { name: 'Telegram' },
-                { name: 'Discord' },
-                { name: 'TikTok' }
+                { name: 'Telegram', url: 'https://t.me/SX_Warrior' },
+                { name: 'Discord', url: 'https://discord.com/users/1304478428015362123' },
+                { name: 'TikTok', url: 'https://www.tiktok.com/@dataexpl0rer?_r=1&_t=ZS-95mI3WIT4zw' }
               ].map((item) => (
-                <div key={item.name} className="footer-social-link">
+                <a 
+                  key={item.name} 
+                  href={item.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="footer-social-link"
+                  style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}
+                >
                   <div 
                     className="social-icon-wrapper"
                     style={{ 
@@ -250,20 +263,20 @@ export default function Footer() {
                     />
                   </div>
                   <span style={{ color: '#ccc', fontSize: '14px', fontWeight: 500, transition: 'all 0.2s ease' }}>{item.name}</span>
-                </div>
+                </a>
               ))}
             </div>
           </div>
 
-          {/* Branding Zone: Logo fixed, only signature moves */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <img src="/branding/logo-full-FRAME.png" alt="FRAME" style={{ height: '120px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'fit-content' }}>
+            <img src="/branding/logo-full-FRAME.png" alt="FRAME" style={{ height: '110px', width: 'auto', objectFit: 'contain', opacity: 0.95 }} />
             <div style={{ 
-              color: '#666', 
+              color: 'var(--text-secondary)', 
               fontSize: '13px', 
               lineHeight: '1.6', 
               whiteSpace: 'nowrap',
-              marginTop: '24px' /* Perfectly aligned with TikTok text baseline */
+              marginTop: '16px',
+              fontWeight: 500
             }}>
               {t('footer.copyright')}
             </div>
