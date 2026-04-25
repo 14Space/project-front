@@ -1,5 +1,6 @@
 {
   "header": {
+    "home": "Home",
     "catalog": "Catalog",
     "search": "I want to find..."
   },
@@ -13,6 +14,7 @@
     "used": "Used",
     "buy": "Buy",
     "productCode": "Product code",
+    "specifications": "Specifications",
     "noData": "No data available"
   },
   "sidebar": {
@@ -65,8 +67,15 @@
       "promotionsDesc": "Best prices in the market"
     },
     "blog": {
-      "title": "Blog & News",
-      "allPosts": "All articles ➔"
+      "title": "Blog",
+      "allPosts": "All articles ➔",
+      "posts": {
+        "how-to-choose-gpu": { "title": "How to choose a graphics card", "date": "April 18, 2026" },
+        "how-to-choose-console": { "title": "How to choose a gaming console: types, features, and differences", "date": "April 10, 2026" },
+        "cross-play-multiplatform": { "title": "Cross-play and Multiplatform: What It Changes for PC Gamers", "date": "April 15, 2026" },
+        "gta-6-price": { "title": "GTA 6 Price: How Much the Game Could Cost at Launch", "date": "April 12, 2026" },
+        "ryzen-9000-review": { "title": "AMD Ryzen™ 9000 (Granite Ridge): The New Gaming King or AM5 Evolution?", "date": "April 2, 2026" }
+      }
     },
     "seo": {
       "title": "FRAME - from PC to Goal",

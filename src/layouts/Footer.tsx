@@ -50,7 +50,7 @@ export default function Footer() {
       <div style={{ backgroundColor: '#A6CE39', padding: '20px 0', color: '#fff' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 25px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-             <img src="/branding/logo-FRAME.png" alt="FRAME" style={{ height: '32px' }} />
+             <img src="/branding/BRANDING-logo-FRAME.png" alt="FRAME" style={{ height: '32px' }} />
              <div style={{ fontSize: '18px', fontWeight: 600 }}>{t('footer.newsletterTitle')}</div>
           </div>
           <div style={{ 
@@ -250,7 +250,7 @@ export default function Footer() {
                     }}
                   >
                     <img 
-                      src={`/icons/icon-${item.name.toLowerCase()}.png`} 
+                      src={`/icons/ICONS-${item.name.toLowerCase()}.png`} 
                       alt={item.name}
                       style={{ 
                         width: '100%', 
@@ -269,7 +269,7 @@ export default function Footer() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'fit-content' }}>
-            <img src="/branding/logo-full-FRAME.png" alt="FRAME" style={{ height: '110px', width: 'auto', objectFit: 'contain', opacity: 0.95 }} />
+            <img src="/branding/BRANDING-logo-full-FRAME.png" alt="FRAME" style={{ height: '110px', width: 'auto', objectFit: 'contain', opacity: 0.95 }} />
             <div style={{ 
               color: 'var(--text-secondary)', 
               fontSize: '13px', 

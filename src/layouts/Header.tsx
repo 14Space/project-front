@@ -27,7 +27,7 @@ export default function Header() {
           borderBottom: '1px solid var(--border-color)', 
           display: 'flex', 
           alignItems: 'center',
-          position: isCatalogOpen ? 'fixed' : 'relative',
+          position: isCatalogOpen ? 'fixed' : 'sticky',
           top: 0,
           left: 0,
           width: '100%',
@@ -36,7 +36,7 @@ export default function Header() {
       >
         <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
           <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
-            <img src="/branding/logo-FRAME.png" alt="FRAME" style={{ height: '52px' }} />
+            <img src="/branding/BRANDING-logo-FRAME.png" alt="FRAME" style={{ height: '52px' }} />
           </div>
 
           <button 
