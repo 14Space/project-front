@@ -1,56 +1,211 @@
-import { ShoppingCart, Heart, Scale } from 'lucide-react';
+import { useState } from 'react';
+import { ShoppingCart, Heart, Scale, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ProductCardProps {
-  image: string;
-  title: string;
+  id: string;
   code: string;
-  oldPrice?: number;
+  title: string;
   price: number;
-  inStock?: boolean;
+  oldPrice?: number;
+  inStock: boolean;
+  specs: string[];
+  images: string[];
 }
 
-export default function ProductCard({ image, title, code, oldPrice, price, inStock = true }: ProductCardProps) {
+export default function ProductCard({ code, title, price, oldPrice, inStock, specs, images }: ProductCardProps) {
   const { t } = useTranslation();
+  const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const discount = oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+
   return (
-    <div style={{ 
-      backgroundColor: 'var(--card-bg)', 
-      borderRadius: '8px', 
-      padding: '20px', 
-      border: '1px solid var(--border-color)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px',
-      position: 'relative',
-      transition: 'box-shadow 0.2s',
-      cursor: 'pointer'
-    }}
-    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'}
-    onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-    >
-      <div style={{ position: 'absolute', top: '16px', right: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <button style={{ color: '#999' }}><Scale size={20} /></button>
-        <button style={{ color: '#999' }}><Heart size={20} /></button>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center', height: '180px' }}>
-        <img src={image} alt={title} style={{ objectFit: 'contain', height: '100%', maxWidth: '100%' }} />
-      </div>
-      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{t('common.productCode')}: {code}</div>
-      <div style={{ fontSize: '14px', fontWeight: 500, lineHeight: '1.4', height: '40px', overflow: 'hidden' }}>{title}</div>
-      
-      <div style={{ fontWeight: 600, fontSize: '14px', color: inStock ? '#A6CE39' : '#888' }}>
-        {inStock ? t('common.inStock') : t('common.outOfStock')}
-      </div>
-      
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {oldPrice && <span style={{ textDecoration: 'line-through', color: 'var(--text-secondary)', fontSize: '14px' }}>{oldPrice} MDL</span>}
-          <span style={{ fontSize: '24px', fontWeight: 700 }}>{price} MDL</span>
+    <div style={{ position: 'relative', height: '445px' }}>
+      <div 
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: '#0c0d0d', 
+          borderRadius: '12px', 
+          padding: '10px 16px 16px', 
+          border: '1px solid var(--border-color)',
+          display: 'flex',
+          flexDirection: 'column',
+          cursor: 'pointer',
+          transition: 'box-shadow 0.3s ease',
+          zIndex: isHovered ? 10 : 1,
+          boxShadow: isHovered ? '0 20px 40px rgba(0,0,0,0.6)' : 'none'
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setCurrentImgIndex(0);
+        }}
+      >
+        {/* 1. Верхняя панель: Код слева, Действия справа */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: '15px', color: '#666' }}>
+            Код: <span style={{ fontWeight: 700, color: 'var(--text-color)' }}>{code}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="telemart-action-btn"><Scale size={25} /></button>
+            <button className="telemart-action-btn"><Heart size={25} /></button>
+          </div>
         </div>
-        <button style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: '#A6CE39', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-           <ShoppingCart size={24} />
-        </button>
+        
+        {/* 2. Зона изображения */}
+        <div style={{ 
+          height: '200px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'flex-end',
+          marginTop: '5px', 
+          position: 'relative'
+        }}>
+          <img 
+            src={`/products/${images[currentImgIndex]}`} 
+            alt={title} 
+            style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%', height: 'auto' }} 
+          />
+        </div>
+
+        {/* 3. Пагинация со стрелками */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '3px' }}>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentImgIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', color: '#ccc' }}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {images.map((_, idx) => (
+              <div 
+                key={idx}
+                style={{ 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  backgroundColor: currentImgIndex === idx ? '#A6CE39' : '#E0E0E0',
+                  transition: 'all 0.2s'
+                }}
+              />
+            ))}
+          </div>
+
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentImgIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', color: '#ccc' }}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        {/* 4. Заголовок */}
+        <div style={{ 
+          marginTop: '5px', 
+          fontSize: '17px', 
+          fontWeight: 700, 
+          lineHeight: '1.3', 
+          color: 'var(--text-color)', 
+          height: '45px', 
+          overflow: 'hidden',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical'
+        }}>
+          {title}
+        </div>
+
+        {/* 5. Статус наличия */}
+        <div style={{ fontSize: '15px', color: inStock ? '#A6CE39' : '#888', marginTop: '8px', fontWeight: 700 }}>
+          {inStock ? t('common.inStock') : t('common.outOfStock')}
+        </div>
+
+        {/* 6. Цена и Корзина */}
+        <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {oldPrice && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '14px' }}>
+                  {oldPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
+                </span>
+                <span style={{ backgroundColor: '#FF1717', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
+                  -{discount}%
+                </span>
+              </div>
+            )}
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#fff' }}>
+              {price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
+            </div>
+          </div>
+
+          <button className="telemart-cart-btn">
+            <ShoppingCart size={24} color="#fff" />
+          </button>
+        </div>
+
+        {/* 7. Характеристики — просто продолжение карточки */}
+        {isHovered && (
+          <div style={{
+            marginTop: '16px',
+            paddingTop: '12px',
+            borderTop: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}>
+            {specs.map((spec, i) => (
+              <div key={i} style={{ fontSize: '13px', color: 'var(--text-color)' }}>
+                {spec}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      <style>{`
+        .telemart-action-btn {
+          background: none;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .telemart-action-btn:hover {
+          color: #A6CE39;
+        }
+        .telemart-cart-btn {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background-color: #A6CE39;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 4px 12px rgba(166, 206, 57, 0.3);
+        }
+        .telemart-cart-btn:hover {
+          transform: scale(1.05);
+          background-color: #95ba33;
+        }
+      `}</style>
     </div>
   );
 }

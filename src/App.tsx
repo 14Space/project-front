@@ -18,6 +18,7 @@ import OrderStatus from './pages/OrderStatus.tsx'
 import TradeIn from './pages/TradeIn.tsx'
 import Support from './pages/Support.tsx'
 import Blog from './pages/Blog.tsx'
+import BlogPost from './pages/BlogPost.tsx'
 import Computers from './pages/Computers.tsx'
 import Laptops from './pages/Laptops.tsx'
 import GPUs from './pages/GPUs.tsx'
@@ -31,10 +32,21 @@ import Networking from './pages/Networking.tsx'
 import Furniture from './pages/Furniture.tsx'
 import Merch from './pages/Merch.tsx'
 import Services from './pages/Services.tsx'
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
@@ -55,6 +67,7 @@ export default function App() {
           <Route path="/trade-in" element={<TradeIn />} />
           <Route path="/support" element={<Support />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/computers" element={<Computers />} />
           <Route path="/laptops" element={<Laptops />} />
           <Route path="/gpus" element={<GPUs />} />
