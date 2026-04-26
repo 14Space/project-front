@@ -15,7 +15,7 @@
     "buy": "Купить",
     "productCode": "Код товара",
     "specifications": "Характеристики",
-    "noData": "Данные отсутствуют"
+    "noData": "Тут пока ничего нет ;)"
   },
   "sidebar": {
     "computers": "Компьютеры",
@@ -199,5 +199,43 @@
     "other": "Другое",
     "subscribe": "Подписаться на акции и спец. предложения интернет-магазина",
     "submitRegister": "Зарегистрироваться"
+  },
+  "products": {
+    "gpu": {
+      "title": "Видеокарта MSI GeForce RTX 5060 Ti 16G GAMING OC",
+      "specs": {
+        "memory": "Объём памяти: 16 ГБ",
+        "type": "Тип памяти: GDDR6",
+        "bus": "Шина памяти: 128 бит",
+        "freq": "Частота видеопамяти: 18000 МГц"
+      }
+    },
+    "cpu": {
+      "title": "Процессор AMD Ryzen 5 7500F",
+      "specs": {
+        "cores": "Ядер/Потоков: 6/12",
+        "freq": "Частота: 3.7 - 5.0 ГГц",
+        "cache": "Кэш L3: 32 МБ",
+        "tdp": "TDP: 65 Вт"
+      }
+    },
+    "mb": {
+      "title": "Материнская плата Asus TUF GAMING B550-PLUS",
+      "specs": {
+        "socket": "Сокет: AM4",
+        "chipset": "Чипсет: AMD B550",
+        "form": "Форм-фактор: ATX",
+        "memory": "Слоты памяти: 4 x DDR4"
+      }
+    },
+    "laptop": {
+      "title": "Ноутбук ASUS ROG Strix G16 G614JV",
+      "specs": {
+        "cpu": "Процессор: Intel Core i7-14650HX",
+        "gpu": "Видеокарта: RTX 5060 8ГБ",
+        "ram": "ОЗУ: 16 ГБ DDR5",
+        "ssd": "Накопитель: 1 ТБ SSD"
+      }
+    }
   }
 }

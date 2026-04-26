@@ -16,73 +16,73 @@ export const HOT_DEALS: Product[] = [
   { 
     id: '402123', 
     code: '402123',
-    title: 'Видеокарта Gigabyte GeForce RTX 4060 Ti WINDFORCE OC 8G', 
+    title: 'products.gpu.title', 
     price: 16999, 
     oldPrice: 18599, 
     inStock: true,
     category: 'gpu',
     specs: [
-      'Объём памяти: 8 ГБ',
-      'Тип памяти: GDDR6',
-      'Шина памяти: 128 бит',
-      'Частота видеопамяти: 18000 МГц'
+      'products.gpu.specs.memory',
+      'products.gpu.specs.type',
+      'products.gpu.specs.bus',
+      'products.gpu.specs.freq'
     ],
     images: ['402123-01.png', '402123-02.png', '402123-03.png'],
     rating: 4.8,
     reviewsCount: 12
   },
   { 
-    id: '392011', 
-    code: '392011',
-    title: 'Процессор AMD Ryzen 5 5600X 3.7(4.6)GHz', 
+    id: '392750', 
+    code: '392750',
+    title: 'products.cpu.title', 
     price: 6199, 
     oldPrice: 6999, 
     inStock: true,
     category: 'cpu',
     specs: [
-      'Ядер / Потоков: 6 / 12',
-      'Частота: 3.7 (4.6) ГГц',
-      'Кэш: 32 МБ L3',
-      'TDP: 65 Вт'
+      'products.cpu.specs.cores',
+      'products.cpu.specs.freq',
+      'products.cpu.specs.cache',
+      'products.cpu.specs.tdp'
     ],
-    images: ['392011-01.png'],
+    images: ['392750-01.png', '392750-02.png'],
     rating: 4.9,
     reviewsCount: 45
   },
   { 
     id: '310928', 
     code: '310928',
-    title: 'Материнская плата Asus TUF GAMING B550-PLUS', 
+    title: 'products.mb.title', 
     price: 5499, 
     oldPrice: 6299, 
     inStock: true,
     category: 'mb',
     specs: [
-      'Сокет: AM4',
-      'Чипсет: AMD B550',
-      'Форм-фактор: ATX',
-      'Слоты памяти: 4 x DDR4'
+      'products.mb.specs.socket',
+      'products.mb.specs.chipset',
+      'products.mb.specs.form',
+      'products.mb.specs.memory'
     ],
-    images: ['310928-01.png'],
+    images: ['310928-01.png', '310928-02.png', '310928-03.png'],
     rating: 4.7,
     reviewsCount: 8
   },
   { 
-    id: '445901', 
-    code: '445901',
-    title: 'Ноутбук Lenovo IdeaPad Gaming 3 15ACH6', 
-    price: 29999, 
-    oldPrice: 33999, 
+    id: '616016', 
+    code: '616016',
+    title: 'products.laptop.title', 
+    price: 38999, 
+    oldPrice: 42999, 
     inStock: true,
     category: 'laptop',
     specs: [
-      'Процессор: Ryzen 5 5600H',
-      'ОЗУ: 16 ГБ RAM',
-      'Накопитель: 512 ГБ SSD',
-      'Видеокарта: RTX 3050'
+      'products.laptop.specs.cpu',
+      'products.laptop.specs.gpu',
+      'products.laptop.specs.ram',
+      'products.laptop.specs.ssd'
     ],
-    images: ['445901-01.png'],
-    rating: 4.5,
-    reviewsCount: 21
+    images: ['616016-01.png'],
+    rating: 4.9,
+    reviewsCount: 15
   },
 ];
