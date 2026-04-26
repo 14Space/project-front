@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ShoppingCart, Heart, Scale, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAppContext } from '../../context/AppContext';
 
 interface ProductCardProps {
   id: string;
@@ -11,14 +12,18 @@ interface ProductCardProps {
   inStock: boolean;
   specs: string[];
   images: string[];
+  category: string;
 }
 
-export default function ProductCard({ code, title, price, oldPrice, inStock, specs, images }: ProductCardProps) {
+export default function ProductCard({ id, code, title, price, oldPrice, inStock, specs, images }: ProductCardProps) {
   const { t } = useTranslation();
+  const { toggleFavorite, toggleCompare, isInFavorites, isInCompare } = useAppContext();
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   const discount = oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+  const isFav = isInFavorites(id);
+  const isComp = isInCompare(id);
 
   return (
     <div style={{ position: 'relative', height: '445px' }}>
@@ -51,8 +56,20 @@ export default function ProductCard({ code, title, price, oldPrice, inStock, spe
             Код: <span style={{ fontWeight: 700, color: 'var(--text-color)' }}>{code}</span>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button className="telemart-action-btn"><Scale size={25} /></button>
-            <button className="telemart-action-btn"><Heart size={25} /></button>
+            <button 
+              className={`telemart-action-btn ${isComp ? 'active' : ''}`}
+              onClick={(e) => { e.stopPropagation(); toggleCompare(id); }}
+              style={{ color: isComp ? '#A6CE39' : '#fff' }}
+            >
+              <Scale size={25} />
+            </button>
+            <button 
+              className={`telemart-action-btn ${isFav ? 'active' : ''}`}
+              onClick={(e) => { e.stopPropagation(); toggleFavorite(id); }}
+              style={{ color: isFav ? '#FF1717' : '#fff' }}
+            >
+              <Heart size={25} />
+            </button>
           </div>
         </div>
         
@@ -124,7 +141,7 @@ export default function ProductCard({ code, title, price, oldPrice, inStock, spe
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical'
         }}>
-          {title}
+          {t(title)}
         </div>
 
         {/* 5. Статус наличия */}
@@ -167,7 +184,7 @@ export default function ProductCard({ code, title, price, oldPrice, inStock, spe
           }}>
             {specs.map((spec, i) => (
               <div key={i} style={{ fontSize: '13px', color: 'var(--text-color)' }}>
-                {spec}
+                {t(spec)}
               </div>
             ))}
           </div>

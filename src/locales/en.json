@@ -15,7 +15,7 @@
     "buy": "Buy",
     "productCode": "Product code",
     "specifications": "Specifications",
-    "noData": "No data available"
+    "noData": "Nothing here yet ;)"
   },
   "sidebar": {
     "computers": "Computers",
@@ -199,5 +199,43 @@
     "other": "Other",
     "subscribe": "Subscribe to promotions and special offers of the online store",
     "submitRegister": "Register"
+  },
+  "products": {
+    "gpu": {
+      "title": "MSI GeForce RTX 5060 Ti 16G GAMING OC Graphics Card",
+      "specs": {
+        "memory": "Memory Volume: 16 GB",
+        "type": "Memory Type: GDDR6",
+        "bus": "Memory Bus: 128 bit",
+        "freq": "Memory Frequency: 18000 MHz"
+      }
+    },
+    "cpu": {
+      "title": "AMD Ryzen 5 7500F Processor",
+      "specs": {
+        "cores": "Cores/Threads: 6/12",
+        "freq": "Frequency: 3.7 - 5.0 GHz",
+        "cache": "L3 Cache: 32 MB",
+        "tdp": "TDP: 65 W"
+      }
+    },
+    "mb": {
+      "title": "Asus TUF GAMING B550-PLUS Motherboard",
+      "specs": {
+        "socket": "Socket: AM4",
+        "chipset": "Chipset: AMD B550",
+        "form": "Form Factor: ATX",
+        "memory": "Memory Slots: 4 x DDR4"
+      }
+    },
+    "laptop": {
+      "title": "ASUS ROG Strix G16 G614JV Laptop",
+      "specs": {
+        "cpu": "Processor: Intel Core i7-14650HX",
+        "gpu": "Graphics: RTX 5060 8GB",
+        "ram": "RAM: 16 GB DDR5",
+        "ssd": "Storage: 1 TB SSD"
+      }
+    }
   }
 }
