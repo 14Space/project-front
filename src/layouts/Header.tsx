@@ -9,7 +9,7 @@ import { HOT_DEALS } from '../constants/products';
 
 export default function Header() {
   const { t, i18n } = useTranslation();
-  const { favorites, compareList } = useAppContext();
+  const { favorites, compareList, user } = useAppContext();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
@@ -114,7 +114,7 @@ export default function Header() {
                 )}
               </button>
 
-              {isCompareOpen && compareList.length > 0 && (
+              {isCompareOpen && (
                 <div style={{ 
                   position: 'absolute', 
                   top: '100%', 
@@ -136,30 +136,36 @@ export default function Header() {
                     <button onClick={() => setIsCompareOpen(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>✕</button>
                   </div>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {compareEntries.map(([category, count], index) => (
-                      <Link 
-                        key={category} 
-                        to="/compare" 
-                        className="compare-dropdown-link"
-                        onClick={() => setIsCompareOpen(false)}
-                        style={{ 
-                          color: '#fff', 
-                          textDecoration: 'none', 
-                          fontSize: '14px', 
-                          display: 'flex', 
-                          justifyContent: 'space-between',
-                          padding: '10px 0',
-                          paddingBottom: index === compareEntries.length - 1 ? '0' : '10px',
-                          borderBottom: index === compareEntries.length - 1 ? 'none' : '1px solid #2a2b2c',
-                          transition: 'color 0.2s ease'
-                        }}
-                      >
-                        <span>{category}</span>
-                        <span style={{ color: '#888' }}>({count})</span>
-                      </Link>
-                    ))}
-                  </div>
+                  {compareList.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {compareEntries.map(([category, count], index) => (
+                        <Link 
+                          key={category} 
+                          to="/compare" 
+                          className="compare-dropdown-link"
+                          onClick={() => setIsCompareOpen(false)}
+                          style={{ 
+                            color: '#fff', 
+                            textDecoration: 'none', 
+                            fontSize: '14px', 
+                            display: 'flex', 
+                            justifyContent: 'space-between',
+                            padding: '10px 0',
+                            paddingBottom: index === compareEntries.length - 1 ? '0' : '10px',
+                            borderBottom: index === compareEntries.length - 1 ? 'none' : '1px solid #2a2b2c',
+                            transition: 'color 0.2s ease'
+                          }}
+                        >
+                          <span>{category}</span>
+                          <span style={{ color: '#888' }}>({count})</span>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '10px 0 0 0', color: '#888', fontSize: '14px' }}>
+                      {i18n.language.startsWith('ru') ? 'Тут пока ничего нет ;)' : 'Nothing here yet ;)'}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -177,9 +183,18 @@ export default function Header() {
               <ShoppingCart size={24} />
             </Link>
             <button 
-              onClick={() => setIsAuthOpen(true)} 
-              className="header-action-btn" 
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+              onClick={() => user ? navigate('/profile') : setIsAuthOpen(true)} 
+              className="header-action-btn header-user-btn" 
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                gap: '4px', 
+                background: 'none', 
+                border: 'none', 
+                cursor: 'pointer', 
+                color: 'inherit' 
+              }}
             >
               <User size={24} />
             </button>
@@ -195,6 +210,9 @@ export default function Header() {
           color: #A6CE39 !important;
         }
         .compare-dropdown-link:hover span:last-child {
+          color: #A6CE39 !important;
+        }
+        .header-user-btn:hover {
           color: #A6CE39 !important;
         }
       `}</style>
