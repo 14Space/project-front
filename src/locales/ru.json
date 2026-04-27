@@ -15,7 +15,10 @@
     "buy": "Купить",
     "productCode": "Код товара",
     "specifications": "Характеристики",
-    "noData": "Тут пока ничего нет ;)"
+    "noData": "Тут пока ничего нет ;)",
+    "edit": "Редактировать",
+    "save": "Сохранить",
+    "cancel": "Отмена"
   },
   "sidebar": {
     "computers": "Компьютеры",
@@ -175,6 +178,15 @@
       ]
     }
   },
+  "profile": {
+    "personalData": "Личные данные",
+    "orders": "История заказов",
+    "settings": "Настройки",
+    "logout": "Выйти из аккаунта",
+    "recentOrders": "Последние заказы",
+    "addPhone": "Добавить номер телефона",
+    "addAddress": "Добавить адрес"
+  },
   "auth": {
     "login": "Вход",
     "registration": "Регистрация",
@@ -188,6 +200,9 @@
     "middleName": "Отчество",
     "phone": "Телефон",
     "email": "E-mail",
+    "city": "Город",
+    "street": "Улица",
+    "address": "Адрес",
     "confirmPassword": "Подтверждение пароля",
     "interestsTitle": "Меня интересуют предложения для:",
     "gaming": "Гейминг",

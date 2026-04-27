@@ -15,7 +15,10 @@
     "buy": "Buy",
     "productCode": "Product code",
     "specifications": "Specifications",
-    "noData": "Nothing here yet ;)"
+    "noData": "Nothing here yet ;)",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "sidebar": {
     "computers": "Computers",
@@ -175,6 +178,15 @@
       ]
     }
   },
+  "profile": {
+    "personalData": "Personal Data",
+    "orders": "Order History",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "recentOrders": "Recent Orders",
+    "addPhone": "Add phone number",
+    "addAddress": "Add address"
+  },
   "auth": {
     "login": "Login",
     "registration": "Registration",
@@ -188,6 +200,9 @@
     "middleName": "Middle Name",
     "phone": "Phone",
     "email": "E-mail",
+    "city": "City",
+    "street": "Street",
+    "address": "Address",
     "confirmPassword": "Confirm Password",
     "interestsTitle": "I'm interested in offers for:",
     "gaming": "Gaming",

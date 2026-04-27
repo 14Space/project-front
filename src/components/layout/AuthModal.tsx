@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Check } from 'lucide-react';
+import { useAppContext, MOCK_USER } from '../../context/AppContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -10,13 +11,12 @@ interface AuthModalProps {
 interface AuthInputProps {
   label: string;
   type?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-const AuthInput = ({ label, type = 'text' }: AuthInputProps) => {
+const AuthInput = ({ label, type = 'text', value, onChange }: AuthInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [hasValue, setHasValue] = useState(false);
 
   return (
     <div style={{ position: 'relative', marginBottom: '20px' }}>
@@ -24,11 +24,11 @@ const AuthInput = ({ label, type = 'text' }: AuthInputProps) => {
         style={{
           position: 'absolute',
           left: '12px',
-          top: '-10px',
+          top: isFocused || value ? '-10px' : '12px',
           backgroundColor: '#fff',
           padding: '0 4px',
-          fontSize: '13px',
-          color: '#666',
+          fontSize: isFocused || value ? '13px' : '15px',
+          color: isFocused ? '#A6CE39' : '#666',
           zIndex: 1,
           transition: 'all 0.2s ease',
           pointerEvents: 'none',
@@ -39,12 +39,10 @@ const AuthInput = ({ label, type = 'text' }: AuthInputProps) => {
       </label>
       <input 
         type={type}
+        value={value}
         onFocus={() => setIsFocused(true)}
-        onBlur={(e) => {
-          setIsFocused(false);
-          setHasValue(e.target.value !== '');
-        }}
-        onChange={(e) => setHasValue(e.target.value !== '')}
+        onBlur={() => setIsFocused(false)}
+        onChange={(e) => onChange(e.target.value)}
         style={{
           width: '100%',
           padding: '12px 16px',
@@ -63,8 +61,29 @@ const AuthInput = ({ label, type = 'text' }: AuthInputProps) => {
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const { t } = useTranslation();
+  const { login } = useAppContext();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [rememberMe, setRememberMe] = useState(true);
+  
+  // Form states
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Always log in as the same mock user
+    login(MOCK_USER);
+    onClose();
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Always log in as the same mock user
+    login(MOCK_USER);
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -162,9 +181,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
 
         {activeTab === 'login' ? (
-          <form style={{ display: 'flex', flexDirection: 'column' }}>
-            <AuthInput label={t('auth.emailPhone')} />
-            <AuthInput label={t('auth.password')} type="password" />
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column' }}>
+            <AuthInput label={t('auth.emailPhone')} value={email} onChange={setEmail} />
+            <AuthInput label={t('auth.password')} type="password" value={password} onChange={setPassword} />
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', marginBottom: '32px' }}>
               <label 
@@ -206,14 +225,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </button>
           </form>
         ) : (
-          <form style={{ display: 'flex', flexDirection: 'column' }}>
-            {['firstName', 'lastName', 'email', 'password', 'confirmPassword'].map((field) => (
-              <AuthInput 
-                key={field} 
-                label={t(`auth.${field}`)} 
-                type={field.includes('password') ? 'password' : 'text'} 
-              />
-            ))}
+          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column' }}>
+            <AuthInput label={t('auth.firstName')} value={firstName} onChange={setFirstName} />
+            <AuthInput label={t('auth.lastName')} value={lastName} onChange={setLastName} />
+            <AuthInput label={t('auth.email')} value={email} onChange={setEmail} />
+            <AuthInput label={t('auth.password')} type="password" value={password} onChange={setPassword} />
+            <AuthInput label={t('auth.confirmPassword')} type="password" value={password} onChange={setPassword} />
 
             <button 
               type="submit"
