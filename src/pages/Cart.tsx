@@ -7,7 +7,7 @@ import { HOT_DEALS } from '../constants/products';
 
 export default function Cart() {
   const { t, i18n } = useTranslation();
-  
+
   const { cart, clearCart, updateCartQuantity, user } = useAppContext();
   const cartProducts = HOT_DEALS.filter(product => !!cart[product.id]);
   const navigate = useNavigate();
@@ -22,8 +22,8 @@ export default function Cart() {
     }
 
     if (!user.phone || !user.city || !user.street) {
-      alert(i18n.language.startsWith('ru') 
-        ? 'Пожалуйста, укажите ваш номер телефона и полный адрес (город, улица) в личном кабинете перед оформлением заказа.' 
+      alert(i18n.language.startsWith('ru')
+        ? 'Пожалуйста, укажите ваш номер телефона и полный адрес (город, улица) в личном кабинете перед оформлением заказа.'
         : 'Please fill in your phone number and full address (city, street) in your profile before placing an order.');
       navigate('/profile');
       return;
@@ -43,15 +43,15 @@ export default function Cart() {
               {t('common.cart')}
             </h1>
           </div>
-          
+
           {cartProducts.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', alignItems: 'flex-start' }}>
               {/* Левая часть: Товары */}
-              <div style={{ 
+              <div style={{
                 gridColumn: 'span 3',
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(3, 1fr)', 
-                gap: '20px' 
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '20px'
               }}>
                 {cartProducts.map(product => (
                   <ProductCard key={product.id} {...product} isCartView={true} />
@@ -59,10 +59,10 @@ export default function Cart() {
               </div>
 
               {/* Правая часть: Оформление */}
-              <div style={{ 
+              <div style={{
                 gridColumn: 'span 1',
-                backgroundColor: 'var(--card-bg)', 
-                borderRadius: '12px', 
+                backgroundColor: 'var(--card-bg)',
+                borderRadius: '12px',
                 padding: '24px',
                 border: '1px solid var(--border-color)',
                 position: 'sticky',
@@ -83,13 +83,13 @@ export default function Cart() {
                           {(product.price * cart[product.id]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <button 
+                          <button
                             onClick={() => updateCartQuantity(product.id, cart[product.id] - 1)}
                             style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: '#1a1b1c', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', opacity: cart[product.id] <= 1 ? 0.3 : 1 }}
                             disabled={cart[product.id] <= 1}
                           >-</button>
                           <span style={{ color: '#A6CE39', fontWeight: 700, width: '16px', textAlign: 'center', fontSize: '14px' }}>{cart[product.id]}</span>
-                          <button 
+                          <button
                             onClick={() => updateCartQuantity(product.id, cart[product.id] + 1)}
                             style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: '#1a1b1c', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}
                           >+</button>
@@ -100,12 +100,12 @@ export default function Cart() {
                 </div>
 
                 <div style={{ borderTop: '1px solid var(--border-color)', margin: '0 -24px 20px -24px' }}></div>
-                
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#ccc', marginBottom: '12px', fontSize: '15px' }}>
                   <span>{i18n.language.startsWith('ru') ? 'Товары' : 'Items'} ({totalItems}):</span>
                   <span>{totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL</span>
                 </div>
-                
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#ccc', marginBottom: '20px', fontSize: '15px' }}>
                   <span>{i18n.language.startsWith('ru') ? 'Доставка' : 'Delivery'}:</span>
                   <span style={{ color: '#A6CE39' }}>{i18n.language.startsWith('ru') ? 'Бесплатно' : 'Free'}</span>
@@ -122,7 +122,7 @@ export default function Cart() {
                   </span>
                 </div>
 
-                <button 
+                <button
                   onClick={handleCheckout}
                   style={{
                     width: '100%',
