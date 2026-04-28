@@ -1,1 +1,164 @@
-export default function Cart() { return <div className="container" style={{ padding: "40px 0", minHeight: "60vh" }}><h1>Cart Page</h1><p>Content coming soon...</p></div>; }
+import { useAppContext } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
+import { ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import ProductCard from '../components/home/ProductCard';
+import { HOT_DEALS } from '../constants/products';
+
+export default function Cart() {
+  const { t, i18n } = useTranslation();
+  
+  const { cart, clearCart, updateCartQuantity, user } = useAppContext();
+  const cartProducts = HOT_DEALS.filter(product => !!cart[product.id]);
+  const navigate = useNavigate();
+
+  const totalPrice = cartProducts.reduce((sum, product) => sum + (product.price * cart[product.id]), 0);
+  const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+
+  const handleCheckout = () => {
+    if (!user) {
+      alert(i18n.language.startsWith('ru') ? 'Для оформления заказа необходимо войти в аккаунт.' : 'You must log in to place an order.');
+      return;
+    }
+
+    if (!user.phone || !user.city || !user.street) {
+      alert(i18n.language.startsWith('ru') 
+        ? 'Пожалуйста, укажите ваш номер телефона и полный адрес (город, улица) в личном кабинете перед оформлением заказа.' 
+        : 'Please fill in your phone number and full address (city, street) in your profile before placing an order.');
+      navigate('/profile');
+      return;
+    }
+
+    alert(i18n.language.startsWith('ru') ? 'Заказ успешно оформлен! Спасибо за покупку.' : 'Order successfully placed! Thank you for your purchase.');
+    clearCart();
+  };
+
+  return (
+    <div style={{ backgroundColor: 'var(--bg-secondary)', minHeight: '80vh' }}>
+      <section className="section" style={{ padding: '20px 0 40px 0' }}>
+        <div className="container">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <ShoppingCart size={28} color="#A6CE39" />
+            <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 700, margin: 0 }}>
+              {t('common.cart')}
+            </h1>
+          </div>
+          
+          {cartProducts.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', alignItems: 'flex-start' }}>
+              {/* Левая часть: Товары */}
+              <div style={{ 
+                gridColumn: 'span 3',
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(3, 1fr)', 
+                gap: '20px' 
+              }}>
+                {cartProducts.map(product => (
+                  <ProductCard key={product.id} {...product} isCartView={true} />
+                ))}
+              </div>
+
+              {/* Правая часть: Оформление */}
+              <div style={{ 
+                gridColumn: 'span 1',
+                backgroundColor: 'var(--card-bg)', 
+                borderRadius: '12px', 
+                padding: '24px',
+                border: '1px solid var(--border-color)',
+                position: 'sticky',
+                top: '100px'
+              }}>
+                <h2 style={{ color: '#fff', fontSize: '20px', fontWeight: 700, marginBottom: '20px' }}>
+                  {i18n.language.startsWith('ru') ? 'Ваш заказ' : 'Your Order'}
+                </h2>
+
+                <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {cartProducts.map(product => (
+                    <div key={product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '13px' }}>
+                      <div style={{ color: '#ccc', paddingRight: '12px', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.4' }}>
+                        {t(product.title)}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
+                        <div style={{ color: '#fff', fontWeight: 700, fontSize: '13px' }}>
+                          {(product.price * cart[product.id]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <button 
+                            onClick={() => updateCartQuantity(product.id, cart[product.id] - 1)}
+                            style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: '#1a1b1c', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', opacity: cart[product.id] <= 1 ? 0.3 : 1 }}
+                            disabled={cart[product.id] <= 1}
+                          >-</button>
+                          <span style={{ color: '#A6CE39', fontWeight: 700, width: '16px', textAlign: 'center', fontSize: '14px' }}>{cart[product.id]}</span>
+                          <button 
+                            onClick={() => updateCartQuantity(product.id, cart[product.id] + 1)}
+                            style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: '#1a1b1c', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}
+                          >+</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--border-color)', margin: '0 -24px 20px -24px' }}></div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#ccc', marginBottom: '12px', fontSize: '15px' }}>
+                  <span>{i18n.language.startsWith('ru') ? 'Товары' : 'Items'} ({totalItems}):</span>
+                  <span>{totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL</span>
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#ccc', marginBottom: '20px', fontSize: '15px' }}>
+                  <span>{i18n.language.startsWith('ru') ? 'Доставка' : 'Delivery'}:</span>
+                  <span style={{ color: '#A6CE39' }}>{i18n.language.startsWith('ru') ? 'Бесплатно' : 'Free'}</span>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--border-color)', margin: '0 -24px 20px -24px' }}></div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <span style={{ color: '#fff', fontSize: '18px', fontWeight: 600 }}>
+                    {i18n.language.startsWith('ru') ? 'Итого' : 'Total'}:
+                  </span>
+                  <span style={{ color: '#fff', fontSize: '24px', fontWeight: 700 }}>
+                    {totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
+                  </span>
+                </div>
+
+                <button 
+                  onClick={handleCheckout}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    backgroundColor: '#A6CE39',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 4px 12px rgba(166, 206, 57, 0.2)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#95ba33';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#A6CE39';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {i18n.language.startsWith('ru') ? 'Оформить заказ' : 'Checkout'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '100px 0', color: '#888' }}>
+              <p style={{ fontSize: '18px' }}>
+                {i18n.language.startsWith('ru') ? 'Ваша корзина пуста ;)' : 'Your cart is empty ;)'}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}

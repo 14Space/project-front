@@ -21,7 +21,7 @@ export default function MainLayout() {
                     <Header />
                 </div>
 
-                <main className="flex-1" style={{ position: 'relative' }}>
+                <main style={{ position: 'relative' }}>
                     <Outlet />
                 </main>
             </div>

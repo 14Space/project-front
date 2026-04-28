@@ -10,7 +10,7 @@ export default function QuickActions() {
     { icon: <Wrench size={32} />, title: t('home.quickActions.pcBuild'), desc: t('home.quickActions.pcBuildDesc'), path: '/pc-build' },
     { icon: <PackageSearch size={32} />, title: t('home.quickActions.orderStatus'), desc: t('home.quickActions.orderStatusDesc'), path: '/order-status' },
     { icon: <Repeat size={32} />, title: t('home.quickActions.tradeIn'), desc: t('home.quickActions.tradeInDesc'), path: '/trade-in' },
-    { icon: <Headphones size={32} />, title: t('home.quickActions.support'), desc: t('home.quickActions.supportDesc'), path: '/support' }
+    { icon: <Headphones size={32} />, title: t('home.quickActions.support'), desc: t('home.quickActions.supportDesc'), path: 'https://t.me/SX_Warrior' }
   ];
 
   return (
@@ -18,7 +18,13 @@ export default function QuickActions() {
       <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', padding: '20px 20px' }}>
         {actions.map((action, idx) => (
           <div key={idx} 
-            onClick={() => navigate(action.path)}
+            onClick={() => {
+              if (action.path.startsWith('http')) {
+                window.open(action.path, '_blank', 'noopener,noreferrer');
+              } else {
+                navigate(action.path);
+              }
+            }}
             style={{ 
               display: 'flex', 
               alignItems: 'center', 

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { User as UserIcon, Package, Settings, LogOut, ChevronRight, Edit2, Save, X, Plus, ChevronDown } from 'lucide-react';
+import { User as UserIcon, LogOut, Edit2, Save, X, Plus, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const Profile: React.FC = () => {
@@ -57,11 +57,11 @@ const Profile: React.FC = () => {
   const cities = ['Кишинёв', 'Бельцы', 'Тирасполь', 'Бендеры', 'Рыбница', 'Кагул', 'Унгены', 'Сороки', 'Орхей', 'Комрат'];
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-secondary)', minHeight: '80vh' }}>
-      <section className="section" style={{ padding: '20px 0 40px 0' }}>
+    <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
+      <section className="section" style={{ padding: '20px 0 20px 0' }}>
         <div className="container">
-          <div style={{ display: 'flex', gap: '20px' }}>
-            {/* Sidebar */}
+          <div style={{ display: 'flex', gap: '20px', flexDirection: 'row-reverse', marginBottom: '20px' }}>
+            {/* Sidebar (now on the right) */}
             <div style={{ width: '300px', flexShrink: 0 }}>
               <div style={{ 
                 backgroundColor: 'var(--card-bg)', 
@@ -91,65 +91,82 @@ const Profile: React.FC = () => {
               <div style={{ 
                 backgroundColor: 'var(--card-bg)', 
                 borderRadius: '12px', 
-                padding: '5px 0',
+                padding: '10px',
                 border: '1px solid var(--border-color)',
-                overflow: 'hidden'
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '15px'
               }}>
-                {[
-                  { icon: <UserIcon size={18} />, label: t('profile.personalData'), active: true },
-                  { icon: <Package size={18} />, label: t('profile.orders') },
-                  { icon: <Settings size={18} />, label: t('profile.settings') },
-                ].map((item, idx) => (
-                  <button 
-                    key={idx}
-                    style={{
-                      margin: '5px 10px',
-                      width: 'calc(100% - 20px)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 15px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      backgroundColor: item.active ? 'rgba(166, 206, 57, 0.1)' : 'transparent',
-                      color: item.active ? '#A6CE39' : '#fff',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      textAlign: 'left',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {item.icon}
-                    {item.label}
-                    <ChevronRight size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
-                  </button>
-                ))}
-                
-                <div style={{ margin: '5px 15px', borderTop: '1px solid var(--border-color)' }} />
-                
                 <button 
-                  onClick={() => { logout(); navigate('/'); }}
+                  onClick={() => { 
+                    if (window.confirm(t('profile.confirmLogout'))) {
+                      logout(); 
+
+                      navigate('/'); 
+                    }
+                  }}
                   style={{
-                    margin: '5px 10px',
-                    width: 'calc(100% - 20px)',
+                    width: '100%',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '12px',
-                    padding: '12px 15px',
+                    padding: '12px',
                     borderRadius: '8px',
-                    border: 'none',
+                    border: '1px solid #ff4d4d',
                     backgroundColor: 'transparent',
-                    color: '#FF1717',
+                    color: '#ff4d4d',
                     cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    textAlign: 'left',
+                    fontSize: '15px',
+                    fontWeight: 600,
                     transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 77, 77, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
                   <LogOut size={18} />
                   {t('profile.logout')}
+                </button>
+              </div>
+
+              <div style={{ textAlign: 'center' }}>
+                <button
+                  onClick={() => {
+                    const userInput = window.prompt(t('profile.confirmDeletePrompt'));
+                    if (userInput !== null) {
+                      if (userInput.trim().toUpperCase() === t('profile.confirmKeyword').toUpperCase()) {
+                        logout();
+                        navigate('/');
+                      } else {
+                        alert(t('profile.deleteFailed'));
+                      }
+                    }
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#666',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    transition: 'color 0.2s',
+                    textDecoration: 'underline',
+                    textDecorationColor: '#444',
+                    textUnderlineOffset: '4px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#ff4d4d';
+                    e.currentTarget.style.textDecorationColor = '#ff4d4d';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#666';
+                    e.currentTarget.style.textDecorationColor = '#444';
+                  }}
+                >
+                  {t('profile.deleteAccount')}
                 </button>
               </div>
             </div>
@@ -161,7 +178,6 @@ const Profile: React.FC = () => {
                 borderRadius: '12px', 
                 padding: '20px',
                 border: '1px solid var(--border-color)',
-                height: '100%',
                 display: 'flex',
                 flexDirection: 'column'
               }}>
@@ -441,6 +457,33 @@ const Profile: React.FC = () => {
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Order History Block */}
+          <div style={{ 
+                backgroundColor: 'var(--card-bg)', 
+                borderRadius: '12px', 
+                padding: '20px',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                  <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#fff', lineHeight: 1 }}>
+                    {t('profile.orders')}
+                  </h2>
+                </div>
+                <div style={{ 
+                  color: '#888', 
+                  fontSize: '15px', 
+                  textAlign: 'center', 
+                  padding: '40px 0',
+                  border: '1px dashed var(--border-color)',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255,255,255,0.02)'
+                }}>
+                  {t('profile.noOrders')}
+                </div>
           </div>
         </div>
       </section>
