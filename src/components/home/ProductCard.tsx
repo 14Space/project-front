@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingCart, Heart, Scale, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Heart, Scale, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../../context/AppContext';
 
@@ -13,17 +13,19 @@ interface ProductCardProps {
   specs: string[];
   images: string[];
   category: string;
+  isCartView?: boolean;
 }
 
-export default function ProductCard({ id, code, title, price, oldPrice, inStock, specs, images }: ProductCardProps) {
+export default function ProductCard({ id, code, title, price, oldPrice, inStock, specs, images, isCartView }: ProductCardProps) {
   const { t } = useTranslation();
-  const { toggleFavorite, toggleCompare, isInFavorites, isInCompare } = useAppContext();
+  const { toggleFavorite, toggleCompare, isInFavorites, isInCompare, toggleCart, isInCart } = useAppContext();
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   const discount = oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
   const isFav = isInFavorites(id);
   const isComp = isInCompare(id);
+  const inCart = isInCart(id);
 
   return (
     <div style={{ position: 'relative', height: '445px' }}>
@@ -167,9 +169,26 @@ export default function ProductCard({ id, code, title, price, oldPrice, inStock,
             </div>
           </div>
 
-          <button className="telemart-cart-btn">
-            <ShoppingCart size={24} color="#fff" />
-          </button>
+          {isCartView ? (
+            <button 
+              className="telemart-remove-btn"
+              onClick={(e) => { e.stopPropagation(); toggleCart(id); }}
+            >
+              <X size={24} color="#ff4d4d" />
+            </button>
+          ) : (
+            <button 
+              className="telemart-cart-btn"
+              onClick={(e) => { e.stopPropagation(); toggleCart(id); }}
+              style={{ 
+                backgroundColor: inCart ? 'transparent' : '#A6CE39',
+                border: inCart ? '2px solid #A6CE39' : 'none',
+                boxShadow: inCart ? 'none' : '0 4px 12px rgba(166, 206, 57, 0.3)'
+              }}
+            >
+              <ShoppingCart size={24} color={inCart ? '#A6CE39' : '#fff'} />
+            </button>
+          )}
         </div>
 
         {/* 7. Характеристики — просто продолжение карточки */}
@@ -221,6 +240,22 @@ export default function ProductCard({ id, code, title, price, oldPrice, inStock,
         .telemart-cart-btn:hover {
           transform: scale(1.05);
           background-color: #95ba33;
+        }
+        .telemart-remove-btn {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background-color: transparent;
+          border: 2px solid #ff4d4d;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .telemart-remove-btn:hover {
+          transform: scale(1.05);
+          background-color: rgba(255, 77, 77, 0.1) !important;
         }
       `}</style>
     </div>

@@ -11,7 +11,7 @@ export default function Favorites() {
   const favoriteProducts = HOT_DEALS.filter(product => favorites.includes(product.id));
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-secondary)', minHeight: '80vh' }}>
+    <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <section className="section" style={{ padding: '20px 0 40px 0' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
