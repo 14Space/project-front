@@ -185,7 +185,13 @@
     "logout": "Log Out",
     "recentOrders": "Recent Orders",
     "addPhone": "Add phone number",
-    "addAddress": "Add address"
+    "addAddress": "Add address",
+    "noOrders": "You have no orders yet",
+    "deleteAccount": "Delete account permanently",
+    "confirmDeletePrompt": "Type CONFIRM to permanently delete your account",
+    "deleteFailed": "Incorrect text. Deletion cancelled.",
+    "confirmLogout": "Are you sure you want to log out?",
+    "confirmKeyword": "CONFIRM"
   },
   "auth": {
     "login": "Login",
@@ -250,6 +256,32 @@
         "gpu": "Graphics: RTX 5060 8GB",
         "ram": "RAM: 16 GB DDR5",
         "ssd": "Storage: 1 TB SSD"
+      }
+    }
+  },
+  "tradeIn": {
+    "title": "Trade-In & Buyback",
+    "subtitle": "Submit a request to evaluate your device and get a discount on a new one",
+    "form": {
+      "category": "Product Category",
+      "condition": "Condition",
+      "conditionNew": "New",
+      "conditionOpenBox": "Open Box",
+      "conditionUsed": "Used",
+      "description": "Product Description",
+      "descriptionPlaceholder": "Describe specifications, defects, and package contents...",
+      "photos": "Product Photos",
+      "photosDesc": "Add up to 5 photos in JPG, PNG, IMG formats",
+      "submit": "Submit Request",
+      "success": "Your request has been successfully sent! Our managers will contact you for evaluation.",
+      "categories": {
+        "computers": "Computers",
+        "laptops": "Laptops",
+        "components": "PC Components",
+        "monitors": "Monitors",
+        "peripherals": "Peripherals",
+        "consoles": "Consoles",
+        "networking": "Networking Equipment"
       }
     }
   }

@@ -22,11 +22,16 @@ export const MOCK_USER: User = {
 interface AppContextType {
   favorites: string[];
   compareList: string[];
+  cart: Record<string, number>;
   user: User | null;
   toggleFavorite: (id: string) => void;
   toggleCompare: (id: string) => void;
+  toggleCart: (id: string) => void;
+  updateCartQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
   isInFavorites: (id: string) => boolean;
   isInCompare: (id: string) => boolean;
+  isInCart: (id: string) => boolean;
   login: (userData: User) => void;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
@@ -45,6 +50,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [cart, setCart] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('cart');
+    // Migration from old array format to object format if necessary
+    const parsed = saved ? JSON.parse(saved) : {};
+    if (Array.isArray(parsed)) {
+      const migrated: Record<string, number> = {};
+      parsed.forEach(id => { migrated[id] = 1; });
+      return migrated;
+    }
+    return parsed;
+  });
+
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
@@ -57,6 +74,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('compareList', JSON.stringify(compareList));
   }, [compareList]);
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   useEffect(() => {
     if (user) {
@@ -78,8 +99,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const toggleCart = (id: string) => {
+    setCart(prev => {
+      const newCart = { ...prev };
+      if (newCart[id]) {
+        delete newCart[id];
+      } else {
+        newCart[id] = 1;
+      }
+      return newCart;
+    });
+  };
+
+  const updateCartQuantity = (id: string, quantity: number) => {
+    if (quantity < 1) return;
+    setCart(prev => {
+      const newCart = { ...prev };
+      newCart[id] = quantity;
+      return newCart;
+    });
+  };
+
+  const clearCart = () => setCart({});
+
   const isInFavorites = (id: string) => favorites.includes(id);
   const isInCompare = (id: string) => compareList.includes(id);
+  const isInCart = (id: string) => !!cart[id];
 
   const login = (userData: User) => {
     setUser(userData);
@@ -97,11 +142,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider value={{ 
       favorites, 
       compareList, 
+      cart,
       user,
       toggleFavorite, 
       toggleCompare, 
+      toggleCart,
+      updateCartQuantity,
+      clearCart,
       isInFavorites, 
       isInCompare,
+      isInCart,
       login,
       logout,
       updateUser

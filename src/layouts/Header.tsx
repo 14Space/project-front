@@ -9,7 +9,7 @@ import { HOT_DEALS } from '../constants/products';
 
 export default function Header() {
   const { t, i18n } = useTranslation();
-  const { favorites, compareList, user } = useAppContext();
+  const { favorites, compareList, cart, user } = useAppContext();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
@@ -21,6 +21,7 @@ export default function Header() {
   };
 
   const compareItems = HOT_DEALS.filter(p => compareList.includes(p.id));
+  const cartItemCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
   // Группировка товаров для сравнения по категориям
   const groupedCompare = compareItems.reduce((acc, product) => {
@@ -179,8 +180,13 @@ export default function Header() {
               )}
             </Link>
 
-            <Link to="/cart" className="header-action-btn" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <Link to="/cart" className="header-action-btn" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <ShoppingCart size={24} />
+              {cartItemCount > 0 && (
+                <span style={{ position: 'absolute', top: '-8px', right: '-8px', backgroundColor: '#A6CE39', color: '#000', borderRadius: '50%', width: '18px', height: '18px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {cartItemCount}
+                </span>
+              )}
             </Link>
             <button 
               onClick={() => user ? navigate('/profile') : setIsAuthOpen(true)} 
