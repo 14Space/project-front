@@ -137,12 +137,24 @@
       "title": "Компьютеры",
       "groups": [
         {
-          "title": "По назначению",
-          "items": ["Игровые компьютеры", "Для работы и учебы", "Рабочие станции", "Для стриминга"]
+          "title": "Игровые компьютеры",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png"
         },
         {
-          "title": "Серии FRAME",
-          "items": ["FRAME Gaming One", "FRAME Work Pro", "FRAME Extreme"]
+          "title": "Мини-ПК",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png"
+        },
+        {
+          "title": "Моноблоки",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png"
+        },
+        {
+          "title": "Рабочие станции",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-workstations.png"
         }
       ]
     },

@@ -8,7 +8,7 @@ import { HOT_DEALS } from '../constants/products';
 export default function Cart() {
   const { t, i18n } = useTranslation();
 
-  const { cart, clearCart, updateCartQuantity, user } = useAppContext();
+  const { cart, clearCart, updateCartQuantity, user, createOrder } = useAppContext();
   const cartProducts = HOT_DEALS.filter(product => !!cart[product.id]);
   const navigate = useNavigate();
 
@@ -29,8 +29,27 @@ export default function Cart() {
       return;
     }
 
-    alert(i18n.language.startsWith('ru') ? 'Заказ успешно оформлен! Спасибо за покупку.' : 'Order successfully placed! Thank you for your purchase.');
+    const orderData = {
+      id: `FRM-${Math.floor(100000 + Math.random() * 900000)}`,
+      items: cartProducts.map(p => ({ 
+        id: p.id, 
+        quantity: cart[p.id], 
+        title: p.title, 
+        price: p.price,
+        image: p.images[0]
+      })),
+      totalPrice,
+      status: i18n.language.startsWith('ru') ? 'Готовится к отправке' : 'Preparing for shipment',
+      date: new Date().toLocaleDateString(i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    };
+
+    createOrder(orderData);
     clearCart();
+    navigate('/order-status');
   };
 
   return (
@@ -139,11 +158,9 @@ export default function Cart() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#95ba33';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#A6CE39';
-                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   {i18n.language.startsWith('ru') ? 'Оформить заказ' : 'Checkout'}

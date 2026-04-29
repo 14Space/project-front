@@ -59,7 +59,7 @@ export default function TradeIn() {
         status: 'pending'
       };
 
-      setRequests(prev => [...prev, newRequest]);
+      setRequests(prev => [newRequest, ...prev]);
       setIsModalOpen(false);
 
       // Reset form
@@ -91,7 +91,6 @@ export default function TradeIn() {
       setRequestToDelete(null);
     }
   };
-
 
 
   return (
