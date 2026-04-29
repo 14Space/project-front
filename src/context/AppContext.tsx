@@ -10,6 +10,14 @@ interface User {
   street?: string;
   avatar?: string;
 }
+
+export interface Order {
+  id: string;
+  items: { id: string; quantity: number; title: string; price: number; image: string }[];
+  totalPrice: number;
+  status: string;
+  date: string;
+}
 export const MOCK_USER: User = {
   id: 'user-1',
   name: 'Номинал',
@@ -35,6 +43,8 @@ interface AppContextType {
   login: (userData: User) => void;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
+  orders: Order[];
+  createOrder: (order: Order) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -67,6 +77,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [orders, setOrders] = useState<Order[]>(() => {
+    const saved = localStorage.getItem('orders');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -86,6 +101,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.removeItem('user');
     }
   }, [user]);
+
+  useEffect(() => {
+    localStorage.setItem('orders', JSON.stringify(orders));
+  }, [orders]);
 
   const toggleFavorite = (id: string) => {
     setFavorites(prev => 
@@ -138,6 +157,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setUser(prev => prev ? { ...prev, ...userData } : null);
   };
 
+  const createOrder = (order: Order) => {
+    setOrders(prev => [order, ...prev]);
+  };
+
   return (
     <AppContext.Provider value={{ 
       favorites, 
@@ -154,7 +177,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       isInCart,
       login,
       logout,
-      updateUser
+      updateUser,
+      orders,
+      createOrder
     }}>
       {children}
     </AppContext.Provider>

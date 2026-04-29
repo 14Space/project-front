@@ -137,12 +137,24 @@
       "title": "Computers",
       "groups": [
         {
-          "title": "By usage",
-          "items": ["Gaming PCs", "For work & study", "Workstations", "Streaming PCs"]
+          "title": "Gaming PCs",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png"
         },
         {
-          "title": "FRAME Series",
-          "items": ["FRAME Gaming One", "FRAME Work Pro", "FRAME Extreme"]
+          "title": "Mini PCs",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png"
+        },
+        {
+          "title": "All-in-Ones",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png"
+        },
+        {
+          "title": "Workstations",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-workstations.png"
         }
       ]
     },

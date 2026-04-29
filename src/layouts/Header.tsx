@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import Catalog from '../components/layout/Catalog';
 import AuthModal from '../components/layout/AuthModal';
+import AuthRequiredModal from '../components/layout/AuthRequiredModal';
 import { useAppContext } from '../context/AppContext';
 import { HOT_DEALS } from '../constants/products';
 
@@ -13,6 +14,7 @@ export default function Header() {
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [isAuthRequiredOpen, setIsAuthRequiredOpen] = useState(false);
   const navigate = useNavigate();
 
   const toggleLanguage = () => {
@@ -36,6 +38,13 @@ export default function Header() {
   }, {} as Record<string, number>);
 
   const compareEntries = Object.entries(groupedCompare);
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      setIsAuthRequiredOpen(true);
+    }
+  };
 
   return (
     <>
@@ -180,7 +189,12 @@ export default function Header() {
               )}
             </Link>
 
-            <Link to="/cart" className="header-action-btn" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <Link 
+              to="/cart" 
+              className="header-action-btn" 
+              onClick={handleCartClick}
+              style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}
+            >
               <ShoppingCart size={24} />
               {cartItemCount > 0 && (
                 <span style={{ position: 'absolute', top: '-8px', right: '-8px', backgroundColor: '#A6CE39', color: '#000', borderRadius: '50%', width: '18px', height: '18px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -191,6 +205,7 @@ export default function Header() {
             <button 
               onClick={() => user ? navigate('/profile') : setIsAuthOpen(true)} 
               className="header-action-btn header-user-btn" 
+              data-auth-trigger
               style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
@@ -208,6 +223,7 @@ export default function Header() {
         </div>
         <Catalog isOpen={isCatalogOpen} onClose={() => setIsCatalogOpen(false)} />
         <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+        <AuthRequiredModal isOpen={isAuthRequiredOpen} onClose={() => setIsAuthRequiredOpen(false)} />
       </header>
       {isCatalogOpen && <div style={{ height: '80px' }} />}
       

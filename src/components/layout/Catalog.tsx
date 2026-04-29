@@ -13,7 +13,6 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [lockedCategory, setLockedCategory] = useState<string | null>(null);
 
-  // Reset when catalog is closed
   useEffect(() => {
     if (!isOpen) {
       setActiveCategory(null);
@@ -23,12 +22,11 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
 
   if (!isOpen) return null;
 
-  // Если мы ни на что не наводимся, показываем зафиксированную категорию
   const displayCategory = activeCategory || lockedCategory;
   const currentCategoryData = displayCategory ? t(`catalog.${displayCategory}`, { returnObjects: true }) as any : null;
 
   return (
-    <div 
+    <div
       className="catalog-overlay"
       style={{
         position: 'fixed',
@@ -51,9 +49,9 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
           @keyframes slideDown { transform: translateY(-10px); opacity: 0; }
         `}
       </style>
-      
+
       <div style={{ width: '100%', maxWidth: '1400px', padding: '0 20px', display: 'flex' }}>
-        <div 
+        <div
           className="catalog-content"
           style={{
             backgroundColor: 'var(--bg-secondary)',
@@ -69,9 +67,9 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Левая часть: Меню */}
-          <div 
+          <div
             className="catalog-sidebar"
-            style={{ 
+            style={{
               width: '280px',
               borderRight: '1px solid var(--border-color)',
               backgroundColor: 'var(--card-bg)',
@@ -114,26 +112,84 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
           {/* Правая часть: Подкатегории */}
           <div style={{ flex: 1, padding: '20px 40px', overflowY: 'auto', backgroundColor: 'var(--bg-secondary)' }}>
             {currentCategoryData && typeof currentCategoryData !== 'string' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%'
+              }}>
+                <style>
+                  {`
+                    .category-group-link {
+                      text-decoration: none;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      transition: all 0.3s ease;
+                      cursor: pointer;
+                    }
+                    .category-group-link:hover h3 {
+                      color: #A6CE39 !important;
+                    }
+                    .category-group-link:hover img {
+                      transform: scale(1.05);
+                    }
+                  `}
+                </style>
                 {currentCategoryData.groups?.map((group: any, idx: number) => (
-                  <div key={idx}>
-                    <h3 style={{ 
-                      fontSize: '15px', 
-                      fontWeight: 700, 
-                      color: '#fff', 
-                      marginBottom: '18px',
-                      textTransform: 'uppercase'
+                  <a 
+                    key={idx} 
+                    href="#" 
+                    className="category-group-link"
+                    style={{ textAlign: 'center' }}
+                  >
+                    <h3 style={{
+                      fontSize: '15px',
+                      fontWeight: 700,
+                      color: '#fff',
+                      margin: '0 0 16px 0',
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                      transition: 'color 0.3s ease'
                     }}>
                       {group.title}
                     </h3>
-                    <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    
+                    {group.image && (
+                      <div style={{ 
+                        width: '100%', 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        marginTop: '10px' 
+                      }}>
+                        <img 
+                          src={group.image} 
+                          alt={group.title} 
+                          style={{ 
+                            width: 'auto', 
+                            maxWidth: '220px',
+                            height: '180px', 
+                            objectFit: 'contain',
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
+                      </div>
+                    )}
+                    <ul style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                      padding: 0,
+                      margin: 0,
+                      listStyle: 'none'
+                    }}>
                       {group.items?.map((item: string, i: number) => (
-                        <li key={i}>
-                          <a 
-                            href="#" 
-                            style={{ 
-                              color: 'var(--text-secondary)', 
-                              fontSize: '14px', 
+                        <li key={i} style={{ margin: 0, padding: 0 }}>
+                          <a
+                            href="#"
+                            style={{
+                              color: 'var(--text-secondary)',
+                              fontSize: '14px',
                               transition: 'all 0.2s',
                               textDecoration: 'none',
                               display: 'block'
@@ -152,7 +208,7 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </a>
                 ))}
               </div>
             ) : null}
