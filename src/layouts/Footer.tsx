@@ -2,6 +2,7 @@ import React from 'react';
 import { Phone, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Newsletter from '../components/layout/Newsletter';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -47,47 +48,7 @@ export default function Footer() {
   return (
     <footer style={{ backgroundColor: '#1D1D1D', color: '#ccc', fontSize: '14px' }}>
       {/* 1. Newsletter Block */}
-      <div style={{ backgroundColor: '#A6CE39', padding: '20px 0', color: '#fff' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 25px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-             <img src="/branding/BRANDING-logo-FRAME.png" alt="FRAME" style={{ height: '32px' }} />
-             <div style={{ fontSize: '18px', fontWeight: 600 }}>{t('footer.newsletterTitle')}</div>
-          </div>
-          <div style={{ 
-            display: 'flex', 
-            width: '480px', 
-            backgroundColor: 'rgba(255,255,255,0.1)', 
-            border: '1px solid rgba(255,255,255,0.4)', 
-            borderRadius: '30px',
-            padding: '4px'
-          }}>
-            <input 
-              type="email" 
-              placeholder={t('footer.newsletterPlaceholder')} 
-              style={{ 
-                flex: 1, 
-                padding: '0 20px', 
-                background: 'none', 
-                border: 'none', 
-                color: '#fff', 
-                outline: 'none',
-                fontSize: '14px'
-              }} 
-            />
-            <button style={{ 
-              backgroundColor: '#fff', 
-              color: '#111', 
-              padding: '10px 24px', 
-              borderRadius: '26px', 
-              fontWeight: 700, 
-              fontSize: '13px',
-              whiteSpace: 'nowrap'
-            }}>
-              {t('footer.newsletterButton')}
-            </button>
-          </div>
-        </div>
-      </div>
+      <Newsletter />
       
       <div className="container" style={{ padding: '60px 20px' }}>
         <div style={{ 
