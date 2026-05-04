@@ -10,8 +10,7 @@ import { HOT_DEALS } from '../constants/products';
 
 export default function Header() {
   const { t, i18n } = useTranslation();
-  const { favorites, compareList, cart, user } = useAppContext();
-  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const { favorites, compareList, cart, user, isCatalogOpen, setIsCatalogOpen } = useAppContext();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isAuthRequiredOpen, setIsAuthRequiredOpen] = useState(false);

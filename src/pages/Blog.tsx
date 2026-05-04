@@ -39,10 +39,9 @@ export default function Blog() {
   ];
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '60px' }}>
-      {/* Хлебные крошки */}
-      <div className="container" style={{ padding: '20px 20px 0' }}>
-        <div style={{ display: 'flex', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '80px' }}>
+      <div className="container" style={{ padding: '5px 20px 0' }}>
+        <div style={{ display: 'flex', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
           <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>{t('header.home')}</Link>
           <span>/</span>
           <span style={{ color: 'var(--text-color)' }}>{t('home.blog.title')}</span>

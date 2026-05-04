@@ -137,24 +137,28 @@
       "title": "Computers",
       "groups": [
         {
-          "title": "Gaming PCs",
+          "title": "Gaming",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png"
+          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png",
+          "path": "/computers"
         },
         {
           "title": "Mini PCs",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png"
+          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png",
+          "path": "/computers"
         },
         {
           "title": "All-in-Ones",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png"
+          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png",
+          "path": "/computers"
         },
         {
           "title": "Workstations",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-workstations.png"
+          "image": "/subcategories/SUBCATEGORIES-workstations.png",
+          "path": "/computers"
         }
       ]
     },
@@ -162,22 +166,36 @@
       "title": "Laptops",
       "groups": [
         {
-          "title": "Popular",
-          "items": ["Gaming Laptops", "For study", "Ultrabooks", "MacBook"]
+          "title": "Gaming",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-gaming-laptops.png",
+          "path": "/laptops"
+        },
+        {
+          "title": "For Study",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-for-study.png",
+          "path": "/laptops"
+        },
+        {
+          "title": "MacBook",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-macbook.png",
+          "path": "/laptops"
         }
       ]
     },
     "components": {
       "title": "Components",
       "groups": [
-        {
-          "title": "Core",
-          "items": ["Graphics Cards", "Processors", "Motherboards", "RAM", "Power Supplies"]
-        },
-        {
-          "title": "Case & Cooling",
-          "items": ["Cases", "CPU Coolers", "Liquid Cooling", "Case Fans"]
-        }
+        { "title": "Processors", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "Graphics Cards", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "Motherboards", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "RAM", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "Storage", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "Cases", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "Cooling Systems", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" },
+        { "title": "Power Supplies", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" }
       ]
     },
     "monitors": {
@@ -185,8 +203,69 @@
       "groups": [
         {
           "title": "Gaming",
-          "items": ["144Hz & above", "2K/4K Monitors", "Curved Monitors"]
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
+        },
+        {
+          "title": "Curved",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
+        },
+        {
+          "title": "For Color Work",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
         }
+      ]
+    },
+    "peripherals": {
+      "title": "Peripherals",
+      "groups": [
+        { "title": "Mice", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" },
+        { "title": "Keyboards", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" },
+        { "title": "Headphones", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" },
+        { "title": "Microphones", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" }
+      ]
+    },
+    "consoleGaming": {
+      "title": "Console Gaming",
+      "groups": [
+        { "title": "PlayStation", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" },
+        { "title": "Xbox", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" },
+        { "title": "Handheld Consoles", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" },
+        { "title": "Gamepads", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" }
+      ]
+    },
+    "networking": {
+      "title": "Networking",
+      "groups": [
+        { "title": "Wi-Fi 7 Routers", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking" },
+        { "title": "Access Points", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking" },
+        { "title": "Bluetooth Adapters", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking" }
+      ]
+    },
+    "furniture": {
+      "title": "Furniture & Accessories",
+      "groups": [
+        { "title": "Gaming Chairs", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture" },
+        { "title": "Gaming Desks", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture" },
+        { "title": "Mounts", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture" }
+      ]
+    },
+    "merch": {
+      "title": "Merch & Gifts",
+      "groups": [
+        { "title": "Apparel", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
+        { "title": "Accessories", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
+        { "title": "Figures", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" }
+      ]
+    },
+    "services": {
+      "title": "Services",
+      "groups": [
+        { "title": "Trade-In Exchange", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/trade-in" },
+        { "title": "Consultations", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" },
+        { "title": "Technician Services", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" }
       ]
     }
   },

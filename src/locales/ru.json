@@ -23,15 +23,14 @@
   "sidebar": {
     "computers": "Компьютеры",
     "laptops": "Ноутбуки",
-    "components": "Комплектующие для ПК",
-    "gaming": "Игровая периферия",
-    "monitors": "Мониторы",
-    "peripherals": "Периферия",
-    "consoleGaming": "Консольный гейминг",
-    "networking": "Сетевое оборудование",
-    "furniture": "Мебель и аксессуары",
-    "merch": "Мерч и подарки",
-    "services": "Услуги"
+    "cpus": "Процессоры",
+    "gpus": "Видеокарты",
+    "motherboards": "Материнские платы",
+    "ram": "Оперативная память",
+    "storage": "Дисковые накопители",
+    "cases": "Корпуса",
+    "cooling": "Системы охлаждения",
+    "psus": "Блоки питания"
   },
   "home": {
     "quickActions": {
@@ -73,11 +72,26 @@
       "title": "Блог",
       "allPosts": "Все статьи ➔",
       "posts": {
-        "how-to-choose-gpu": { "title": "Как выбрать видеокарту", "date": "18 Апреля 2026" },
-        "how-to-choose-console": { "title": "Как выбрать игровую консоль: виды, особенности и отличия", "date": "10 Апреля 2026" },
-        "cross-play-multiplatform": { "title": "Cross-play и мультиплатформенность: что это меняет для PC-геймеров", "date": "15 Апреля 2026" },
-        "gta-6-price": { "title": "Цена GTA 6: сколько может стоить игра на старте продаж", "date": "12 Апреля 2026" },
-        "ryzen-9000-review": { "title": "AMD Ryzen™ 9000 (Granite Ridge): Новый король гейминга или эволюция платформы AM5?", "date": "2 Апреля 2026" }
+        "how-to-choose-gpu": {
+          "title": "Как выбрать видеокарту",
+          "date": "18 Апреля 2026"
+        },
+        "how-to-choose-console": {
+          "title": "Как выбрать игровую консоль: виды, особенности и отличия",
+          "date": "10 Апреля 2026"
+        },
+        "cross-play-multiplatform": {
+          "title": "Cross-play и мультиплатформенность: что это меняет для PC-геймеров",
+          "date": "15 Апреля 2026"
+        },
+        "gta-6-price": {
+          "title": "Цена GTA 6: сколько может стоить игра на старте продаж",
+          "date": "12 Апреля 2026"
+        },
+        "ryzen-9000-review": {
+          "title": "AMD Ryzen™ 9000 (Granite Ridge): Новый король гейминга или эволюция платформы AM5?",
+          "date": "2 Апреля 2026"
+        }
       }
     },
     "seo": {
@@ -122,10 +136,30 @@
       "hrTitle": "Работа в компании",
       "showroomsTitle": "Наши шоурумы в Молдове",
       "showroomsList": {
-        "botanica": { "city": "Кишинев (Ботаника)", "address": "ул. Арборилор, 21", "mall": "ТЦ «Shopping MallDova»", "shop": "Шоурум FRAME" },
-        "ciocana": { "city": "Кишинев (Чеканы)", "address": "ул. Михаил Садовяну, 42/6", "mall": "ТЦ «Port Mall»", "shop": "Шоурум FRAME" },
-        "riscani": { "city": "Кишинев (Рышкановка)", "address": "ул. Студенцилор, 7/1", "mall": "Шоурум FRAME", "shop": "Шоурум FRAME" },
-        "balti": { "city": "Бельцы", "address": "ул. Николае Йорги, 1", "mall": "ТЦ «Evimall»", "shop": "Шоурум FRAME" }
+        "botanica": {
+          "city": "Кишинев (Ботаника)",
+          "address": "ул. Арборилор, 21",
+          "mall": "ТЦ «Shopping MallDova»",
+          "shop": "Шоурум FRAME"
+        },
+        "ciocana": {
+          "city": "Кишинев (Чеканы)",
+          "address": "ул. Михаил Садовяну, 42/6",
+          "mall": "ТЦ «Port Mall»",
+          "shop": "Шоурум FRAME"
+        },
+        "riscani": {
+          "city": "Кишинев (Рышкановка)",
+          "address": "ул. Студенцилор, 7/1",
+          "mall": "Шоурум FRAME",
+          "shop": "Шоурум FRAME"
+        },
+        "balti": {
+          "city": "Бельцы",
+          "address": "ул. Николае Йорги, 1",
+          "mall": "ТЦ «Evimall»",
+          "shop": "Шоурум FRAME"
+        }
       },
       "showroomPrefix": "Шоурум в",
       "allWeek": "Пн-Вс"
@@ -137,24 +171,24 @@
       "title": "Компьютеры",
       "groups": [
         {
-          "title": "Игровые компьютеры",
+          "title": "Игровые",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png"
+          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png", "path": "/computers?subcategory=Игровые"
         },
         {
           "title": "Мини-ПК",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png"
+          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png", "path": "/computers?subcategory=Мини-ПК"
         },
         {
           "title": "Моноблоки",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png"
+          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png", "path": "/computers?subcategory=Моноблоки"
         },
         {
           "title": "Рабочие станции",
           "items": [],
-          "image": "/subcategories/SUBCATEGORIES-workstations.png"
+          "image": "/subcategories/SUBCATEGORIES-workstations.png", "path": "/computers?subcategory=Рабочие станции"
         }
       ]
     },
@@ -162,8 +196,19 @@
       "title": "Ноутбуки",
       "groups": [
         {
-          "title": "Популярное",
-          "items": ["Игровые ноутбуки", "Для учебы", "Ультрабуки", "MacBook"]
+          "title": "Игровые",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-gaming-laptops.png", "path": "/laptops?subcategory=Игровые"
+        },
+        {
+          "title": "Для учёбы",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-for-study.png", "path": "/laptops?subcategory=Для учёбы"
+        },
+        {
+          "title": "MacBook",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-macbook.png", "path": "/laptops?subcategory=MacBook"
         }
       ]
     },
@@ -171,12 +216,44 @@
       "title": "Комплектующие",
       "groups": [
         {
-          "title": "Основные",
-          "items": ["Видеокарты", "Процессоры", "Материнские платы", "Оперативная память", "Блоки питания"]
+          "title": "Процессоры",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus"
         },
         {
-          "title": "Охлаждение и корпус",
-          "items": ["Корпуса", "Кулеры для процессоров", "Системы водяного охлаждения", "Вентиляторы"]
+          "title": "Видеокарты",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus"
+        },
+        {
+          "title": "Материнские платы",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards"
+        },
+        {
+          "title": "Оперативная память",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram"
+        },
+        {
+          "title": "Дисковые накопители",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage"
+        },
+        {
+          "title": "Корпуса",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases"
+        },
+        {
+          "title": "Системы охлаждения",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling"
+        },
+        {
+          "title": "Блоки питания",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus"
         }
       ]
     },
@@ -185,8 +262,125 @@
       "groups": [
         {
           "title": "Игровые",
-          "items": ["144Гц и выше", "2K/4K мониторы", "Изогнутые"]
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
+        },
+        {
+          "title": "Изогнутые",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
+        },
+        {
+          "title": "Для работы с цветом",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
         }
+      ]
+    },
+    "peripherals": {
+      "title": "Периферия",
+      "groups": [
+        {
+          "title": "Мышки",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
+        },
+        {
+          "title": "Клавиатуры",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
+        },
+        {
+          "title": "Наушники",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
+        },
+        {
+          "title": "Микрофоны",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
+        }
+      ]
+    },
+    "consoleGaming": {
+      "title": "Консольный гейминг",
+      "groups": [
+        {
+          "title": "PlayStation",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming"
+        },
+        {
+          "title": "Xbox",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming"
+        },
+        {
+          "title": "Портативные консоли",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming"
+        },
+        {
+          "title": "Геймпады",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png"
+        }
+      ]
+    },
+    "networking": {
+      "title": "Сетевое оборудование",
+      "groups": [
+        {
+          "title": "Роутеры с Wi-Fi 7",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking"
+        },
+        {
+          "title": "Точки доступа",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking"
+        },
+        {
+          "title": "Bluetooth Адаптеры",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking"
+        }
+      ]
+    },
+    "furniture": {
+      "title": "Мебель и аксессуары",
+      "groups": [
+        {
+          "title": "Геймерские кресла",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture"
+        },
+        {
+          "title": "Игровые столы",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture"
+        },
+        {
+          "title": "Кронштейны",
+          "items": [],
+          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture"
+        }
+      ]
+    },
+    "merch": {
+      "title": "Мерч и подарки",
+      "groups": [
+        { "title": "Одежда", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
+        { "title": "Аксессуары", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
+        { "title": "Фигурки", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" }
+      ]
+    },
+    "services": {
+      "title": "Услуги",
+      "groups": [
+        { "title": "Обмен по Trade-In", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/trade-in" },
+        { "title": "Консультации", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" },
+        { "title": "Услуги мастера", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" }
       ]
     }
   },

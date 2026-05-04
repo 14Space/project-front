@@ -24,14 +24,18 @@ import Laptops from './pages/Laptops.tsx'
 import GPUs from './pages/GPUs.tsx'
 import CPUs from './pages/CPUs.tsx'
 import CatalogPage from './pages/CatalogPage.tsx'
-import Components from './pages/Components.tsx'
+import Motherboards from './pages/Motherboards.tsx'
+import RAM from './pages/RAM.tsx'
+import Storage from './pages/Storage.tsx'
+import Cases from './pages/Cases.tsx'
+import Cooling from './pages/Cooling.tsx'
+import PSUs from './pages/PSUs.tsx'
 import Monitors from './pages/Monitors.tsx'
 import Peripherals from './pages/Peripherals.tsx'
 import ConsoleGaming from './pages/ConsoleGaming.tsx'
 import Networking from './pages/Networking.tsx'
 import Furniture from './pages/Furniture.tsx'
 import Merch from './pages/Merch.tsx'
-import Services from './pages/Services.tsx'
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext.tsx'
@@ -74,15 +78,20 @@ export default function App() {
             <Route path="/laptops" element={<Laptops />} />
             <Route path="/gpus" element={<GPUs />} />
             <Route path="/cpus" element={<CPUs />} />
+            <Route path="/motherboards" element={<Motherboards />} />
+            <Route path="/ram" element={<RAM />} />
+            <Route path="/storage" element={<Storage />} />
+            <Route path="/cases" element={<Cases />} />
+            <Route path="/cooling" element={<Cooling />} />
+            <Route path="/psus" element={<PSUs />} />
             <Route path="/catalog" element={<CatalogPage />} />
-            <Route path="/components" element={<Components />} />
             <Route path="/monitors" element={<Monitors />} />
             <Route path="/peripherals" element={<Peripherals />} />
             <Route path="/console-gaming" element={<ConsoleGaming />} />
             <Route path="/networking" element={<Networking />} />
             <Route path="/furniture" element={<Furniture />} />
             <Route path="/merch" element={<Merch />} />
-            <Route path="/services" element={<Services />} />
+
           </Route>
         </Routes>
       </BrowserRouter>

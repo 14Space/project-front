@@ -45,6 +45,10 @@ interface AppContextType {
   updateUser: (userData: Partial<User>) => void;
   orders: Order[];
   createOrder: (order: Order) => void;
+  isCatalogOpen: boolean;
+  setIsCatalogOpen: (open: boolean) => void;
+  catalogCategory: string | null;
+  setCatalogCategory: (cat: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -161,6 +165,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setOrders(prev => [order, ...prev]);
   };
 
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [catalogCategory, setCatalogCategory] = useState<string | null>(null);
+
   return (
     <AppContext.Provider value={{ 
       favorites, 
@@ -179,7 +186,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       logout,
       updateUser,
       orders,
-      createOrder
+      createOrder,
+      isCatalogOpen,
+      setIsCatalogOpen,
+      catalogCategory,
+      setCatalogCategory
     }}>
       {children}
     </AppContext.Provider>
