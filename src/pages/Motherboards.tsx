@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
-import GPUFilters from '../components/product/GPUFilters';
+import MotherboardFilters from '../components/product/MotherboardFilters';
 import { HOT_DEALS } from '../constants/products';
 
-export default function GPUs() {
+export default function Motherboards() {
   
   const [activeSort, setActiveSort] = useState('popularity');
   
@@ -13,12 +13,16 @@ export default function GPUs() {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [selectedPopular, setSelectedPopular] = useState<string[]>([]);
-  const [selectedGPUs, setSelectedGPUs] = useState<string[]>([]);
-  const [selectedMemory, setSelectedMemory] = useState<string[]>([]);
+  const [selectedChipsets, setSelectedChipsets] = useState<string[]>([]);
+  const [selectedSockets, setSelectedSockets] = useState<string[]>([]);
+  const [selectedFormFactors, setSelectedFormFactors] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedBus, setSelectedBus] = useState<string[]>([]);
-  const [selectedMemoryType, setSelectedMemoryType] = useState<string[]>([]);
-  const [selectedLength, setSelectedLength] = useState<string[]>([]);
+  const [selectedVideoInterfaces, setSelectedVideoInterfaces] = useState<string[]>([]);
+  const [selectedRAMTypes, setSelectedRAMTypes] = useState<string[]>([]);
+  const [selectedWiFi, setSelectedWiFi] = useState<string[]>([]);
+  const [selectedM2Version, setSelectedM2Version] = useState<string[]>([]);
+  const [selectedM2Count, setSelectedM2Count] = useState<string[]>([]);
+  const [selectedRAMSlots, setSelectedRAMSlots] = useState<string[]>([]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
@@ -26,7 +30,7 @@ export default function GPUs() {
 
   // Фильтрация (демонстрация на HOT_DEALS)
   const filteredProducts = useMemo(() => {
-    let result = HOT_DEALS.filter(p => p.category === 'gpu');
+    let result = HOT_DEALS.filter(p => p.category === 'motherboard');
 
     if (minPrice) result = result.filter(p => p.price >= parseInt(minPrice));
     if (maxPrice) result = result.filter(p => p.price <= parseInt(maxPrice));
@@ -42,38 +46,46 @@ export default function GPUs() {
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '60px' }}>
       <div className="container" style={{ padding: '5px 20px 0' }}>
         <Breadcrumbs items={[
-          { label: 'Видеокарты', active: true }
+          { label: 'Материнские платы', active: true }
         ]} />
       </div>
 
       <div className="container" style={{ padding: '0 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <h1 className="title" style={{ fontSize: '32px', margin: 0 }}>Видеокарты</h1>
+          <h1 className="title" style={{ fontSize: '32px', margin: 0 }}>Материнские платы</h1>
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
         <ProductGrid 
           products={filteredProducts}
           sidebar={
-            <GPUFilters 
+            <MotherboardFilters 
               minPrice={minPrice}
               onMinPriceChange={setMinPrice}
               maxPrice={maxPrice}
               onMaxPriceChange={setMaxPrice}
               selectedPopular={selectedPopular}
               onPopularChange={(val) => toggleFilter(setSelectedPopular, val)}
-              selectedGPUs={selectedGPUs}
-              onGPUsChange={(val) => toggleFilter(setSelectedGPUs, val)}
-              selectedMemory={selectedMemory}
-              onMemoryChange={(val) => toggleFilter(setSelectedMemory, val)}
+              selectedChipsets={selectedChipsets}
+              onChipsetsChange={(val) => toggleFilter(setSelectedChipsets, val)}
+              selectedSockets={selectedSockets}
+              onSocketsChange={(val) => toggleFilter(setSelectedSockets, val)}
+              selectedFormFactors={selectedFormFactors}
+              onFormFactorsChange={(val) => toggleFilter(setSelectedFormFactors, val)}
               selectedBrands={selectedBrands}
               onBrandsChange={(val) => toggleFilter(setSelectedBrands, val)}
-              selectedBus={selectedBus}
-              onBusChange={(val) => toggleFilter(setSelectedBus, val)}
-              selectedMemoryType={selectedMemoryType}
-              onMemoryTypeChange={(val) => toggleFilter(setSelectedMemoryType, val)}
-              selectedLength={selectedLength}
-              onLengthChange={(val) => toggleFilter(setSelectedLength, val)}
+              selectedVideoInterfaces={selectedVideoInterfaces}
+              onVideoInterfacesChange={(val) => toggleFilter(setSelectedVideoInterfaces, val)}
+              selectedRAMTypes={selectedRAMTypes}
+              onRAMTypesChange={(val) => toggleFilter(setSelectedRAMTypes, val)}
+              selectedWiFi={selectedWiFi}
+              onWiFiChange={(val) => toggleFilter(setSelectedWiFi, val)}
+              selectedM2Version={selectedM2Version}
+              onM2VersionChange={(val) => toggleFilter(setSelectedM2Version, val)}
+              selectedM2Count={selectedM2Count}
+              onM2CountChange={(val) => toggleFilter(setSelectedM2Count, val)}
+              selectedRAMSlots={selectedRAMSlots}
+              onRAMSlotsChange={(val) => toggleFilter(setSelectedRAMSlots, val)}
             />
           } 
         />

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { CATEGORIES } from '../../constants/categories';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../context/AppContext';
+import AuthRequiredModal from './AuthRequiredModal';
 
 interface CatalogProps {
   isOpen: boolean;
@@ -10,15 +13,23 @@ interface CatalogProps {
 
 export default function Catalog({ isOpen, onClose }: CatalogProps) {
   const { t } = useTranslation();
+  const { user, catalogCategory, setCatalogCategory } = useAppContext();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [lockedCategory, setLockedCategory] = useState<string | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      if (catalogCategory) {
+        setLockedCategory(catalogCategory);
+      }
+    } else {
       setActiveCategory(null);
       setLockedCategory(null);
+      setCatalogCategory(null);
     }
-  }, [isOpen]);
+  }, [isOpen, catalogCategory, setCatalogCategory]);
 
   if (!isOpen) return null;
 
@@ -114,8 +125,10 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
             {currentCategoryData && typeof currentCategoryData !== 'string' ? (
               <div style={{
                 display: 'flex',
+                flexWrap: 'wrap',
                 justifyContent: 'space-between',
-                width: '100%'
+                width: '100%',
+                rowGap: '40px'
               }}>
                 <style>
                   {`
@@ -126,6 +139,7 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                       align-items: center;
                       transition: all 0.3s ease;
                       cursor: pointer;
+                      width: 22%;
                     }
                     .category-group-link:hover h3 {
                       color: #A6CE39 !important;
@@ -135,18 +149,35 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                     }
                   `}
                 </style>
-                {currentCategoryData.groups?.map((group: any, idx: number) => (
-                  <a 
-                    key={idx} 
-                    href="#" 
-                    className="category-group-link"
-                    style={{ textAlign: 'center' }}
-                  >
+                {currentCategoryData.groups?.map((group: any, idx: number) => {
+                  const isExternal = group.path?.startsWith('http');
+                  return (
+                    <a 
+                      key={idx} 
+                      href={group.path || '#'} 
+                      className="category-group-link"
+                      style={{ textAlign: 'center' }}
+                      target={isExternal ? "_blank" : undefined}
+                      rel={isExternal ? "noopener noreferrer" : undefined}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (group.path?.startsWith('http')) {
+                          window.open(group.path, '_blank', 'noopener,noreferrer');
+                        } else if (group.path) {
+                          if (group.path === '/trade-in' && !user) {
+                            setIsAuthModalOpen(true);
+                            return;
+                          }
+                          onClose();
+                          navigate(group.path);
+                        }
+                      }}
+                    >
                     <h3 style={{
                       fontSize: '15px',
                       fontWeight: 700,
                       color: '#fff',
-                      margin: '0 0 16px 0',
+                      margin: '0 0 8px 0',
                       textTransform: 'uppercase',
                       textAlign: 'center',
                       transition: 'color 0.3s ease'
@@ -159,18 +190,18 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                         width: '100%', 
                         display: 'flex', 
                         justifyContent: 'center', 
-                        marginTop: '10px' 
+                        marginTop: '0' 
                       }}>
                         <img 
                           src={group.image} 
                           alt={group.title} 
                           style={{ 
                             width: 'auto', 
-                            maxWidth: '220px',
                             height: '180px', 
                             objectFit: 'contain',
                             borderRadius: '8px',
-                            transition: 'transform 0.3s ease'
+                            transition: 'transform 0.3s ease',
+                            padding: group.image.includes('zaglushka') ? '25px' : '0'
                           }}
                         />
                       </div>
@@ -209,12 +240,14 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                       ))}
                     </ul>
                   </a>
-                ))}
+                );
+              })}
               </div>
             ) : null}
           </div>
         </div>
       </div>
+      <AuthRequiredModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }

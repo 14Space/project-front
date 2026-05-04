@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '../../constants/categories';
+import { useAppContext } from '../../context/AppContext';
 
 interface SidebarProps {
   height?: string;
@@ -9,8 +10,14 @@ interface SidebarProps {
 export default function Sidebar({ height }: SidebarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { setIsCatalogOpen, setCatalogCategory } = useAppContext();
 
   const handleCategoryClick = (id: string) => {
+    if (id === 'services' || id === 'components') {
+      setCatalogCategory(id);
+      setIsCatalogOpen(true);
+      return;
+    }
     // Преобразуем camelCase в kebab-case для URL
     const path = id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
     navigate(`/${path}`);
