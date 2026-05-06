@@ -4,7 +4,7 @@ import QuickActions from '../components/home/QuickActions';
 import Advantages from '../components/home/Advantages';
 import Promotions from '../components/home/Promotions';
 import Blog from '../components/home/Blog';
-import SeoText from '../components/home/SeoText';
+
 
 export default function Home() {
   return (
@@ -16,7 +16,7 @@ export default function Home() {
       {/* Блог должен быть вторым после акций */}
       <Blog />
       <Advantages />
-      {/* <SeoText /> */}
+
     </div>
   );
 }
