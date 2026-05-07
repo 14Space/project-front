@@ -1,26 +1,29 @@
-import { ShieldCheck, Wrench, Headphones, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Wrench, RefreshCw, Headphones } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Warranty() {
-  const warrantyInfo = [
-    {
-      icon: <ShieldCheck size={24} color="#A6CE39" />,
-      title: 'Срок гарантии',
-      desc: 'На все новые комплектующие и готовые ПК предоставляется гарантия от 12 до 36 месяцев.'
+  const { t } = useTranslation();
+
+  const features = [
+    { 
+      icon: <ShieldCheck size={24} color="#A6CE39" />, 
+      title: t('warranty.features.official.title'), 
+      desc: t('warranty.features.official.desc') 
     },
-    {
-      icon: <Wrench size={24} color="#A6CE39" />,
-      title: 'Сервисный центр',
-      desc: 'Собственный технический отдел для быстрой диагностики и качественного ремонта оборудования.'
+    { 
+      icon: <Wrench size={24} color="#A6CE39" />, 
+      title: t('warranty.features.service.title'), 
+      desc: t('warranty.features.service.desc') 
     },
-    {
-      icon: <CheckCircle2 size={24} color="#A6CE39" />,
-      title: 'Гарантийные случаи',
-      desc: 'Бесплатное устранение заводских дефектов или полная замена устройства на новое.'
+    { 
+      icon: <RefreshCw size={24} color="#A6CE39" />, 
+      title: t('warranty.features.replace.title'), 
+      desc: t('warranty.features.replace.desc') 
     },
-    {
-      icon: <Headphones size={24} color="#A6CE39" />,
-      title: 'Поддержка 24/7',
-      desc: 'Онлайн-консультации специалистов по вопросам работы и настройки вашего железа.'
+    { 
+      icon: <Headphones size={24} color="#A6CE39" />, 
+      title: t('warranty.features.support.title'), 
+      desc: t('warranty.features.support.desc') 
     }
   ];
 
@@ -37,23 +40,33 @@ export default function Warranty() {
               textAlign: 'center',
               margin: 0
             }}>
-              Гарантия
+              {t('footer.links.warranty')}
             </h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
-            {warrantyInfo.map((item, i) => (
+            {features.map((feature, i) => (
               <div key={i} style={{ 
                 backgroundColor: 'rgba(255,255,255,0.03)', 
                 padding: '24px', 
-                borderRadius: '12px', 
-                border: '1px solid rgba(255,255,255,0.05)'
+                borderRadius: '16px', 
+                border: '1px solid rgba(255,255,255,0.05)',
+                textAlign: 'center'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <div style={{ flexShrink: 0 }}>{item.icon}</div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#fff' }}>{item.title}</h3>
+                <div style={{ 
+                  width: '48px', 
+                  height: '48px', 
+                  backgroundColor: 'rgba(166, 206, 57, 0.1)', 
+                  borderRadius: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 16px'
+                }}>
+                  {feature.icon}
                 </div>
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.6', margin: 0 }}>{item.desc}</p>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '10px' }}>{feature.title}</h3>
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.5', margin: 0 }}>{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -62,14 +75,14 @@ export default function Warranty() {
             backgroundColor: 'rgba(255,255,255,0.02)', 
             padding: '30px', 
             borderRadius: '16px', 
-            border: '1px solid rgba(255,255,255,0.05)' 
+            border: '1px solid rgba(255,255,255,0.05)'
           }}>
-            <h4 style={{ color: '#fff', fontSize: '18px', fontWeight: 700, marginBottom: '15px' }}>Важно знать:</h4>
-            <ul style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', lineHeight: '1.8', padding: 0, margin: 0, listStyle: 'none' }}>
-              <li style={{ marginBottom: '10px' }}>1) Сохраняйте гарантийный талон и чек на протяжении всего срока гарантии.</li>
-              <li style={{ marginBottom: '10px' }}>2) Гарантия не распространяется на механические повреждения и следы самостоятельного вскрытия.</li>
-              <li>3) При обнаружении неисправности рекомендуем сразу обратиться в нашу службу поддержки.</li>
-            </ul>
+            <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', marginBottom: '20px' }}>{t('warranty.importantTitle')}</h3>
+            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '15px', lineHeight: '1.8', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <p style={{ margin: 0 }}>{t('warranty.rules.r1')}</p>
+              <p style={{ margin: 0 }}>{t('warranty.rules.r2')}</p>
+              <p style={{ margin: 0 }}>{t('warranty.rules.r3')}</p>
+            </div>
           </div>
         </div>
       </section>

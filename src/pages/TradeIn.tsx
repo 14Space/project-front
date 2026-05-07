@@ -160,7 +160,7 @@ export default function TradeIn() {
                       width: 'fit-content'
                     }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#FFAB00' }} />
-                      {i18n.language.startsWith('ru') ? 'На рассмотрении' : 'Under review'}
+                      {t('tradeIn.form.statusUnderReview')}
                     </div>
 
                     <button
@@ -233,7 +233,7 @@ export default function TradeIn() {
                 <Plus size={32} />
               </div>
               <span style={{ color: '#888', fontWeight: 600, fontSize: '15px' }}>
-                {i18n.language.startsWith('ru') ? 'Добавить товар' : 'Add Item'}
+                {t('tradeIn.form.addItem')}
               </span>
             </div>
           </div>
@@ -696,7 +696,7 @@ export default function TradeIn() {
                   <X size={32} />
                 </div>
                 <h3 style={{ color: '#fff', fontSize: '20px', fontWeight: 700, marginBottom: '32px', lineHeight: 1.4 }}>
-                  {i18n.language.startsWith('ru') ? 'Вы точно хотите удалить вашу заявку на Трейд Ин?' : 'Are you sure you want to delete your Trade-In request?'}
+                  {t('tradeIn.form.deletePrompt')}
                 </h3>
                 <div style={{ display: 'flex', gap: '16px' }}>
                   <button
@@ -714,7 +714,7 @@ export default function TradeIn() {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e64545'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff4d4d'}
                   >
-                    {i18n.language.startsWith('ru') ? 'Да, удалить' : 'Yes, delete'}
+                    {t('tradeIn.form.deleteConfirm')}
                   </button>
                   <button
                     onClick={() => setRequestToDelete(null)}
@@ -732,7 +732,7 @@ export default function TradeIn() {
                     onMouseEnter={(e) => e.currentTarget.style.borderColor = '#666'}
                     onMouseLeave={(e) => e.currentTarget.style.borderColor = '#333'}
                   >
-                    {i18n.language.startsWith('ru') ? 'Нет, отмена' : 'No, cancel'}
+                    {t('tradeIn.form.deleteCancel')}
                   </button>
                 </div>
               </div>

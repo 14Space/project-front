@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
@@ -6,6 +7,7 @@ import CoolingFilters from '../components/product/CoolingFilters';
 import { HOT_DEALS } from '../constants/products';
 
 export default function Cooling() {
+  const { t } = useTranslation();
   
   const [activeSort, setActiveSort] = useState('popularity');
   
@@ -43,13 +45,13 @@ export default function Cooling() {
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '60px' }}>
       <div className="container" style={{ padding: '5px 20px 0' }}>
         <Breadcrumbs items={[
-          { label: 'Системы охлаждения', active: true }
+          { label: t('sidebar.cooling'), active: true }
         ]} />
       </div>
 
       <div className="container" style={{ padding: '0 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <h1 className="title" style={{ fontSize: '32px', margin: 0 }}>Системы охлаждения</h1>
+          <h1 className="title" style={{ fontSize: '32px', margin: 0 }}>{t('sidebar.cooling')}</h1>
           <SortButtons onSortChange={setActiveSort} />
         </div>
         

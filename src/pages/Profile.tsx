@@ -11,6 +11,7 @@ const Profile: React.FC = () => {
 
   const [isEditing, setIsEditing] = React.useState(false);
   const [isCityOpen, setIsCityOpen] = React.useState(false);
+  const [emailError, setEmailError] = React.useState(false);
   const [formData, setFormData] = React.useState({
     name: '',
     lastName: '',
@@ -29,15 +30,23 @@ const Profile: React.FC = () => {
         lastName: user.lastName || '',
         email: user.email || '',
         phone: user.phone || '',
-        city: user.city || 'Кишинёв',
+        city: user.city || t('profile.cities.chisinau'),
         street: user.street || ''
       });
     }
-  }, [user, navigate]);
+  }, [user, navigate, t]);
 
   if (!user) return null;
 
   const handleSave = () => {
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setEmailError(true);
+      return;
+    }
+
+    setEmailError(false);
     updateUser(formData);
     setIsEditing(false);
   };
@@ -48,13 +57,19 @@ const Profile: React.FC = () => {
       lastName: user.lastName || '',
       email: user.email || '',
       phone: user.phone || '',
-      city: user.city || 'Кишинёв',
+      city: user.city || t('profile.cities.chisinau'),
       street: user.street || ''
     });
     setIsEditing(false);
+    setEmailError(false);
   };
 
-  const cities = ['Кишинёв', 'Бельцы', 'Тирасполь', 'Бендеры', 'Рыбница', 'Кагул', 'Унгены', 'Сороки', 'Орхей', 'Комрат'];
+  const cities = [
+    t('profile.cities.chisinau'), t('profile.cities.balti'), t('profile.cities.tiraspol'), 
+    t('profile.cities.bender'), t('profile.cities.ribnita'), t('profile.cities.cahul'), 
+    t('profile.cities.ungheni'), t('profile.cities.soroca'), t('profile.cities.orhei'), 
+    t('profile.cities.comrat')
+  ];
 
   return (
     <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
@@ -246,12 +261,31 @@ const Profile: React.FC = () => {
                   <div>
                     <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.email')}</label>
                     {isEditing ? (
-                      <input 
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                      />
+                      <>
+                        <input 
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => {
+                            setFormData({ ...formData, email: e.target.value });
+                            if (emailError) setEmailError(false);
+                          }}
+                          style={{ 
+                            width: '100%', 
+                            padding: '12px 16px', 
+                            borderRadius: '8px', 
+                            border: `1px solid ${emailError ? '#ff4d4d' : '#A6CE39'}`, 
+                            backgroundColor: 'transparent', 
+                            color: '#fff', 
+                            outline: 'none',
+                            transition: 'border-color 0.2s'
+                          }}
+                        />
+                        {emailError && (
+                          <span style={{ color: '#ff4d4d', fontSize: '11px', marginTop: '4px', display: 'block' }}>
+                            {t('profile.emailError')}
+                          </span>
+                        )}
+                      </>
                     ) : (
                       <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff', fontSize: '15px' }}>
                         {user.email}
@@ -390,7 +424,7 @@ const Profile: React.FC = () => {
                       <div 
                         onClick={() => {
                           if (!user.street) {
-                            setFormData(prev => ({ ...prev, city: user.city || 'Кишинёв', street: '' }));
+                            setFormData(prev => ({ ...prev, city: user.city || t('profile.cities.chisinau'), street: '' }));
                           }
                           setIsEditing(true);
                         }}

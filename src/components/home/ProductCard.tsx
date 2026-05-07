@@ -55,7 +55,7 @@ export default function ProductCard({ id, code, title, price, oldPrice, inStock,
         {/* 1. Верхняя панель: Код слева, Действия справа */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: '15px', color: '#666' }}>
-            Код: <span style={{ fontWeight: 700, color: 'var(--text-color)' }}>{code}</span>
+            {t('common.code')}: <span style={{ fontWeight: 700, color: 'var(--text-color)' }}>{code}</span>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
