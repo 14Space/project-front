@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 
 interface FilterSectionProps {
@@ -45,6 +46,7 @@ const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }
 };
 
 export default function EmptyFilters() {
+  const { t } = useTranslation();
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
@@ -65,16 +67,14 @@ export default function EmptyFilters() {
         paddingBottom: '12px', 
         borderBottom: '1px solid var(--border-color)',
         margin: 0
-      }}>
-        Фильтры
-      </div>
+      }}>{t('filters.title')}</div>
 
       {/* Цена */}
-      <FilterSection title="Цена" hasBorder={false}>
+      <FilterSection title={t('filters.price')} hasBorder={false}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input 
             type="text" 
-            placeholder="от" 
+            placeholder={t('filters.from')} 
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ''))}
             style={{ 
@@ -90,7 +90,7 @@ export default function EmptyFilters() {
           <span style={{ color: 'var(--text-secondary)' }}>–</span>
           <input 
             type="text" 
-            placeholder="до" 
+            placeholder={t('filters.to')} 
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value.replace(/\D/g, ''))}
             style={{ 

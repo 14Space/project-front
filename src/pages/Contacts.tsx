@@ -1,13 +1,16 @@
 import { Phone, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Contacts() {
+  const { t } = useTranslation();
+
   const allContacts = [
-    { icon: <Phone size={20} color="#A6CE39" />, value: '+373 69 467 556', label: 'Телефон', href: 'tel:+37369467556' },
-    { icon: <Phone size={20} color="#A6CE39" />, value: '+373 78 658 351', label: 'Телефон', href: 'tel:+37378658351' },
-    { icon: <Mail size={20} color="#A6CE39" />, value: 'sales@frame.md', label: 'Отдел продаж', href: 'mailto:sales@frame.md' },
-    { icon: <Mail size={20} color="#A6CE39" />, value: 'service@frame.md', label: 'Сервис и поддержка', href: 'mailto:service@frame.md' },
-    { icon: <Mail size={20} color="#A6CE39" />, value: 'hr@frame.md', label: 'Работа у нас', href: 'mailto:hr@frame.md' },
-    { icon: <Mail size={20} color="#A6CE39" />, value: 'corp@frame.md', label: 'Безналичный расчет', href: 'mailto:corp@frame.md' }
+    { icon: <Phone size={20} color="#A6CE39" />, value: '+373 69 467 556', label: t('contacts.phone'), href: 'tel:+37369467556' },
+    { icon: <Phone size={20} color="#A6CE39" />, value: '+373 78 658 351', label: t('contacts.phone'), href: 'tel:+37378658351' },
+    { icon: <Mail size={20} color="#A6CE39" />, value: 'sales@frame.md', label: t('contacts.sales'), href: 'mailto:sales@frame.md' },
+    { icon: <Mail size={20} color="#A6CE39" />, value: 'service@frame.md', label: t('contacts.service'), href: 'mailto:service@frame.md' },
+    { icon: <Mail size={20} color="#A6CE39" />, value: 'hr@frame.md', label: t('contacts.hr'), href: 'mailto:hr@frame.md' },
+    { icon: <Mail size={20} color="#A6CE39" />, value: 'corp@frame.md', label: t('contacts.corp'), href: 'mailto:corp@frame.md' }
   ];
 
   const socialLinks = [
@@ -30,7 +33,7 @@ export default function Contacts() {
               textAlign: 'center',
               margin: 0
             }}>
-              Контакты
+              {t('footer.links.contacts')}
             </h2>
           </div>
 
@@ -88,7 +91,7 @@ export default function Contacts() {
               textTransform: 'uppercase',
               margin: 0
             }}>
-              Мы в соцсетях
+              {t('footer.sections.socialTitle')}
             </h2>
           </div>
 

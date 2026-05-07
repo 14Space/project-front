@@ -1,26 +1,52 @@
-import { RotateCcw, Box, CreditCard, HelpCircle } from 'lucide-react';
+import { RotateCcw, Box, ClipboardCheck, Banknote, MessageCircle, Package, Store, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Return() {
-  const returnSteps = [
-    {
-      icon: <RotateCcw size={24} color="#A6CE39" />,
-      title: '14 дней на возврат',
-      desc: 'Вы можете вернуть или обменять товар в течение 14 дней с момента покупки.'
+  const { t } = useTranslation();
+
+  const features = [
+    { 
+      icon: <RotateCcw size={24} color="#A6CE39" />, 
+      title: t('return.features.days.title'), 
+      desc: t('return.features.days.desc') 
     },
-    {
-      icon: <Box size={24} color="#A6CE39" />,
-      title: 'Состояние товара',
-      desc: 'Товар должен сохранить товарный вид, упаковку, пломбы и полную комплектацию.'
+    { 
+      icon: <Box size={24} color="#A6CE39" />, 
+      title: t('return.features.appearance.title'), 
+      desc: t('return.features.appearance.desc') 
     },
-    {
-      icon: <CreditCard size={24} color="#A6CE39" />,
-      title: 'Возврат средств',
-      desc: 'Деньги возвращаются тем же способом, которым была произведена оплата.'
+    { 
+      icon: <ClipboardCheck size={24} color="#A6CE39" />, 
+      title: t('return.features.completeness.title'), 
+      desc: t('return.features.completeness.desc') 
     },
-    {
-      icon: <HelpCircle size={24} color="#A6CE39" />,
-      title: 'Как оформить?',
-      desc: 'Просто свяжитесь с нами по телефону или посетите любой из наших шоурумов.'
+    { 
+      icon: <Banknote size={24} color="#A6CE39" />, 
+      title: t('return.features.fast.title'), 
+      desc: t('return.features.fast.desc') 
+    }
+  ];
+
+  const steps = [
+    { 
+      icon: <MessageCircle size={20} color="#A6CE39" />, 
+      title: t('return.steps.contact.title'), 
+      desc: t('return.steps.contact.desc') 
+    },
+    { 
+      icon: <Package size={20} color="#A6CE39" />, 
+      title: t('return.steps.prepare.title'), 
+      desc: t('return.steps.prepare.desc') 
+    },
+    { 
+      icon: <Store size={20} color="#A6CE39" />, 
+      title: t('return.steps.showroom.title'), 
+      desc: t('return.steps.showroom.desc') 
+    },
+    { 
+      icon: <CheckCircle2 size={20} color="#A6CE39" />, 
+      title: t('return.steps.money.title'), 
+      desc: t('return.steps.money.desc') 
     }
   ];
 
@@ -37,23 +63,81 @@ export default function Return() {
               textAlign: 'center',
               margin: 0
             }}>
-              Возврат товара
+              {t('footer.links.return')}
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
+            {features.map((feature, i) => (
+              <div key={i} style={{ 
+                backgroundColor: 'rgba(255,255,255,0.03)', 
+                padding: '24px', 
+                borderRadius: '16px', 
+                border: '1px solid rgba(255,255,255,0.05)',
+                textAlign: 'center'
+              }}>
+                <div style={{ 
+                  width: '48px', 
+                  height: '48px', 
+                  backgroundColor: 'rgba(166, 206, 57, 0.1)', 
+                  borderRadius: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 16px'
+                }}>
+                  {feature.icon}
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '10px' }}>{feature.title}</h3>
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.5', margin: 0 }}>{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <h2 style={{ 
+              fontSize: '28px', 
+              fontWeight: 700, 
+              color: '#fff', 
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              margin: 0
+            }}>
+              {t('return.stepsTitle')}
             </h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-            {returnSteps.map((step, i) => (
+            {steps.map((step, i) => (
               <div key={i} style={{ 
-                backgroundColor: 'rgba(255,255,255,0.03)', 
+                backgroundColor: 'rgba(255,255,255,0.02)', 
                 padding: '24px', 
-                borderRadius: '12px', 
-                border: '1px solid rgba(255,255,255,0.05)'
+                borderRadius: '16px', 
+                border: '1px solid rgba(255,255,255,0.05)',
+                position: 'relative'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <div style={{ flexShrink: 0 }}>{step.icon}</div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#fff' }}>{step.title}</h3>
+                <div style={{ 
+                  width: '32px', 
+                  height: '32px', 
+                  backgroundColor: '#A6CE39', 
+                  color: '#111', 
+                  borderRadius: '50%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  position: 'absolute',
+                  top: '-16px',
+                  left: '24px'
+                }}>
+                  {i + 1}
                 </div>
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.6', margin: 0 }}>{step.desc}</p>
+                <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  {step.icon}
+                  <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: 0 }}>{step.title}</h4>
+                </div>
+                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.6', margin: 0 }}>{step.desc}</p>
               </div>
             ))}
           </div>

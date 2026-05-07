@@ -18,11 +18,32 @@
     "noData": "Nothing here yet ;)",
     "edit": "Edit",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "code": "Code"
+  },
+  "pcBuild": {
+    "title": "PC Configurator"
+  },
+  "orderStatus": {
+    "preparing": "Preparing for shipment",
+    "titles": {
+      "main": "Order Statuses"
+    },
+    "quantity": "Quantity",
+    "details": "Details",
+    "empty": "Nothing here yet ;)"
   },
   "sidebar": {
     "computers": "Computers",
     "laptops": "Laptops",
+    "cpus": "Processors",
+    "gpus": "Graphics Cards",
+    "motherboards": "Motherboards",
+    "ram": "RAM",
+    "storage": "Storage Devices",
+    "cases": "PC Cases",
+    "cooling": "Cooling Systems",
+    "psus": "Power Supplies",
     "components": "PC Components",
     "gaming": "Gaming Peripherals",
     "monitors": "Monitors",
@@ -136,53 +157,18 @@
     "computers": {
       "title": "Computers",
       "groups": [
-        {
-          "title": "Gaming",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png",
-          "path": "/computers"
-        },
-        {
-          "title": "Mini PCs",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-mini-pcs.png",
-          "path": "/computers"
-        },
-        {
-          "title": "All-in-Ones",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png",
-          "path": "/computers"
-        },
-        {
-          "title": "Workstations",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-workstations.png",
-          "path": "/computers"
-        }
+        { "title": "Gaming", "items": [], "image": "/subcategories/SUBCATEGORIES-gaming-pcs.png", "path": "/computers" },
+        { "title": "Mini PCs", "items": [], "image": "/subcategories/SUBCATEGORIES-mini-pcs.png", "path": "/computers" },
+        { "title": "All-in-Ones", "items": [], "image": "/subcategories/SUBCATEGORIES-all-in-one computer.png", "path": "/computers" },
+        { "title": "Workstations", "items": [], "image": "/subcategories/SUBCATEGORIES-workstations.png", "path": "/computers" }
       ]
     },
     "laptops": {
       "title": "Laptops",
       "groups": [
-        {
-          "title": "Gaming",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-gaming-laptops.png",
-          "path": "/laptops"
-        },
-        {
-          "title": "For Study",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-for-study.png",
-          "path": "/laptops"
-        },
-        {
-          "title": "MacBook",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-macbook.png",
-          "path": "/laptops"
-        }
+        { "title": "Gaming", "items": [], "image": "/subcategories/SUBCATEGORIES-gaming-laptops.png", "path": "/laptops" },
+        { "title": "For Study", "items": [], "image": "/subcategories/SUBCATEGORIES-for-study.png", "path": "/laptops" },
+        { "title": "MacBook", "items": [], "image": "/subcategories/SUBCATEGORIES-macbook.png", "path": "/laptops" }
       ]
     },
     "components": {
@@ -201,21 +187,9 @@
     "monitors": {
       "title": "Monitors",
       "groups": [
-        {
-          "title": "Gaming",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
-        },
-        {
-          "title": "Curved",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
-        },
-        {
-          "title": "For Color Work",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
-        }
+        { "title": "Gaming", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors" },
+        { "title": "Curved", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors" },
+        { "title": "For Color Work", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors" }
       ]
     },
     "peripherals": {
@@ -282,7 +256,20 @@
     "confirmDeletePrompt": "Type CONFIRM to permanently delete your account",
     "deleteFailed": "Incorrect text. Deletion cancelled.",
     "confirmLogout": "Are you sure you want to log out?",
-    "confirmKeyword": "CONFIRM"
+    "confirmKeyword": "CONFIRM",
+    "emailError": "Please enter a valid Email",
+    "cities": {
+      "chisinau": "Chisinau",
+      "balti": "Balti",
+      "tiraspol": "Tiraspol",
+      "bender": "Bender",
+      "ribnita": "Ribnita",
+      "cahul": "Cahul",
+      "ungheni": "Ungheni",
+      "soroca": "Soroca",
+      "orhei": "Orhei",
+      "comrat": "Comrat"
+    }
   },
   "auth": {
     "login": "Login",
@@ -350,9 +337,151 @@
       }
     }
   },
+  "contacts": {
+    "sales": "Sales Department",
+    "service": "Service & Support",
+    "hr": "Careers",
+    "corp": "Corporate Sales",
+    "phone": "Phone",
+    "email": "E-mail"
+  },
+  "vacancies": {
+    "intro": "Join the FRAME team! We are looking for talented people who love hardware and technology.",
+    "apply": "Apply",
+    "jobs": {
+      "sales": {
+        "title": "Sales Manager",
+        "salary": "from 22,000 MDL",
+        "desc": "Consulting clients, helping with component selection, and order processing."
+      },
+      "assembly": {
+        "title": "Gaming PC Assembly Specialist",
+        "salary": "from 20,000 MDL",
+        "desc": "Professional PC assembly, cable management, and stress testing."
+      },
+      "service": {
+        "title": "Service Center Technician",
+        "salary": "from 20,000 MDL",
+        "desc": "Fault diagnosis, modular repairs, and cooling system maintenance."
+      }
+    }
+  },
+  "reviews": {
+    "placeholder": "We are still thinking about how to implement this ;)"
+  },
+  "delivery": {
+    "title": "Delivery",
+    "features": {
+      "allMoldova": {
+        "title": "All over Moldova",
+        "desc": "We deliver orders to any point in the country in the shortest possible time."
+      },
+      "free": {
+        "title": "Free delivery",
+        "desc": "When ordering over 5000 MDL, delivery in Chisinau is free."
+      },
+      "express": {
+        "title": "Express delivery",
+        "desc": "Get your order on the same day if the item is in stock."
+      },
+      "floor": {
+        "title": "Floor delivery",
+        "desc": "Large equipment is delivered directly to your apartment."
+      }
+    },
+    "pickupTitle": "OR PICKUP DIRECTLY FROM SHOWROOMS"
+  },
+  "payment": {
+    "title": "Payment",
+    "methods": {
+      "cash": {
+        "title": "Cash",
+        "desc": "Payment upon receipt to the courier or at the showroom cash desk."
+      },
+      "card": {
+        "title": "Online by card",
+        "desc": "Secure payment with Visa and MasterCard directly on the website."
+      },
+      "credit": {
+        "title": "Installments",
+        "desc": "Registration of credit or 0% installments through partners."
+      },
+      "corp": {
+        "title": "For Legal Entities",
+        "desc": "Bank transfer for companies with provision of all documents."
+      }
+    }
+  },
+  "warranty": {
+    "title": "Warranty",
+    "features": {
+      "official": {
+        "title": "Official Warranty",
+        "desc": "All products are accompanied by an official manufacturer's warranty."
+      },
+      "service": {
+        "title": "Service Center",
+        "desc": "Our own service center for fast and high-quality maintenance."
+      },
+      "replace": {
+        "title": "Device Replacement",
+        "desc": "If repair is not possible, we will replace the item with a new one in the shortest time."
+      },
+      "support": {
+        "title": "Tech Support",
+        "desc": "Qualified assistance with any questions regarding device operation."
+      }
+    },
+    "importantTitle": "Important to know:",
+    "rules": {
+      "r1": "1) Keep the warranty card and receipt throughout the warranty period.",
+      "r2": "2) The warranty does not cover mechanical damage.",
+      "r3": "3) The warranty period depends on the product category and brand."
+    }
+  },
+  "return": {
+    "title": "Return Policy",
+    "features": {
+      "days": {
+        "title": "14 days to return",
+        "desc": "You can return or exchange an item within 14 days from the date of purchase."
+      },
+      "appearance": {
+        "title": "Preservation of appearance",
+        "desc": "The item must maintain its commercial appearance, packaging, and all consumer properties."
+      },
+      "completeness": {
+        "title": "Full completeness",
+        "desc": "For a return, all accessories and documentation must be present."
+      },
+      "fast": {
+        "title": "Fast refund",
+        "desc": "We will refund the money within 3 working days after checking the item."
+      }
+    },
+    "stepsTitle": "HOW TO ARRANGE A RETURN?",
+    "steps": {
+      "contact": {
+        "title": "Contact us",
+        "desc": "Call us or message us to clarify the details."
+      },
+      "prepare": {
+        "title": "Prepare the item",
+        "desc": "Pack the device in its original packaging with all receipts."
+      },
+      "showroom": {
+        "title": "Bring to showroom",
+        "desc": "Deliver the item to any of our stores for diagnostics."
+      },
+      "money": {
+        "title": "Get your money",
+        "desc": "After checking, we will process the refund using a method convenient for you."
+      }
+    }
+  },
   "tradeIn": {
     "title": "Trade-In & Buyback",
-    "subtitle": "Submit a request to evaluate your device and get a discount on a new one",
+    "subtitle": "Submit a request for device appraisal and get a discount on a new one",
     "form": {
       "category": "Product Category",
       "condition": "Condition",
@@ -360,11 +489,16 @@
       "conditionOpenBox": "Open Box",
       "conditionUsed": "Used",
       "description": "Product Description",
-      "descriptionPlaceholder": "Describe specifications, defects, and package contents...",
+      "descriptionPlaceholder": "Describe specs, defects, and completeness...",
       "photos": "Product Photos",
-      "photosDesc": "Add up to 5 photos in JPG, PNG, IMG formats",
+      "photosDesc": "Add up to 5 photos in JPG, PNG, or IMG formats.",
       "submit": "Submit Request",
-      "success": "Your request has been successfully sent! Our managers will contact you for evaluation.",
+      "success": "Your request has been successfully submitted! Our managers will contact you for appraisal.",
+      "statusUnderReview": "Under review",
+      "addItem": "Add Item",
+      "deletePrompt": "Are you sure you want to delete your Trade-In request?",
+      "deleteConfirm": "Yes, delete",
+      "deleteCancel": "No, cancel",
       "categories": {
         "computers": "Computers",
         "laptops": "Laptops",
@@ -375,5 +509,13 @@
         "networking": "Networking Equipment"
       }
     }
+  },
+  "filters": {
+    "title": "Filters",
+    "price": "Price",
+    "from": "from",
+    "to": "to",
+    "subcategories": "Subcategories",
+    "brands": "Brands"
   }
 }

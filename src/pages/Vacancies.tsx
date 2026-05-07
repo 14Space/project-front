@@ -1,19 +1,23 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Vacancies() {
+  const { t } = useTranslation();
+
   const jobs = [
     {
-      title: 'Менеджер по продажам',
-      salary: 'от 22,000 MDL',
-      desc: 'Консультирование клиентов, помощь в подборе комплектующих и оформление заказов.'
+      title: t('vacancies.jobs.sales.title'),
+      salary: t('vacancies.jobs.sales.salary'),
+      desc: t('vacancies.jobs.sales.desc')
     },
     {
-      title: 'Сборщик игровых ПК',
-      salary: 'от 20,000 MDL',
-      desc: 'Профессиональная сборка компьютеров, кабель-менеджмент и стресс-тестирование.'
+      title: t('vacancies.jobs.assembly.title'),
+      salary: t('vacancies.jobs.assembly.salary'),
+      desc: t('vacancies.jobs.assembly.desc')
     },
     {
-      title: 'Мастер сервисного центра',
-      salary: 'от 20,000 MDL',
-      desc: 'Диагностика неисправностей, модульный ремонт и обслуживание систем охлаждения.'
+      title: t('vacancies.jobs.service.title'),
+      salary: t('vacancies.jobs.service.salary'),
+      desc: t('vacancies.jobs.service.desc')
     }
   ];
 
@@ -30,13 +34,13 @@ export default function Vacancies() {
               textAlign: 'center',
               margin: 0
             }}>
-              Вакансии
+              {t('footer.links.vacancies')}
             </h2>
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '16px' }}>
-              Присоединяйся к команде FRAME! Мы ищем талантливых людей, влюбленных в железо и технологии.
+              {t('vacancies.intro')}
             </p>
           </div>
 
@@ -81,7 +85,7 @@ export default function Vacancies() {
                       e.currentTarget.style.color = '#fff';
                     }}
                   >
-                    Откликнуться
+                    {t('vacancies.apply')}
                   </a>
                 </div>
               </div>

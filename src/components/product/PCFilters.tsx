@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 
 interface FilterSectionProps {
@@ -113,6 +114,7 @@ export default function PCFilters({
   maxPrice,
   onMaxPriceChange
 }: PCFiltersProps) {
+  const { t } = useTranslation();
   // Остальные состояния (SSD, RAM и т.д.) пока оставим локальными для простоты, 
   // так как мы оживляем только основные фильтры по просьбе пользователя.
   const [selectedVRAM, setSelectedVRAM] = useState<string[]>([]);
@@ -143,16 +145,14 @@ export default function PCFilters({
         paddingBottom: '12px', 
         borderBottom: '1px solid var(--border-color)',
         margin: 0
-      }}>
-        Фильтры
-      </div>
+      }}>{t('filters.title')}</div>
 
       {/* Цена */}
-      <FilterSection title="Цена">
+      <FilterSection title={t('filters.price')}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input 
             type="text" 
-            placeholder="от" 
+            placeholder={t('filters.from')} 
             value={minPrice}
             onChange={(e) => onMinPriceChange(e.target.value.replace(/\D/g, ''))}
             style={{ 
@@ -168,7 +168,7 @@ export default function PCFilters({
           <span style={{ color: 'var(--text-secondary)' }}>–</span>
           <input 
             type="text" 
-            placeholder="до" 
+            placeholder={t('filters.to')} 
             value={maxPrice}
             onChange={(e) => onMaxPriceChange(e.target.value.replace(/\D/g, ''))}
             style={{ 
@@ -185,7 +185,7 @@ export default function PCFilters({
       </FilterSection>
 
       {/* Подкатегории */}
-      <FilterSection title="Подкатегории">
+      <FilterSection title={t('filters.subcategories')}>
         {subcategoryList.map(label => (
           <Checkbox 
             key={label} 
@@ -197,7 +197,7 @@ export default function PCFilters({
       </FilterSection>
 
       {/* Производители */}
-      <FilterSection title="Производители">
+      <FilterSection title={t('filters.brands')}>
         {['Apple', 'ASUS', 'Lenovo'].map(b => (
           <Checkbox 
             key={b} 

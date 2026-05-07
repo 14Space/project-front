@@ -39,12 +39,8 @@ export default function Cart() {
         image: p.images[0]
       })),
       totalPrice,
-      status: i18n.language.startsWith('ru') ? 'Готовится к отправке' : 'Preparing for shipment',
-      date: new Date().toLocaleDateString(i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      })
+      status: 'preparing', // Store key instead of localized string
+      date: new Date().toISOString() // Store ISO string for dynamic formatting
     };
 
     createOrder(orderData);

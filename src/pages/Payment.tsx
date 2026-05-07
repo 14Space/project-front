@@ -1,26 +1,29 @@
-import { Banknote, CreditCard, Coins, ShieldCheck } from 'lucide-react';
+import { Wallet, CreditCard, Percent, Building2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Payment() {
-  const paymentMethods = [
-    {
-      icon: <Banknote size={24} color="#A6CE39" />,
-      title: 'Наложенный платеж',
-      desc: 'Оплата наличными или картой при получении заказа в отделении или у курьера.'
+  const { t } = useTranslation();
+
+  const methods = [
+    { 
+      icon: <Wallet size={24} color="#A6CE39" />, 
+      title: t('payment.methods.cash.title'), 
+      desc: t('payment.methods.cash.desc') 
     },
-    {
-      icon: <CreditCard size={24} color="#A6CE39" />,
-      title: 'Карта Visa',
-      desc: 'Безопасная оплата картой Visa любого банка через защищенный шлюз.'
+    { 
+      icon: <CreditCard size={24} color="#A6CE39" />, 
+      title: t('payment.methods.card.title'), 
+      desc: t('payment.methods.card.desc') 
     },
-    {
-      icon: <CreditCard size={24} color="#A6CE39" />,
-      title: 'Карта Mastercard',
-      desc: 'Быстрая и удобная оплата картой Mastercard любого банка.'
+    { 
+      icon: <Percent size={24} color="#A6CE39" />, 
+      title: t('payment.methods.credit.title'), 
+      desc: t('payment.methods.credit.desc') 
     },
-    {
-      icon: <Coins size={24} color="#A6CE39" />,
-      title: 'Оплата USDT',
-      desc: 'Оплата в криптовалюте USDT (TRC-20) по актуальному курсу на момент заказа.'
+    { 
+      icon: <Building2 size={24} color="#A6CE39" />, 
+      title: t('payment.methods.corp.title'), 
+      desc: t('payment.methods.corp.desc') 
     }
   ];
 
@@ -28,7 +31,6 @@ export default function Payment() {
     <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <section className="section" style={{ padding: '20px 0 40px 0' }}>
         <div className="container">
-          {/* ОСНОВНОЙ ЗАГОЛОВОК */}
           <div style={{ marginBottom: '20px' }}>
             <h2 style={{ 
               fontSize: '28px', 
@@ -38,24 +40,33 @@ export default function Payment() {
               textAlign: 'center',
               margin: 0
             }}>
-              Способы оплаты
+              {t('footer.links.payment')}
             </h2>
           </div>
 
-          {/* СЕТКА СПОСОБОВ ОПЛАТЫ */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-            {paymentMethods.map((method, i) => (
+            {methods.map((method, i) => (
               <div key={i} style={{ 
                 backgroundColor: 'rgba(255,255,255,0.03)', 
                 padding: '24px', 
-                borderRadius: '12px', 
-                border: '1px solid rgba(255,255,255,0.05)'
+                borderRadius: '16px', 
+                border: '1px solid rgba(255,255,255,0.05)',
+                textAlign: 'center'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <div style={{ flexShrink: 0 }}>{method.icon}</div>
-                  <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: '#fff' }}>{method.title}</h3>
+                <div style={{ 
+                  width: '48px', 
+                  height: '48px', 
+                  backgroundColor: 'rgba(166, 206, 57, 0.1)', 
+                  borderRadius: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 16px'
+                }}>
+                  {method.icon}
                 </div>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.5', margin: 0 }}>{method.desc}</p>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '10px' }}>{method.title}</h3>
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.5', margin: 0 }}>{method.desc}</p>
               </div>
             ))}
           </div>

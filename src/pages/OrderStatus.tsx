@@ -22,7 +22,7 @@ export default function OrderStatus() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <PackageSearch size={28} color="#A6CE39" />
             <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 700, margin: 0 }}>
-              {i18n.language.startsWith('ru') ? 'Статусы заказов' : 'Order Statuses'}
+              {t('orderStatus.titles.main')}
             </h1>
           </div>
 
@@ -32,6 +32,36 @@ export default function OrderStatus() {
                 const item = order.currentItem;
                 const product = HOT_DEALS.find(p => p.id === item.id);
                 const imagePath = product?.images[0] || item.image;
+
+                // Dynamic Status Translation (with legacy support)
+                let displayStatus = order.status;
+                if (order.status === 'preparing') {
+                  displayStatus = t('orderStatus.preparing');
+                } else if (i18n.language.startsWith('en')) {
+                  // Legacy support for hardcoded RU statuses
+                  if (order.status === 'Готовится к отправке') displayStatus = 'Preparing for shipment';
+                } else if (i18n.language.startsWith('ru')) {
+                  if (order.status === 'Preparing for shipment') displayStatus = 'Готовится к отправке';
+                }
+
+                // Dynamic Date Formatting (with legacy support)
+                let displayDate = order.date;
+                const parsedDate = new Date(order.date);
+                if (!isNaN(parsedDate.getTime()) && order.date.includes('-')) { // Basic check for ISO or YYYY-MM-DD
+                  displayDate = parsedDate.toLocaleDateString(i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  });
+                } else if (i18n.language.startsWith('en')) {
+                  // Legacy support for hardcoded RU dates (very basic mapping for the screenshot case)
+                  displayDate = displayDate
+                    .replace('января', 'January').replace('февраля', 'February').replace('марта', 'March')
+                    .replace('апреля', 'April').replace('мая', 'May').replace('июня', 'June')
+                    .replace('июля', 'July').replace('августа', 'August').replace('сентября', 'September')
+                    .replace('октября', 'October').replace('ноября', 'November').replace('декабря', 'December')
+                    .replace(' г.', '');
+                }
 
                 return (
                   <div 
@@ -62,7 +92,7 @@ export default function OrderStatus() {
                     }}>
                       {imagePath ? (
                         <img 
-                          src={`/products/${imagePath}`} 
+                           src={imagePath.startsWith('http') ? imagePath : `/products/${imagePath}`} 
                           alt={item.title} 
                           style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                         />
@@ -82,19 +112,19 @@ export default function OrderStatus() {
                           padding: '4px 12px', 
                           borderRadius: '20px'
                         }}>
-                          {order.status}
+                          {displayStatus}
                         </span>
                       </div>
                       <div style={{ color: '#888', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Clock size={14} />
-                        {order.date}
+                        {displayDate}
                       </div>
                       <div style={{ marginTop: '16px' }}>
                         <div style={{ color: '#ccc', fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>
                           {t(item.title)}
                         </div>
                         <div style={{ color: '#888', fontSize: '13px' }}>
-                          {i18n.language.startsWith('ru') ? 'Количество' : 'Quantity'}: {item.quantity}
+                          {t('orderStatus.quantity')}: {item.quantity}
                         </div>
                       </div>
                     </div>
@@ -119,7 +149,7 @@ export default function OrderStatus() {
                       onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#A6CE39'; e.currentTarget.style.color = '#A6CE39'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#888'; }}
                       >
-                        {i18n.language.startsWith('ru') ? 'Подробнее' : 'Details'}
+                        {t('orderStatus.details')}
                         <ChevronRight size={16} />
                       </button>
                     </div>
@@ -130,7 +160,7 @@ export default function OrderStatus() {
           ) : (
             <div style={{ textAlign: 'center', padding: '100px 0', color: '#888' }}>
               <p style={{ fontSize: '18px' }}>
-                {i18n.language.startsWith('ru') ? 'Тут пока ничего нет ;)' : 'Nothing here yet ;)'}
+                {t('orderStatus.empty')}
               </p>
             </div>
           )}

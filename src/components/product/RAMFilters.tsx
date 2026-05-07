@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 
 interface FilterSectionProps {
@@ -114,6 +115,7 @@ export default function RAMFilters({
   minPrice, onMinPriceChange,
   maxPrice, onMaxPriceChange
 }: RAMFiltersProps) {
+  const { t } = useTranslation();
 
   return (
     <div style={{
@@ -132,16 +134,14 @@ export default function RAMFilters({
         paddingBottom: '12px', 
         borderBottom: '1px solid var(--border-color)',
         margin: 0
-      }}>
-        Фильтры
-      </div>
+      }}>{t('filters.title')}</div>
 
       {/* Цена */}
-      <FilterSection title="Цена">
+      <FilterSection title={t('filters.price')}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input 
             type="text" 
-            placeholder="от" 
+            placeholder={t('filters.from')} 
             value={minPrice}
             onChange={(e) => onMinPriceChange(e.target.value.replace(/\D/g, ''))}
             style={{ 
@@ -157,7 +157,7 @@ export default function RAMFilters({
           <span style={{ color: 'var(--text-secondary)' }}>–</span>
           <input 
             type="text" 
-            placeholder="до" 
+            placeholder={t('filters.to')} 
             value={maxPrice}
             onChange={(e) => onMaxPriceChange(e.target.value.replace(/\D/g, ''))}
             style={{ 
