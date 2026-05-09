@@ -36,6 +36,7 @@ import ConsoleGaming from './pages/ConsoleGaming.tsx'
 import Networking from './pages/Networking.tsx'
 import Furniture from './pages/Furniture.tsx'
 import Merch from './pages/Merch.tsx'
+import Admin from './pages/Admin.tsx'
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext.tsx'
@@ -91,6 +92,7 @@ export default function App() {
             <Route path="/networking" element={<Networking />} />
             <Route path="/furniture" element={<Furniture />} />
             <Route path="/merch" element={<Merch />} />
+            <Route path="/admin" element={<Admin />} />
 
           </Route>
         </Routes>

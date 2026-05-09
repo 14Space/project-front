@@ -4,6 +4,24 @@
     "catalog": "Catalog",
     "search": "I want to find..."
   },
+  "admin": {
+    "sections": {
+      "catalog": "Catalog Management",
+      "orders": "Order & Request Management",
+      "users": "User Database & Content"
+    },
+    "actions": {
+      "addEditDelete": "Add, edit, delete products",
+      "specs": "Specifications Management",
+      "categories": "Categories & Subcategories",
+      "viewOrders": "All Orders",
+      "returns": "Returns & Cancellations",
+      "tradeInRequests": "Trade-In Appraisal Requests",
+      "userDatabase": "Customer List",
+      "blockUser": "Access Management",
+      "editBlog": "Edit blog articles"
+    }
+  },
   "common": {
     "profile": "Profile",
     "favorites": "Favorites",
@@ -251,6 +269,8 @@
     "recentOrders": "Recent Orders",
     "addPhone": "Add phone number",
     "addAddress": "Add address",
+    "adminTitle": "Administration",
+    "adminDesc": "Platform management",
     "noOrders": "You have no orders yet",
     "deleteAccount": "Delete account permanently",
     "confirmDeletePrompt": "Type CONFIRM to permanently delete your account",
