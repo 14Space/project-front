@@ -9,6 +9,7 @@ interface User {
   city?: string;
   street?: string;
   avatar?: string;
+  role?: 'user' | 'admin';
 }
 
 export interface Order {
@@ -25,7 +26,8 @@ export const MOCK_USER: User = {
   email: '14t.space@gmail.com',
   phone: '+37369467556',
   city: '',
-  street: ''
+  street: '',
+  role: 'admin'
 };
 interface AppContextType {
   favorites: string[];
@@ -78,7 +80,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
+    const parsedUser = saved ? JSON.parse(saved) : null;
+    if (parsedUser && parsedUser.email === '14t.space@gmail.com') {
+      parsedUser.role = 'admin';
+    }
+    return parsedUser;
   });
 
   const [orders, setOrders] = useState<Order[]>(() => {
@@ -150,6 +156,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const isInCart = (id: string) => !!cart[id];
 
   const login = (userData: User) => {
+    if (userData.email === '14t.space@gmail.com') {
+      userData.role = 'admin';
+    } else {
+      userData.role = 'user';
+    }
     setUser(userData);
   };
 

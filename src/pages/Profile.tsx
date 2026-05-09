@@ -342,109 +342,153 @@ const Profile: React.FC = () => {
 
                   {/* Address Block */}
                   <div style={{ gridColumn: 'span 2' }}>
-                    <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.address')}</label>
+                    <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>
+                      {user.role === 'admin' ? t('profile.adminTitle') : t('auth.address')}
+                    </label>
                     {isEditing ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {/* Custom City Dropdown */}
-                        <div style={{ position: 'relative', width: '160px' }}>
-                          <div 
-                            onClick={() => setIsCityOpen(!isCityOpen)}
-                            style={{ 
-                              padding: '12px 16px', 
-                              borderRadius: '8px', 
-                              border: '1px solid #A6CE39', 
-                              backgroundColor: '#1a1a1a', 
-                              color: '#fff', 
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              fontSize: '15px'
-                            }}
-                          >
-                            {formData.city}
-                            <ChevronDown 
-                              size={16} 
-                              style={{ 
-                                transition: 'transform 0.2s',
-                                transform: isCityOpen ? 'rotate(180deg)' : 'rotate(0)'
-                              }} 
-                            />
-                          </div>
-                          
-                          {isCityOpen && (
-                            <div style={{ 
-                              position: 'absolute',
-                              top: 'calc(100% + 5px)',
-                              left: 0,
-                              width: '100%',
-                              backgroundColor: '#1a1a1a',
-                              border: '1px solid #333',
-                              borderRadius: '8px',
-                              boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-                              zIndex: 100,
-                              maxHeight: '200px',
-                              overflowY: 'auto'
-                            }}>
-                              {cities.map(city => (
-                                <div 
-                                  key={city}
-                                  onClick={() => {
-                                    setFormData({ ...formData, city });
-                                    setIsCityOpen(false);
-                                  }}
-                                  style={{ 
-                                    padding: '10px 16px', 
-                                    color: '#fff', 
-                                    fontSize: '14px',
-                                    cursor: 'pointer',
-                                    backgroundColor: formData.city === city ? 'rgba(166, 206, 57, 0.1)' : 'transparent',
-                                    transition: 'background-color 0.2s'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = formData.city === city ? 'rgba(166, 206, 57, 0.1)' : 'transparent'}
-                                >
-                                  {city}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        <span style={{ color: '#fff', fontSize: '18px' }}>,</span>
-                        <input 
-                          type="text"
-                          value={formData.street}
-                          onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                          placeholder={t('auth.street')}
-                          style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                        />
-                      </div>
-                    ) : (
-                      <div 
-                        onClick={() => {
-                          if (!user.street) {
-                            setFormData(prev => ({ ...prev, city: user.city || t('profile.cities.chisinau'), street: '' }));
-                          }
-                          setIsEditing(true);
-                        }}
-                        style={{ 
+                      user.role === 'admin' ? (
+                        <div style={{ 
                           padding: '12px 16px', 
                           borderRadius: '8px', 
                           border: '1px solid var(--border-color)', 
-                          color: '#fff', 
+                          color: '#888', 
                           fontSize: '15px',
-                          cursor: !user.street ? 'pointer' : 'default',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          transition: 'all 0.2s'
-                        }}
-                        className={!user.street ? 'add-phone-link' : ''}
-                      >
-                        {!user.street && <Plus size={14} />}
-                        {!user.street ? t('profile.addAddress') : `${user.city}${user.street ? `, ${user.street}` : ''}`}
-                      </div>
+                          backgroundColor: 'rgba(255,255,255,0.02)'
+                        }}>
+                          {t('profile.adminDesc')}
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          {/* Custom City Dropdown */}
+                          <div style={{ position: 'relative', width: '160px' }}>
+                            <div 
+                              onClick={() => setIsCityOpen(!isCityOpen)}
+                              style={{ 
+                                padding: '12px 16px', 
+                                borderRadius: '8px', 
+                                border: '1px solid #A6CE39', 
+                                backgroundColor: '#1a1a1a', 
+                                color: '#fff', 
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                fontSize: '15px'
+                              }}
+                            >
+                              {formData.city}
+                              <ChevronDown 
+                                size={16} 
+                                style={{ 
+                                  transition: 'transform 0.2s',
+                                  transform: isCityOpen ? 'rotate(180deg)' : 'rotate(0)'
+                                }} 
+                              />
+                            </div>
+                            
+                            {isCityOpen && (
+                              <div style={{ 
+                                position: 'absolute',
+                                top: 'calc(100% + 5px)',
+                                left: 0,
+                                width: '100%',
+                                backgroundColor: '#1a1a1a',
+                                border: '1px solid #333',
+                                borderRadius: '8px',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                                zIndex: 100,
+                                maxHeight: '200px',
+                                overflowY: 'auto'
+                              }}>
+                                {cities.map(city => (
+                                  <div 
+                                    key={city}
+                                    onClick={() => {
+                                      setFormData({ ...formData, city });
+                                      setIsCityOpen(false);
+                                    }}
+                                    style={{ 
+                                      padding: '10px 16px', 
+                                      color: '#fff', 
+                                      fontSize: '14px',
+                                      cursor: 'pointer',
+                                      backgroundColor: formData.city === city ? 'rgba(166, 206, 57, 0.1)' : 'transparent',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = formData.city === city ? 'rgba(166, 206, 57, 0.1)' : 'transparent'}
+                                  >
+                                    {city}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <span style={{ color: '#fff', fontSize: '18px' }}>,</span>
+                          <input 
+                            type="text"
+                            value={formData.street}
+                            onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                            placeholder={t('auth.street')}
+                            style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
+                          />
+                        </div>
+                      )
+                    ) : (
+                      user.role === 'admin' ? (
+                        <button 
+                          onClick={() => navigate('/admin')}
+                          style={{ 
+                            width: '100%',
+                            height: '48px',
+                            borderRadius: '8px', 
+                            backgroundColor: '#A6CE39', 
+                            color: '#000', 
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s',
+                            border: 'none'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#96bb33';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#A6CE39';
+                          }}
+                        >
+                          {t('profile.adminDesc')}
+                        </button>
+                      ) : (
+                        <div 
+                          onClick={() => {
+                            if (!user.street) {
+                              setFormData(prev => ({ ...prev, city: user.city || t('profile.cities.chisinau'), street: '' }));
+                            }
+                            setIsEditing(true);
+                          }}
+                          style={{ 
+                            padding: '12px 16px', 
+                            borderRadius: '8px', 
+                            border: '1px solid var(--border-color)', 
+                            color: '#fff', 
+                            fontSize: '15px',
+                            cursor: !user.street ? 'pointer' : 'default',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 0.2s'
+                          }}
+                          className={!user.street ? 'add-phone-link' : ''}
+                        >
+                          {!user.street && <Plus size={14} />}
+                          {!user.street ? t('profile.addAddress') : `${user.city}${user.street ? `, ${user.street}` : ''}`}
+                        </div>
+                      )
                     )}
                   </div>
                 </div>
@@ -493,32 +537,33 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          {/* Order History Block */}
-          <div style={{ 
-                backgroundColor: 'var(--card-bg)', 
-                borderRadius: '12px', 
-                padding: '20px',
-                border: '1px solid var(--border-color)',
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#fff', lineHeight: 1 }}>
-                    {t('profile.orders')}
-                  </h2>
-                </div>
-                <div style={{ 
-                  color: '#888', 
-                  fontSize: '15px', 
-                  textAlign: 'center', 
-                  padding: '40px 0',
-                  border: '1px dashed var(--border-color)',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255,255,255,0.02)'
+          {user.role !== 'admin' && (
+            <div style={{ 
+                  backgroundColor: 'var(--card-bg)', 
+                  borderRadius: '12px', 
+                  padding: '20px',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  flexDirection: 'column'
                 }}>
-                  {t('profile.noOrders')}
-                </div>
-          </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#fff', lineHeight: 1 }}>
+                      {t('profile.orders')}
+                    </h2>
+                  </div>
+                  <div style={{ 
+                    color: '#888', 
+                    fontSize: '15px', 
+                    textAlign: 'center', 
+                    padding: '40px 0',
+                    border: '1px dashed var(--border-color)',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(255,255,255,0.02)'
+                  }}>
+                    {t('profile.noOrders')}
+                  </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
