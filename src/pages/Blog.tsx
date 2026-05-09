@@ -39,18 +39,10 @@ export default function Blog() {
   ];
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '80px' }}>
-      <div className="container" style={{ padding: '5px 20px 0' }}>
-        <div style={{ display: 'flex', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-          <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>{t('header.home')}</Link>
-          <span>/</span>
-          <span style={{ color: 'var(--text-color)' }}>{t('home.blog.title')}</span>
-        </div>
-      </div>
-
+    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
       {/* Заголовок и список статей */}
-      <div className="container" style={{ padding: '0 20px' }}>
-        <h1 className="title" style={{ fontSize: '32px', marginBottom: '20px' }}>{t('home.blog.title')}</h1>
+      <div className="container" style={{ padding: '10px 20px 0' }}>
+        <h1 className="title" style={{ fontSize: '32px', marginBottom: '20px', marginTop: 0 }}>{t('home.blog.title')}</h1>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
           {posts.map((post, idx) => (

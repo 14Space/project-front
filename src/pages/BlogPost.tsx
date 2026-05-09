@@ -1,6 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Breadcrumbs from '../components/layout/Breadcrumbs';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -542,10 +541,6 @@ export default function BlogPost() {
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '80px' }}>
       <div className="container" style={{ padding: '5px 20px 0' }}>
-        <Breadcrumbs items={[
-          { label: t('home.blog.title'), path: '/blog' },
-          { label: title, active: true }
-        ]} />
 
         <div style={{ marginBottom: '40px' }}>
           <div style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>{date}</div>
@@ -572,3 +567,4 @@ export default function BlogPost() {
     </div>
   );
 }
+

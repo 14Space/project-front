@@ -12,7 +12,7 @@ export default function Favorites() {
 
   return (
     <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
-      <section className="section" style={{ padding: '20px 0 40px 0' }}>
+      <section className="section" style={{ padding: '10px 0 40px 0' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <Heart size={28} color="#FF1717" fill="#FF1717" />

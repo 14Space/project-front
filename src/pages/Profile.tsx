@@ -73,9 +73,9 @@ const Profile: React.FC = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
-      <section className="section" style={{ padding: '20px 0 20px 0' }}>
+      <section className="section" style={{ padding: '20px 0 40px 0' }}>
         <div className="container">
-          <div style={{ display: 'flex', gap: '20px', flexDirection: 'row-reverse', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: '20px', flexDirection: 'row-reverse' }}>
             {/* Sidebar (now on the right) */}
             <div style={{ width: '300px', flexShrink: 0 }}>
               <div style={{ 

@@ -50,18 +50,18 @@ export default function Footer() {
       {/* 1. Newsletter Block */}
       <Newsletter />
       
-      <div className="container" style={{ padding: '60px 20px' }}>
+      <div className="container" style={{ padding: '40px 25px' }}>
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '1.2fr 2fr', 
           gap: '0 60px', 
-          marginBottom: '60px', 
+          marginBottom: '40px', 
           borderBottom: '1px solid #333', 
-          paddingBottom: '60px' 
+          paddingBottom: '40px' 
         }}>
           
           {/* Row 1: Titles */}
-          <div style={{ gridRow: '1', display: 'flex', gap: '40px', paddingLeft: '5px' }}>
+          <div style={{ gridRow: '1', display: 'flex', gap: '40px' }}>
              <div style={{ flex: 1, ...titleStyle }}>{t('footer.contactDetails.workTimeTitle')}</div>
              <div style={{ flex: 1.2, height: '14px' }}></div>
           </div>
@@ -70,7 +70,7 @@ export default function Footer() {
           </div>
 
           {/* Row 2 & 3: Contacts Grouped by Column */}
-          <div style={{ gridRow: '2 / span 2', display: 'flex', gap: '40px', paddingTop: '32px', paddingLeft: '5px' }}>
+          <div style={{ gridRow: '2 / span 2', display: 'flex', gap: '40px', paddingTop: '32px' }}>
              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <div style={{ marginBottom: '44px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px', height: '24px' }}>
@@ -157,7 +157,6 @@ export default function Footer() {
         <div style={{ 
           display: 'flex', 
           alignItems: 'flex-start', 
-          paddingLeft: '5px', 
           paddingRight: '80px' // Отступ от падинга футера XXX (справа)
         }}>
           <div style={{ flex: 1 }}>

@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Breadcrumbs from '../components/layout/Breadcrumbs';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import StorageFilters from '../components/product/StorageFilters';
@@ -42,16 +41,10 @@ export default function Storage() {
   }, [activeSort, minPrice, maxPrice]);
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '60px' }}>
-      <div className="container" style={{ padding: '5px 20px 0' }}>
-        <Breadcrumbs items={[
-          { label: t('sidebar.storage'), active: true }
-        ]} />
-      </div>
-
-      <div className="container" style={{ padding: '0 20px' }}>
+    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
+      <div className="container" style={{ padding: '10px 20px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <h1 className="title" style={{ fontSize: '32px', margin: 0 }}>{t('sidebar.storage')}</h1>
+          <h1 className="title" style={{ fontSize: '32px', margin: 0, lineHeight: 1.5 }}>{t('sidebar.storage')}</h1>
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
@@ -88,3 +81,5 @@ export default function Storage() {
     </div>
   );
 }
+
+
