@@ -12,7 +12,7 @@ export default function ProductGrid({ sidebar, products = [] }: ProductGridProps
       display: 'grid',
       gridTemplateColumns: '1fr 3fr',
       gap: '20px',
-      margin: '0 0 20px',
+      margin: '0',
       alignItems: 'start'
     }}>
       {/* Левая колонка — Фильтры */}

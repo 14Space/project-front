@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import Breadcrumbs from '../components/layout/Breadcrumbs';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import PCFilters from '../components/product/PCFilters';
@@ -75,14 +74,10 @@ export default function Computers() {
   ];
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '60px' }}>
-      <div className="container" style={{ padding: '5px 20px 0' }}>
-        <Breadcrumbs items={breadcrumbItems} />
-      </div>
-
-      <div className="container" style={{ padding: '0 20px' }}>
+    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
+      <div className="container" style={{ padding: '10px 20px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <h1 className="title" style={{ fontSize: '32px', margin: 0 }}>{t('catalog.computers.title')}</h1>
+          <h1 className="title" style={{ fontSize: '32px', margin: 0, lineHeight: 1.5 }}>{t('catalog.computers.title')}</h1>
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
@@ -110,3 +105,4 @@ export default function Computers() {
     </div>
   );
 }
+

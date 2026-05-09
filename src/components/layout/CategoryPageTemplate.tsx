@@ -16,14 +16,6 @@ export default function CategoryPageTemplate({ categoryKey }: CategoryPageProps)
 
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '80px' }}>
-      {/* Breadcrumbs */}
-      <div className="container" style={{ padding: '20px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '14px' }}>
-          <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('nav.home') || 'Главная'}</Link>
-          <ChevronRight size={14} />
-          <span style={{ color: 'var(--primary-color)' }}>{categoryData.title}</span>
-        </div>
-      </div>
 
       {/* Hero Section */}
       <div style={{ 
