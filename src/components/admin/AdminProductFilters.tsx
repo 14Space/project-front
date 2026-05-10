@@ -30,7 +30,7 @@ const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }
           color: 'var(--text-color)',
           fontSize: '16px',
           fontWeight: 600,
-          lineHeight: 1.2,
+          lineHeight: 1.4,
           cursor: 'pointer',
           padding: 0,
           textAlign: 'left'
@@ -113,42 +113,42 @@ export default function AdminProductFilters() {
     {
       id: 'cpus',
       title: t('sidebar.cpus'),
-      items: ['Intel', 'AMD']
+      items: ['Процессоры AMD с 3D V-Cache', 'Производительная iGPU', 'Процессор для игровых ПК', 'Процессор для рабочих станций']
     },
     {
       id: 'gpus',
       title: t('sidebar.gpus'),
-      items: ['NVIDIA', 'AMD']
+      items: ['Игровая видеокарта NVIDIA', 'Игровая видеокарта AMD', 'Профессиональная видеокарта']
     },
     {
       id: 'motherboards',
       title: t('sidebar.motherboards'),
-      items: ['Intel', 'AMD']
+      items: ['Материнские платы для AMD', 'Материнские платы для Intel', 'Материнская плата с Wi-Fi']
     },
     {
       id: 'ram',
       title: t('sidebar.ram'),
-      items: ['DDR5', 'DDR4']
+      items: ['Комплект 2x16 ГБ DDR5', 'Комплект 2x8 ГБ DDR5', 'DDR5 6000 МТ/с CL30']
     },
     {
       id: 'storage',
       title: t('sidebar.storage'),
-      items: ['SSD', 'HDD']
+      items: ['HDD накопитель', 'SSD накопитель', 'SSD с интерфейсом PCIe 4.0']
     },
     {
       id: 'cases',
       title: t('sidebar.cases'),
-      items: ['ATX', 'Micro-ATX', 'Mini-ITX']
+      items: ['Корпус с предустановленными вентиляторами', 'Компактный Mini ITX корпус', 'Корпус с окном из закаленного стекла']
     },
     {
       id: 'cooling',
       title: t('sidebar.cooling'),
-      items: ['Воздушное', 'Жидкостное']
+      items: ['Водяное охлаждение для Intel 1700/AMD AM5', 'Воздушный кулер для Intel 1700/AMD AM5', 'Вентиляторы с подсветкой']
     },
     {
       id: 'psus',
       title: t('sidebar.psus'),
-      items: ['Модульные', 'Стандартные']
+      items: ['1600 Вт и более', '80 PLUS Titanium', 'ATX']
     }
   ];
 
@@ -174,7 +174,7 @@ export default function AdminProductFilters() {
       }}>{t('filters.title')}</div>
 
       {/* Цена */}
-      <FilterSection title={t('filters.price')}>
+      <FilterSection title={t('filters.price')} defaultOpen={false}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input 
             type="text" 
@@ -215,9 +215,20 @@ export default function AdminProductFilters() {
         <FilterSection 
           key={group.id} 
           title={group.title} 
-          defaultOpen={idx < 2} // Open first two by default
+          defaultOpen={false}
           hasBorder={idx !== filterGroups.length - 1}
         >
+          <Checkbox 
+            label={`Все в ${group.title}`}
+            checked={(selections[group.id] || []).length === group.items.length} 
+            onChange={(checked) => {
+              if (checked) {
+                setSelections(prev => ({ ...prev, [group.id]: [...group.items] }));
+              } else {
+                setSelections(prev => ({ ...prev, [group.id]: [] }));
+              }
+            }} 
+          />
           {group.items.map(label => (
             <Checkbox 
               key={label} 
