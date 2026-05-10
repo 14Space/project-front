@@ -139,7 +139,7 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                       align-items: center;
                       transition: all 0.3s ease;
                       cursor: pointer;
-                      width: 22%;
+                      width: '30%',
                     }
                     .category-group-link:hover h3 {
                       color: #A6CE39 !important;
@@ -180,7 +180,8 @@ export default function Catalog({ isOpen, onClose }: CatalogProps) {
                       margin: '0 0 8px 0',
                       textTransform: 'uppercase',
                       textAlign: 'center',
-                      transition: 'color 0.3s ease'
+                      transition: 'color 0.3s ease',
+                      whiteSpace: 'nowrap'
                     }}>
                       {group.title}
                     </h3>

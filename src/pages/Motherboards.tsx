@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import MotherboardFilters from '../components/product/MotherboardFilters';
@@ -24,6 +25,25 @@ export default function Motherboards() {
   const [selectedM2Version, setSelectedM2Version] = useState<string[]>([]);
   const [selectedM2Count, setSelectedM2Count] = useState<string[]>([]);
   const [selectedRAMSlots, setSelectedRAMSlots] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        'для AMD': 'Материнские платы для AMD',
+        'Для AMD': 'Материнские платы для AMD',
+        'для Intel': 'Материнские платы для Intel',
+        'Для Intel': 'Материнские платы для Intel',
+        'с Wi-Fi': 'Материнская плата с Wi-Fi',
+        'С Wi-Fi': 'Материнская плата с Wi-Fi'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

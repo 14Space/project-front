@@ -30,7 +30,8 @@ const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }
           color: 'var(--text-color)',
           fontSize: '16px',
           fontWeight: 600,
-          lineHeight: 1,
+          lineHeight: 1.4,
+          textAlign: 'left',
           cursor: 'pointer',
           padding: 0
         }}
@@ -173,8 +174,8 @@ export default function RAMFilters({
         </div>
       </FilterSection>
 
-      {/* Популярные фильтры */}
-      <FilterSection title="Популярные фильтры">
+      {/* Подкатегории */}
+      <FilterSection title={t('filters.subcategories')}>
         {['Комплект 2x16 ГБ DDR5', 'Комплект 2x8 ГБ DDR5', 'DDR5 6000 МТ/с CL30'].map(label => (
           <Checkbox 
             key={label} 

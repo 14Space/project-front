@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import CPUFilters from '../components/product/CPUFilters';
@@ -22,6 +23,23 @@ export default function CPUs() {
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
   const [selectedTDP, setSelectedTDP] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        'AMD с 3D V-Cache': 'Процессоры AMD с 3D V-Cache',
+        'Производительная iGPU': 'Производительная iGPU',
+        'Для игровых ПК': 'Процессор для игровых ПК',
+        'Для рабочих станций': 'Процессор для рабочих станций'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

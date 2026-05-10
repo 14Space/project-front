@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import PSUFilters from '../components/product/PSUFilters';
@@ -20,6 +21,25 @@ export default function PSUs() {
   const [selectedGPUConnectors, setSelectedGPUConnectors] = useState<string[]>([]);
   const [selectedModularity, setSelectedModularity] = useState<string[]>([]);
   const [selectedCPUConnectors, setSelectedCPUConnectors] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      // Для БП названия совпадают, но для порядка добавим маппинг
+      const mapping: Record<string, string> = {
+        '1600 Вт и более': '1600 Вт и более',
+        '80 PLUS Titanium': '80 PLUS Titanium',
+        '80 Plus Titanium': '80 PLUS Titanium',
+        'ATX': 'ATX'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedSubcategories([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
@@ -69,6 +89,8 @@ export default function PSUs() {
               onModularityChange={(val) => toggleFilter(setSelectedModularity, val)}
               selectedCPUConnectors={selectedCPUConnectors}
               onCPUConnectorsChange={(val) => toggleFilter(setSelectedCPUConnectors, val)}
+              selectedSubcategories={selectedSubcategories}
+              onSubcategoryChange={(val) => toggleFilter(setSelectedSubcategories, val)}
             />
           } 
         />

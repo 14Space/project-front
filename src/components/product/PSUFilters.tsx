@@ -30,7 +30,8 @@ const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }
           color: 'var(--text-color)',
           fontSize: '16px',
           fontWeight: 600,
-          lineHeight: 1,
+          lineHeight: 1.4,
+          textAlign: 'left',
           cursor: 'pointer',
           padding: 0
         }}
@@ -102,6 +103,8 @@ interface PSUFiltersProps {
   onMinPriceChange: (val: string) => void;
   maxPrice: string;
   onMaxPriceChange: (val: string) => void;
+  selectedSubcategories: string[];
+  onSubcategoryChange: (label: string) => void;
 }
 
 export default function PSUFilters({ 
@@ -113,7 +116,8 @@ export default function PSUFilters({
   selectedModularity, onModularityChange,
   selectedCPUConnectors, onCPUConnectorsChange,
   minPrice, onMinPriceChange,
-  maxPrice, onMaxPriceChange
+  maxPrice, onMaxPriceChange,
+  selectedSubcategories, onSubcategoryChange
 }: PSUFiltersProps) {
   const { t } = useTranslation();
 
@@ -171,6 +175,18 @@ export default function PSUFilters({
             }} 
           />
         </div>
+      </FilterSection>
+
+      {/* Подкатегории */}
+      <FilterSection title={t('filters.subcategories')}>
+        {['1600 Вт и более', '80 PLUS Titanium', 'ATX'].map(label => (
+          <Checkbox 
+            key={label} 
+            label={label} 
+            checked={selectedSubcategories.includes(label)} 
+            onChange={() => onSubcategoryChange(label)} 
+          />
+        ))}
       </FilterSection>
 
       {/* Мощность */}
