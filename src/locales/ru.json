@@ -13,7 +13,9 @@
     "actions": {
       "addEditDelete": "Добавление, исправление, удаление товаров",
       "specs": "Управление характеристиками",
-      "categories": "Категории и подкатегории",
+      "categoriesAndSubcategories": "Категории и подкатегории",
+      "categories": "Категории",
+      "subcategories": "Подкатегории",
       "viewOrders": "Все заказы",
       "returns": "Возвраты и отмены",
       "tradeInRequests": "Заявки на оценку Trade-In",
@@ -37,7 +39,12 @@
     "edit": "Редактировать",
     "save": "Сохранить",
     "cancel": "Отмена",
-    "code": "Код"
+    "code": "Код",
+    "back": "Назад",
+    "actions": "Действия",
+    "title": "Название",
+    "price": "Цена",
+    "add": "Добавить"
   },
   "pcBuild": {
     "title": "Конфигуратор ПК"
@@ -61,16 +68,7 @@
     "storage": "Дисковые накопители",
     "cases": "Корпуса",
     "cooling": "Системы охлаждения",
-    "psus": "Блоки питания",
-    "components": "Комплектующие",
-    "gaming": "Гейминг",
-    "monitors": "Мониторы",
-    "peripherals": "Периферия",
-    "consoleGaming": "Консоли",
-    "networking": "Сети",
-    "furniture": "Мебель",
-    "merch": "Мерч",
-    "services": "Сервисы"
+    "psus": "Блоки питания"
   },
   "home": {
     "quickActions": {
@@ -207,6 +205,7 @@
     "copyright": "© FRAME с 2026. Все права зарегестрированы"
   },
   "catalog": {
+    "search": "Поиск товаров...",
     "computers": {
       "title": "Компьютеры",
       "groups": [
@@ -250,6 +249,63 @@
           "items": [],
           "image": "/subcategories/SUBCATEGORIES-macbook.png", "path": "/laptops?subcategory=MacBook"
         }
+      ]
+    },
+    "cpus": {
+      "title": "Процессоры",
+      "groups": [
+        { "title": "AMD с 3D V-Cache", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=AMD с 3D V-Cache" },
+        { "title": "Производительная iGPU", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=Производительная iGPU" },
+        { "title": "Для игровых ПК", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=Для игровых ПК" },
+        { "title": "Для рабочих станций", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=Для рабочих станций" }
+      ]
+    },
+    "gpus": {
+      "title": "Видеокарты",
+      "groups": [
+        { "title": "Игровые NVIDIA", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Игровые NVIDIA" },
+        { "title": "Игровые AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Игровые AMD" },
+        { "title": "Профессиональные", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Профессиональные" }
+      ]
+    },
+    "motherboards": {
+      "title": "Материнские платы",
+      "groups": [
+        { "title": "для AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=для AMD" },
+        { "title": "для Intel", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=для Intel" },
+        { "title": "с Wi-Fi", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=с Wi-Fi" }
+      ]
+    },
+    "ram": {
+      "title": "Оперативная память",
+      "groups": [
+        { "title": "2x16 ГБ DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x16 ГБ DDR5" },
+        { "title": "2x8 ГБ DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x8 ГБ DDR5" },
+        { "title": "DDR5 6000 МТ/с CL30", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=DDR5 6000 МТ/с CL30" }
+      ]
+    },
+    "storage": {
+      "title": "Дисковые накопители",
+      "groups": [
+        { "title": "HDD накопители", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=HDD накопители" },
+        { "title": "SSD накопители", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD накопители" },
+        { "title": "SSD с PCIe 4.0", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD с PCIe 4.0" }
+      ]
+    },
+    "cases": {
+      "title": "Корпуса",
+      "groups": [
+        { "title": "С вентиляторами", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=С вентиляторами" },
+        { "title": "Mini ITX корпус", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=Mini ITX корпус" },
+        { "title": "С окном из стекла", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=С окном из стекла" }
+      ]
+    },
+    "cooling": {
+      "title": "Системы охлаждения",
+      "groups": [
+        { "title": "Водяное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Водяное охлаждение" },
+        { "title": "Воздушное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Воздушное охлаждение" },
+        { "title": "Вентиляторы", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Вентиляторы" }
       ]
     },
     "components": {
@@ -297,130 +353,12 @@
         }
       ]
     },
-    "monitors": {
-      "title": "Мониторы",
+    "psus": {
+      "title": "Блоки питания",
       "groups": [
-        {
-          "title": "Игровые",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
-        },
-        {
-          "title": "Изогнутые",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
-        },
-        {
-          "title": "Для работы с цветом",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors"
-        }
-      ]
-    },
-    "peripherals": {
-      "title": "Периферия",
-      "groups": [
-        {
-          "title": "Мышки",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
-        },
-        {
-          "title": "Клавиатуры",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
-        },
-        {
-          "title": "Наушники",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
-        },
-        {
-          "title": "Микрофоны",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals"
-        }
-      ]
-    },
-    "consoleGaming": {
-      "title": "Консольный гейминг",
-      "groups": [
-        {
-          "title": "PlayStation",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming"
-        },
-        {
-          "title": "Xbox",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming"
-        },
-        {
-          "title": "Портативные консоли",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming"
-        },
-        {
-          "title": "Геймпады",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png"
-        }
-      ]
-    },
-    "networking": {
-      "title": "Сетевое оборудование",
-      "groups": [
-        {
-          "title": "Роутеры с Wi-Fi 7",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking"
-        },
-        {
-          "title": "Точки доступа",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking"
-        },
-        {
-          "title": "Bluetooth Адаптеры",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking"
-        }
-      ]
-    },
-    "furniture": {
-      "title": "Мебель и аксессуары",
-      "groups": [
-        {
-          "title": "Геймерские кресла",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture"
-        },
-        {
-          "title": "Игровые столы",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture"
-        },
-        {
-          "title": "Кронштейны",
-          "items": [],
-          "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture"
-        }
-      ]
-    },
-    "merch": {
-      "title": "Мерч и подарки",
-      "groups": [
-        { "title": "Одежда", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
-        { "title": "Аксессуары", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
-        { "title": "Фигурки", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" }
-      ]
-    },
-    "services": {
-      "title": "Услуги",
-      "groups": [
-        { "title": "Обмен по Trade-In", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/trade-in" },
-        { "title": "Консультации", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" },
-        { "title": "Услуги мастера", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" }
+        { "title": "1600 Вт и более", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=1600 Вт и более" },
+        { "title": "80 PLUS Titanium", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=80 PLUS Titanium" },
+        { "title": "ATX", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=ATX" }
       ]
     }
   },

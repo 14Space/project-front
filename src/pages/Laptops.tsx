@@ -31,7 +31,14 @@ export default function Laptops() {
   // Синхронизация с URL
   useEffect(() => {
     if (subcategory) {
-      setSelectedSubcategories([subcategory]);
+      const mapping: Record<string, string> = {
+        'Игровые': 'Игровые',
+        'Для учёбы': 'Для учёбы',
+        'Macbook': 'MacBook',
+        'MacBook': 'MacBook'
+      };
+      const filterValue = mapping[subcategory] || subcategory;
+      setSelectedSubcategories([filterValue]);
     } else {
       setSelectedSubcategories([]);
     }
@@ -93,7 +100,7 @@ export default function Laptops() {
             <LaptopFilters 
               selectedSubcategories={selectedSubcategories}
               onSubcategoryChange={handleSubcategoryChange}
-              subcategoryList={['Игровые', 'Для учёбы', 'Macbook']}
+              subcategoryList={['Игровые', 'Для учёбы', 'MacBook']}
               selectedBrands={selectedBrands}
               onBrandsChange={(b) => toggleFilter(setSelectedBrands, b)}
               selectedCPUs={selectedCPUs}

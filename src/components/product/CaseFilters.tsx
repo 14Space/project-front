@@ -30,7 +30,8 @@ const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }
           color: 'var(--text-color)',
           fontSize: '16px',
           fontWeight: 600,
-          lineHeight: 1,
+          lineHeight: 1.4,
+          textAlign: 'left',
           cursor: 'pointer',
           padding: 0
         }}
@@ -170,8 +171,8 @@ export default function CaseFilters({
         </div>
       </FilterSection>
 
-      {/* Популярные фильтры */}
-      <FilterSection title="Популярные фильтры">
+      {/* Подкатегории */}
+      <FilterSection title={t('filters.subcategories')}>
         {['Корпус с предустановленными вентиляторами', 'Компактный Mini ITX корпус', 'Корпус с окном из закаленного стекла'].map(label => (
           <Checkbox 
             key={label} 

@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import StorageFilters from '../components/product/StorageFilters';
@@ -21,6 +22,22 @@ export default function Storage() {
   const [selectedFormFactors, setSelectedFormFactors] = useState<string[]>([]);
   const [selectedReadSpeed, setSelectedReadSpeed] = useState<string[]>([]);
   const [selectedWriteSpeed, setSelectedWriteSpeed] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        'HDD накопители': 'HDD накопитель',
+        'SSD накопители': 'SSD накопитель',
+        'SSD с PCIe 4.0': 'SSD с интерфейсом PCIe 4.0'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

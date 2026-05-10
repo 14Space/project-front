@@ -13,7 +13,9 @@
     "actions": {
       "addEditDelete": "Add, edit, delete products",
       "specs": "Specifications Management",
-      "categories": "Categories & Subcategories",
+      "categoriesAndSubcategories": "Categories & Subcategories",
+      "categories": "Categories",
+      "subcategories": "Subcategories",
       "viewOrders": "All Orders",
       "returns": "Returns & Cancellations",
       "tradeInRequests": "Trade-In Appraisal Requests",
@@ -37,7 +39,12 @@
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
-    "code": "Code"
+    "code": "Code",
+    "back": "Back",
+    "actions": "Actions",
+    "title": "Title",
+    "price": "Price",
+    "add": "Add"
   },
   "pcBuild": {
     "title": "PC Configurator"
@@ -61,16 +68,7 @@
     "storage": "Storage Devices",
     "cases": "PC Cases",
     "cooling": "Cooling Systems",
-    "psus": "Power Supplies",
-    "components": "PC Components",
-    "gaming": "Gaming Peripherals",
-    "monitors": "Monitors",
-    "peripherals": "Peripherals",
-    "consoleGaming": "Console Gaming",
-    "networking": "Networking",
-    "furniture": "Furniture & Accessories",
-    "merch": "Merch & Gifts",
-    "services": "Services"
+    "psus": "PSUs"
   },
   "home": {
     "quickActions": {
@@ -172,6 +170,7 @@
     "copyright": "© FRAME since 2026. All rights reserved"
   },
   "catalog": {
+    "search": "Search products...",
     "computers": {
       "title": "Computers",
       "groups": [
@@ -189,6 +188,63 @@
         { "title": "MacBook", "items": [], "image": "/subcategories/SUBCATEGORIES-macbook.png", "path": "/laptops" }
       ]
     },
+    "cpus": {
+      "title": "Processors",
+      "groups": [
+        { "title": "AMD with 3D V-Cache", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=AMD with 3D V-Cache" },
+        { "title": "High-performance iGPU", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=High-performance iGPU" },
+        { "title": "For Gaming PCs", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=For Gaming PCs" },
+        { "title": "For Workstations", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=For Workstations" }
+      ]
+    },
+    "gpus": {
+      "title": "Graphics Cards",
+      "groups": [
+        { "title": "Gaming NVIDIA", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Gaming NVIDIA" },
+        { "title": "Gaming AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Gaming AMD" },
+        { "title": "Professional", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Professional" }
+      ]
+    },
+    "motherboards": {
+      "title": "Motherboards",
+      "groups": [
+        { "title": "for AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=for AMD" },
+        { "title": "for Intel", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=for Intel" },
+        { "title": "with Wi-Fi", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=with Wi-Fi" }
+      ]
+    },
+    "ram": {
+      "title": "RAM",
+      "groups": [
+        { "title": "2x16 GB DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x16 GB DDR5" },
+        { "title": "2x8 GB DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x8 GB DDR5" },
+        { "title": "DDR5 6000 MT/s CL30", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=DDR5 6000 MT/s CL30" }
+      ]
+    },
+    "storage": {
+      "title": "Storage Devices",
+      "groups": [
+        { "title": "HDD Drives", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=HDD Drives" },
+        { "title": "SSD Drives", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD Drives" },
+        { "title": "SSD with PCIe 4.0", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD with PCIe 4.0" }
+      ]
+    },
+    "cases": {
+      "title": "PC Cases",
+      "groups": [
+        { "title": "With Fans", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=With Fans" },
+        { "title": "Mini ITX Case", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=Mini ITX Case" },
+        { "title": "With Glass Window", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=With Glass Window" }
+      ]
+    },
+    "cooling": {
+      "title": "Cooling Systems",
+      "groups": [
+        { "title": "Liquid Cooling", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Liquid Cooling" },
+        { "title": "Air Cooling", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Air Cooling" },
+        { "title": "Fans", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Fans" }
+      ]
+    },
     "components": {
       "title": "Components",
       "groups": [
@@ -202,62 +258,12 @@
         { "title": "Power Supplies", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/components" }
       ]
     },
-    "monitors": {
-      "title": "Monitors",
+    "psus": {
+      "title": "Power Supplies",
       "groups": [
-        { "title": "Gaming", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors" },
-        { "title": "Curved", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors" },
-        { "title": "For Color Work", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/monitors" }
-      ]
-    },
-    "peripherals": {
-      "title": "Peripherals",
-      "groups": [
-        { "title": "Mice", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" },
-        { "title": "Keyboards", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" },
-        { "title": "Headphones", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" },
-        { "title": "Microphones", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/peripherals" }
-      ]
-    },
-    "consoleGaming": {
-      "title": "Console Gaming",
-      "groups": [
-        { "title": "PlayStation", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" },
-        { "title": "Xbox", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" },
-        { "title": "Handheld Consoles", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" },
-        { "title": "Gamepads", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/console-gaming" }
-      ]
-    },
-    "networking": {
-      "title": "Networking",
-      "groups": [
-        { "title": "Wi-Fi 7 Routers", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking" },
-        { "title": "Access Points", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking" },
-        { "title": "Bluetooth Adapters", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/networking" }
-      ]
-    },
-    "furniture": {
-      "title": "Furniture & Accessories",
-      "groups": [
-        { "title": "Gaming Chairs", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture" },
-        { "title": "Gaming Desks", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture" },
-        { "title": "Mounts", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/furniture" }
-      ]
-    },
-    "merch": {
-      "title": "Merch & Gifts",
-      "groups": [
-        { "title": "Apparel", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
-        { "title": "Accessories", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" },
-        { "title": "Figures", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/merch" }
-      ]
-    },
-    "services": {
-      "title": "Services",
-      "groups": [
-        { "title": "Trade-In Exchange", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/trade-in" },
-        { "title": "Consultations", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" },
-        { "title": "Technician Services", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "https://t.me/SX_Warrior" }
+        { "title": "1600W and more", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=1600W and more" },
+        { "title": "80 PLUS Titanium", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=80 PLUS Titanium" },
+        { "title": "ATX", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=ATX" }
       ]
     }
   },

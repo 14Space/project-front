@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import RAMFilters from '../components/product/RAMFilters';
@@ -20,6 +21,22 @@ export default function RAM() {
   const [selectedSticks, setSelectedSticks] = useState<string[]>([]);
   const [selectedTimings, setSelectedTimings] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        '2x16 ГБ DDR5': 'Комплект 2x16 ГБ DDR5',
+        '2x8 ГБ DDR5': 'Комплект 2x8 ГБ DDR5',
+        'DDR5 6000 МТ/с CL30': 'DDR5 6000 МТ/с CL30'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

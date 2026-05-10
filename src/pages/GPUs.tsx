@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import GPUFilters from '../components/product/GPUFilters';
@@ -20,6 +21,22 @@ export default function GPUs() {
   const [selectedBus, setSelectedBus] = useState<string[]>([]);
   const [selectedMemoryType, setSelectedMemoryType] = useState<string[]>([]);
   const [selectedLength, setSelectedLength] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        'Игровые NVIDIA': 'Игровая видеокарта NVIDIA',
+        'Игровые AMD': 'Игровая видеокарта AMD',
+        'Профессиональные': 'Профессиональная видеокарта'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

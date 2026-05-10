@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Check } from 'lucide-react';
-import { useAppContext, MOCK_USER } from '../../context/AppContext';
+import { useAppContext, MOCK_USER, MOCK_USER_REGULAR } from '../../context/AppContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -81,15 +81,30 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Always log in as the same mock user
-    login(MOCK_USER);
+    if (email === '14t.space@gmail.com') {
+      login(MOCK_USER);
+    } else if (email === 'mihafelciuc@gmail.com') {
+      login(MOCK_USER_REGULAR);
+    } else {
+      login({
+        id: `user-${Date.now()}`,
+        name: email.split('@')[0],
+        email: email,
+        role: 'user'
+      });
+    }
     onClose();
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    // Always log in as the same mock user
-    login(MOCK_USER);
+    login({
+      id: `user-${Date.now()}`,
+      name: firstName || email.split('@')[0],
+      lastName: lastName,
+      email: email,
+      role: 'user'
+    });
     onClose();
   };
 

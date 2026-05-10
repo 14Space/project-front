@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import CoolingFilters from '../components/product/CoolingFilters';
@@ -21,6 +22,22 @@ export default function Cooling() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedTDP, setSelectedTDP] = useState<string[]>([]);
   const [selectedFanCounts, setSelectedFanCounts] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        'Водяное охлаждение': 'Водяное охлаждение для Intel 1700/AMD AM5',
+        'Воздушное охлаждение': 'Воздушный кулер для Intel 1700/AMD AM5',
+        'Вентиляторы': 'Вентиляторы с подсветкой'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

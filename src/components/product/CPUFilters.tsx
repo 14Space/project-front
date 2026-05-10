@@ -30,7 +30,8 @@ const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }
           color: 'var(--text-color)',
           fontSize: '16px',
           fontWeight: 600,
-          lineHeight: 1,
+          lineHeight: 1.4,
+          textAlign: 'left',
           cursor: 'pointer',
           padding: 0
         }}
@@ -179,8 +180,8 @@ export default function CPUFilters({
         </div>
       </FilterSection>
 
-      {/* Популярные фильтры */}
-      <FilterSection title="Популярные фильтры">
+      {/* Подкатегории */}
+      <FilterSection title={t('filters.subcategories')}>
         {['Процессоры AMD с 3D V-Cache', 'Производительная iGPU', 'Процессор для игровых ПК', 'Процессор для рабочих станций'].map(label => (
           <Checkbox 
             key={label} 

@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import CaseFilters from '../components/product/CaseFilters';
@@ -19,6 +20,22 @@ export default function Cases() {
   const [selectedSizeTypes, setSelectedSizeTypes] = useState<string[]>([]);
   const [selectedPSULocations, setSelectedPSULocations] = useState<string[]>([]);
   const [selectedCoolerHeights, setSelectedCoolerHeights] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const subcat = searchParams.get('subcategory');
+    if (subcat) {
+      const mapping: Record<string, string> = {
+        'С вентиляторами': 'Корпус с предустановленными вентиляторами',
+        'Mini ITX корпус': 'Компактный Mini ITX корпус',
+        'С окном из стекла': 'Корпус с окном из закаленного стекла'
+      };
+      const filterValue = mapping[subcat];
+      if (filterValue) {
+        setSelectedPopular([filterValue]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);

@@ -20,7 +20,7 @@ export interface Order {
   date: string;
 }
 export const MOCK_USER: User = {
-  id: 'user-1',
+  id: 'user-admin',
   name: 'Номинал',
   lastName: 'Номиналович',
   email: '14t.space@gmail.com',
@@ -28,6 +28,17 @@ export const MOCK_USER: User = {
   city: '',
   street: '',
   role: 'admin'
+};
+
+export const MOCK_USER_REGULAR: User = {
+  id: 'user-regular',
+  name: 'Mihai',
+  lastName: 'Felciuc',
+  email: 'mihafelciuc@gmail.com',
+  phone: '+37369000000',
+  city: 'Chisinau',
+  street: 'Stefan cel Mare 1',
+  role: 'user'
 };
 interface AppContextType {
   favorites: string[];
