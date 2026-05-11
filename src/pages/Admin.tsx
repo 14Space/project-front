@@ -9,16 +9,18 @@ import {
   Settings,
   Layers,
   List,
-  AlertCircle,
   FileText,
   ChevronLeft,
   Search,
   Edit2,
-  Trash2
+  Trash2,
+  GripVertical,
+  X
 } from 'lucide-react';
 
 import AdminProductFilters from '../components/admin/AdminProductFilters';
 import AdminSpecFilters from '../components/admin/AdminSpecFilters';
+import { useAppContext } from '../context/AppContext';
 
 // Sub-components for Admin views
 const AdminProducts = ({ onBack }: { onBack: () => void }) => {
@@ -164,23 +166,1155 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
+const AdminOrders = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
+  const { orders, updateOrderStatus } = useAppContext();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusModal, setStatusModal] = useState<{ orderId: string, currentStatus: string } | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
+
+  const handleStatusChange = (orderId: string, newStatus: string) => {
+    updateOrderStatus(orderId, newStatus);
+    setStatusModal(null);
+  };
+
+  const filteredOrders = orders.filter(order => 
+    order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.userId.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return '#eab308';
+      case 'shipped': return '#3b82f6';
+      case 'delivered': return '#A6CE39';
+      default: return '#888';
+    }
+  };
+
+  return (
+    <div style={{ animation: 'fadeIn 0.3s ease' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
+        <button 
+          onClick={onBack}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#fff', 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            padding: 0,
+            position: 'absolute',
+            left: 0
+          }}
+        >
+          <ChevronLeft size={18} />
+          {t('common.back')}
+        </button>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
+          {t('admin.actions.viewOrders')}
+        </h2>
+        
+        <div style={{ position: 'absolute', right: 0, width: '300px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
+          <input 
+            type="text" 
+            placeholder="Поиск по ID заказа или клиента..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              width: '100%', 
+              backgroundColor: 'rgba(255,255,255,0.03)', 
+              border: '1px solid var(--border-color)', 
+              borderRadius: '8px', 
+              padding: '10px 15px 10px 40px', 
+              color: '#fff',
+              fontSize: '14px'
+            }}
+          />
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>ID Заказа</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Дата</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Товары</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Сумма</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Статус</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Управление</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrders.map((order) => (
+                <tr key={order.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.01)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', fontWeight: 600 }}>
+                    <button 
+                      onClick={() => alert(`Opening details for ${order.id}...`)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0,
+                        fontWeight: 600,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {order.id}
+                    </button>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
+                    {new Date(order.date).toLocaleDateString('ru-RU')}
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
+                    <button 
+                      onClick={() => alert(`Opening profile for ${order.userId}...`)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {order.userId}
+                    </button>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {order.items.map(i => t(i.title)).join(', ')}
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', fontWeight: 600 }}>
+                    {order.totalPrice.toLocaleString()} MDL
+                  </td>
+                  <td style={{ padding: '15px 20px' }}>
+                    <span style={{ 
+                      padding: '4px 10px', 
+                      borderRadius: '100px', 
+                      fontSize: '12px', 
+                      backgroundColor: `${getStatusColor(order.status)}20`, 
+                      color: getStatusColor(order.status),
+                      border: `1px solid ${getStatusColor(order.status)}40`
+                    }}>
+                      {order.status === 'pending' ? 'В обработке' : order.status === 'shipped' ? 'Отправлен' : 'Доставлен'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '15px 20px' }}>
+                    <button 
+                      onClick={() => {
+                        setStatusModal({ orderId: order.id, currentStatus: order.status });
+                        setSelectedStatus(order.status);
+                      }}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0 
+                      }}
+                    >
+                      Изменить статус
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {statusModal && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.85)', 
+          zIndex: 1000, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{ 
+            backgroundColor: '#111', 
+            border: '1px solid var(--border-color)', 
+            borderRadius: '16px', 
+            padding: '30px', 
+            width: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+            position: 'relative'
+          }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Изменить статус</h3>
+            <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>
+              Выберите новый статус для заказа <span style={{ color: 'var(--primary-color)' }}>{statusModal.orderId}</span>
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
+              {[
+                { id: 'pending', label: 'В обработке' },
+                { id: 'shipped', label: 'Отправлен' },
+                { id: 'delivered', label: 'Доставлен' }
+              ].map((status) => (
+                <div 
+                  key={status.id}
+                  onClick={() => setSelectedStatus(status.id)}
+                  style={{ 
+                    padding: '12px 16px', 
+                    borderRadius: '10px', 
+                    border: `1px solid ${selectedStatus === status.id ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                    backgroundColor: selectedStatus === status.id ? 'rgba(166, 206, 57, 0.05)' : 'rgba(255,255,255,0.02)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedStatus !== status.id) e.currentTarget.style.borderColor = '#444';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedStatus !== status.id) e.currentTarget.style.borderColor = 'var(--border-color)';
+                  }}
+                >
+                  <span style={{ fontSize: '14px', color: selectedStatus === status.id ? '#fff' : '#888', fontWeight: selectedStatus === status.id ? 600 : 400 }}>
+                    {status.label}
+                  </span>
+                  {selectedStatus === status.id && (
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--primary-color)' }} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setStatusModal(null)}
+                style={{ 
+                  flex: 1, 
+                  padding: '12px', 
+                  borderRadius: '100px', 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: 'transparent', 
+                  color: '#fff', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                {t('common.cancel')}
+              </button>
+              <button 
+                onClick={() => handleStatusChange(statusModal.orderId, selectedStatus)}
+                style={{ 
+                  flex: 1, 
+                  padding: '12px', 
+                  borderRadius: '100px', 
+                  border: 'none', 
+                  backgroundColor: 'var(--primary-color)', 
+                  color: '#000', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Подтвердить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
+  const { tradeInRequests, updateTradeInRequest } = useAppContext();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [evalModal, setEvalModal] = useState<{ id: string, amount: string } | null>(null);
+  const [detailsModal, setDetailsModal] = useState<any | null>(null);
+
+  const filteredRequests = tradeInRequests.filter(req => 
+    req.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    req.userId.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleEvaluate = (id: string, amount: number) => {
+    updateTradeInRequest(id, { status: 'evaluated', offerAmount: amount });
+    setEvalModal(null);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return '#eab308';
+      case 'evaluated': return '#3b82f6';
+      case 'accepted': return '#A6CE39';
+      case 'rejected': return '#ff4d4d';
+      default: return '#888';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending': return 'В ожидании';
+      case 'evaluated': return 'Оценен';
+      case 'accepted': return 'Принят';
+      case 'rejected': return 'Отклонен';
+      default: return status;
+    }
+  };
+
+  return (
+    <div style={{ animation: 'fadeIn 0.3s ease' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
+        <button 
+          onClick={onBack}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#fff', 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            padding: 0,
+            position: 'absolute',
+            left: 0
+          }}
+        >
+          <ChevronLeft size={18} />
+          {t('common.back')}
+        </button>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
+          Заявки на оценку Trade-In
+        </h2>
+        
+        <div style={{ position: 'absolute', right: 0, width: '300px' }}>
+          <input 
+            type="text" 
+            placeholder="Поиск по ID заявки или клиента..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              width: '100%', 
+              padding: '10px 15px 10px 40px', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-color)', 
+              backgroundColor: '#111', 
+              color: '#fff',
+              fontSize: '14px',
+              outline: 'none'
+            }}
+          />
+          <Search size={16} color="#888" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '160px' }}>ID Заявки</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Дата</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Категория</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Статус</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Оценка (MDL)</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '150px' }}>Состояние</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRequests.map(req => (
+                <tr key={req.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.01)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    <button 
+                      onClick={() => setDetailsModal(req)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0,
+                        fontWeight: 600,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {req.id}
+                    </button>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
+                    {new Date(req.date).toLocaleDateString('ru-RU')}
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
+                    <button 
+                      onClick={() => alert(`Opening profile for ${req.userId}...`)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {req.userId}
+                    </button>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
+                    {t(`tradeIn.form.categories.${req.category}`)}
+                  </td>
+                  <td style={{ padding: '15px 20px' }}>
+                    <span style={{ 
+                      padding: '4px 10px', 
+                      borderRadius: '100px', 
+                      fontSize: '12px', 
+                      backgroundColor: `${getStatusColor(req.status)}20`, 
+                      color: getStatusColor(req.status),
+                      border: `1px solid ${getStatusColor(req.status)}40`
+                    }}>
+                      {getStatusText(req.status)}
+                    </span>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', fontWeight: 600 }}>
+                    {req.offerAmount ? `${req.offerAmount.toLocaleString()} MDL` : '—'}
+                  </td>
+                  <td style={{ padding: '15px 20px' }}>
+                    {req.status === 'rejected' ? (
+                      <span style={{ color: '#ff4d4d', fontSize: '13px', fontWeight: 600 }}>Отказ</span>
+                    ) : req.status === 'accepted' ? (
+                      <span style={{ color: '#A6CE39', fontSize: '13px', fontWeight: 600 }}>Принято</span>
+                    ) : (
+                      <button 
+                        onClick={() => setEvalModal({ id: req.id, amount: req.offerAmount ? req.offerAmount.toString() : '' })}
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: 'var(--primary-color)', 
+                          cursor: 'pointer', 
+                          fontSize: '13px', 
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'opacity 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                      >
+                        {req.status === 'pending' ? 'Оценить' : 'Изменить оценку'}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {filteredRequests.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
+                    Заявки не найдены
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal for Evaluation */}
+      {evalModal && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, left: 0, right: 0, bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.8)', 
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{ 
+            backgroundColor: '#111', 
+            border: '1px solid var(--border-color)', 
+            borderRadius: '16px', 
+            padding: '30px', 
+            width: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+            position: 'relative'
+          }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Оценка заявки</h3>
+            <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>
+              Введите предложенную сумму для заявки <span style={{ color: 'var(--primary-color)' }}>{evalModal.id}</span>
+            </p>
+
+            <div style={{ marginBottom: '30px' }}>
+              <input 
+                type="text"
+                value={evalModal.amount}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  setEvalModal({ ...evalModal, amount: val });
+                }}
+                placeholder="Сумма в MDL"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                  color: '#fff',
+                  fontSize: '16px',
+                  outline: 'none'
+                }}
+                autoFocus
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setEvalModal(null)}
+                style={{ 
+                  flex: 1, 
+                  padding: '12px', 
+                  borderRadius: '100px', 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: 'transparent', 
+                  color: '#fff', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                Отмена
+              </button>
+              <button 
+                onClick={() => {
+                  const num = parseInt(evalModal.amount);
+                  if (!isNaN(num) && num > 0) {
+                    handleEvaluate(evalModal.id, num);
+                  } else {
+                    alert('Введите корректную сумму');
+                  }
+                }}
+                style={{ 
+                  flex: 1, 
+                  padding: '12px', 
+                  borderRadius: '100px', 
+                  border: 'none', 
+                  backgroundColor: 'var(--primary-color)', 
+                  color: '#000', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Оценить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Details */}
+      {detailsModal && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, left: 0, right: 0, bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.8)', 
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{ 
+            backgroundColor: '#111', 
+            border: '1px solid var(--border-color)', 
+            borderRadius: '16px', 
+            padding: '30px', 
+            width: '500px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+            position: 'relative'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div>
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Детали заявки</h3>
+                <p style={{ margin: 0, fontSize: '14px', color: 'var(--primary-color)' }}>{detailsModal.id}</p>
+              </div>
+              <button 
+                onClick={() => setDetailsModal(null)}
+                style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: '5px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '25px' }}>
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <div style={{ flex: 1, padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>Категория</div>
+                  <div style={{ fontSize: '14px', color: '#fff', fontWeight: 500 }}>{t(`tradeIn.form.categories.${detailsModal.category}`)}</div>
+                </div>
+
+                <div style={{ flex: 1, padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>Состояние</div>
+                  <div style={{ fontSize: '14px', color: '#fff', fontWeight: 500 }}>
+                    {detailsModal.condition === 'new' ? 'Новое' : 'Б/У'}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>Описание от пользователя</div>
+                <div style={{ fontSize: '14px', color: '#fff', lineHeight: '1.5', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                  {detailsModal.description || <span style={{ color: '#555', fontStyle: 'italic' }}>Нет описания</span>}
+                </div>
+              </div>
+            </div>
+
+            {(detailsModal.photos && detailsModal.photos.length > 0) ? (
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>Фотографии устройства ({detailsModal.photos.length})</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {detailsModal.photos.map((photo: string, idx: number) => (
+                    <img 
+                      key={idx}
+                      src={photo} 
+                      alt={`Item ${idx + 1}`} 
+                      style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--border-color)' }} 
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : detailsModal.photo ? (
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>Фотографии устройства</div>
+                <img 
+                  src={detailsModal.photo} 
+                  alt="Item" 
+                  style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--border-color)' }} 
+                />
+              </div>
+            ) : null}
+            
+            <button 
+              onClick={() => setDetailsModal(null)}
+              style={{ 
+                width: '100%', 
+                padding: '12px', 
+                borderRadius: '100px', 
+                border: '1px solid var(--border-color)', 
+                backgroundColor: 'rgba(255,255,255,0.05)', 
+                color: '#fff', 
+                fontSize: '14px', 
+                fontWeight: 600, 
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AdminBlog = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
+  const { blogPosts, addBlogPost, deleteBlogPost } = useAppContext();
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newImage, setNewImage] = useState('');
+
+  const handleAdd = () => {
+    if (!newTitle || !newImage) return;
+    addBlogPost({
+      id: newTitle.toLowerCase().replace(/\s+/g, '-'),
+      title: newTitle,
+      image: newImage,
+      date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+    });
+    setNewTitle('');
+    setNewImage('');
+    setIsAdding(false);
+  };
+
+  const defaultPosts = [
+    { 
+      id: 'how-to-choose-gpu',
+      title: t('home.blog.posts.how-to-choose-gpu.title'), 
+      image: '/blog/BLOG-how-to-choose-gpu.png', 
+      date: t('home.blog.posts.how-to-choose-gpu.date')
+    },
+    { 
+      id: 'cross-play-multiplatform',
+      title: t('home.blog.posts.cross-play-multiplatform.title'), 
+      image: '/blog/BLOG-crossplay-multiplatform.png', 
+      date: t('home.blog.posts.cross-play-multiplatform.date')
+    },
+    { 
+      id: 'gta-6-price',
+      title: t('home.blog.posts.gta-6-price.title'), 
+      image: '/blog/BLOG-gta-price.png', 
+      date: t('home.blog.posts.gta-6-price.date')
+    },
+    { 
+      id: 'how-to-choose-console',
+      title: t('home.blog.posts.how-to-choose-console.title'), 
+      image: '/blog/BLOG-how-to-choose-gaming-console.png', 
+      date: t('home.blog.posts.how-to-choose-console.date')
+    },
+    { 
+      id: 'ryzen-9000-review',
+      title: t('home.blog.posts.ryzen-9000-review.title'), 
+      image: '/blog/BLOG-amd-ryzen-9000.png', 
+      date: t('home.blog.posts.ryzen-9000-review.date')
+    }
+  ];
+
+  return (
+    <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
+        <button 
+          onClick={onBack}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#fff', 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            padding: 0,
+            position: 'absolute',
+            left: 0,
+            transition: 'color 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
+        >
+          <ChevronLeft size={18} />
+          {t('common.back')}
+        </button>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
+          {t('admin.actions.editBlog')}
+        </h2>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+        {/* Кнопка добавления статьи */}
+        <div 
+          onClick={() => setIsAdding(true)}
+          style={{ 
+            borderRadius: '8px', 
+            overflow: 'hidden', 
+            border: '1px dashed #333', 
+            backgroundColor: '#111212',
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            minHeight: '280px'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#A6CE39';
+            e.currentTarget.style.backgroundColor = '#151617';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#333';
+            e.currentTarget.style.backgroundColor = '#111212';
+          }}
+        >
+          <div style={{
+            width: '56px',
+            height: '56px',
+            backgroundColor: 'rgba(166, 206, 57, 0.1)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px'
+          }}>
+            <Plus size={28} color="#A6CE39" />
+          </div>
+          <span style={{ color: '#fff', fontSize: '15px', fontWeight: 600 }}>Добавить статью</span>
+        </div>
+
+        {[...blogPosts, ...defaultPosts].map((post, idx) => (
+          <div 
+            key={idx} 
+            onClick={() => alert(`Editing article ${post.id}`)}
+            style={{ 
+              borderRadius: '8px', 
+              overflow: 'hidden', 
+              border: '1px solid var(--border-color)', 
+              backgroundColor: 'var(--card-bg)',
+              cursor: 'pointer',
+              position: 'relative'
+            }}
+          >
+            {/* Delete Button for custom posts */}
+            {blogPosts.some(p => p.id === post.id) && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if(window.confirm('Вы уверены, что хотите удалить эту статью?')) {
+                    deleteBlogPost(post.id);
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  background: 'rgba(0,0,0,0.6)',
+                  border: 'none',
+                  color: '#fff',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 10,
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#ff4d4d'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+              >
+                <X size={16} />
+              </button>
+            )}
+            
+            <img src={post.image} alt={post.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+            <div style={{ padding: '20px' }}>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '8px' }}>{post.date}</div>
+              <div style={{ fontWeight: 600, fontSize: '18px', color: 'var(--text-color)', transition: 'color 0.2s', lineHeight: '1.4' }}
+                   onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+                   onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-color)'}
+              >
+                {post.title}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isAdding && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            backgroundColor: '#111',
+            border: '1px solid var(--border-color)',
+            borderRadius: '16px',
+            padding: '30px',
+            width: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#fff' }}>Новая статья</h3>
+              <button 
+                onClick={() => setIsAdding(false)}
+                style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: '5px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '25px' }}>
+              <div>
+                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Заголовок статьи</label>
+                <input 
+                  type="text" 
+                  value={newTitle}
+                  onChange={e => setNewTitle(e.target.value)}
+                  placeholder="Введите заголовок..."
+                  style={{ width: '100%', padding: '12px 15px', borderRadius: '8px', border: '1px solid #333', backgroundColor: 'rgba(255,255,255,0.02)', color: '#fff', fontSize: '14px', outline: 'none' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>URL обложки</label>
+                <input 
+                  type="text" 
+                  value={newImage}
+                  onChange={e => setNewImage(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  style={{ width: '100%', padding: '12px 15px', borderRadius: '8px', border: '1px solid #333', backgroundColor: 'rgba(255,255,255,0.02)', color: '#fff', fontSize: '14px', outline: 'none' }}
+                />
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleAdd}
+              disabled={!newTitle || !newImage}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: newTitle && newImage ? 'var(--primary-color)' : '#333',
+                color: newTitle && newImage ? '#000' : '#888',
+                fontWeight: 600,
+                cursor: newTitle && newImage ? 'pointer' : 'not-allowed',
+                transition: 'all 0.2s'
+              }}
+            >
+              Создать статью
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+const AdminUsers = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
+  const { users } = useAppContext();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredUsers = users.filter(u => 
+    u.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
+        <button 
+          onClick={onBack}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#fff', 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            padding: 0,
+            position: 'absolute',
+            left: 0,
+            transition: 'color 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
+        >
+          <ChevronLeft size={18} />
+          {t('common.back')}
+        </button>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
+          Список клиентов и управление
+        </h2>
+        
+        <div style={{ position: 'absolute', right: 0, width: '300px' }}>
+          <input 
+            type="text" 
+            placeholder="Поиск по ID, имени или email..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              width: '100%', 
+              padding: '10px 15px 10px 40px', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-color)', 
+              backgroundColor: '#111', 
+              color: '#fff',
+              fontSize: '14px',
+              outline: 'none'
+            }}
+          />
+          <Search size={16} color="#888" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Имя</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Фамилия</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Email</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Телефон</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Роль</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((u, idx) => (
+                <tr key={u.id} style={{ borderBottom: idx === filteredUsers.length - 1 ? 'none' : '1px solid var(--border-color)', transition: 'background-color 0.2s' }}>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: 'var(--primary-color)' }}>{u.id}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.name}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.lastName || '--'}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#aaa' }}>{u.email}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#aaa' }}>{u.phone && u.phone !== '+373' ? u.phone : '--'}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
+                    <span style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '12px', 
+                      fontWeight: 600,
+                      backgroundColor: u.role === 'admin' ? 'rgba(166, 206, 57, 0.1)' : 'rgba(255,255,255,0.05)',
+                      color: u.role === 'admin' ? 'var(--primary-color)' : '#aaa'
+                    }}>
+                      {u.role === 'admin' ? 'Администратор' : 'Пользователь'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {filteredUsers.length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ padding: '30px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
+                    Пользователи не найдены
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Admin() {
   const { t } = useTranslation();
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase'>('dashboard');
   const [selectedSpecCategory, setSelectedSpecCategory] = useState<string | null>(null);
   const [categorySpecs, setCategorySpecs] = useState<Record<string, string[]>>({});
   const [isAddingParam, setIsAddingParam] = useState(false);
   const [newParamName, setNewParamName] = useState('');
   const [isEditingSpecs, setIsEditingSpecs] = useState(false);
+  const [categorySubcategories, setCategorySubcategories] = useState<Record<string, string[]>>({});
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
   const handleAddParam = () => {
     if (!selectedSpecCategory || !newParamName.trim()) return;
-    setCategorySpecs(prev => ({
-      ...prev,
-      [selectedSpecCategory]: [...(prev[selectedSpecCategory] || []), newParamName.trim()]
-    }));
+    
+    const trimmedName = newParamName.trim();
+    const isSpecs = activeView === 'specs';
+    const currentData = isSpecs ? (categorySpecs[selectedSpecCategory] || []) : (categorySubcategories[selectedSpecCategory] || []);
+    
+    if (currentData.some(p => p.toLowerCase() === trimmedName.toLowerCase())) {
+      alert(`Такой ${isSpecs ? 'параметр' : 'подкатегория'} уже существует в этой категории`);
+      return;
+    }
+
+    if (isSpecs) {
+      setCategorySpecs(prev => ({
+        ...prev,
+        [selectedSpecCategory]: [...currentData, trimmedName]
+      }));
+    } else {
+      setCategorySubcategories(prev => ({
+        ...prev,
+        [selectedSpecCategory]: [...currentData, trimmedName]
+      }));
+    }
     setNewParamName('');
     setIsAddingParam(false);
+  };
+
+  const handleDeleteParam = (paramToDelete: string) => {
+    if (!selectedSpecCategory) return;
+    if (activeView === 'specs') {
+      setCategorySpecs(prev => ({
+        ...prev,
+        [selectedSpecCategory]: prev[selectedSpecCategory].filter(p => p !== paramToDelete)
+      }));
+    } else {
+      setCategorySubcategories(prev => ({
+        ...prev,
+        [selectedSpecCategory]: prev[selectedSpecCategory].filter(p => p !== paramToDelete)
+      }));
+    }
+  };
+
+  const handleUpdateParam = (oldName: string, newName: string) => {
+    if (!selectedSpecCategory) return;
+    if (activeView === 'specs') {
+      setCategorySpecs(prev => ({
+        ...prev,
+        [selectedSpecCategory]: prev[selectedSpecCategory].map(p => p === oldName ? newName : p)
+      }));
+    } else {
+      setCategorySubcategories(prev => ({
+        ...prev,
+        [selectedSpecCategory]: prev[selectedSpecCategory].map(p => p === oldName ? newName : p)
+      }));
+    }
+  };
+
+  const handleDragStart = (idx: number) => {
+    setDraggedItemIndex(idx);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetIdx: number) => {
+    if (draggedItemIndex === null || draggedItemIndex === targetIdx || !selectedSpecCategory) return;
+
+    const isSpecs = activeView === 'specs';
+    const list = isSpecs ? [...(categorySpecs[selectedSpecCategory] || [])] : [...(categorySubcategories[selectedSpecCategory] || [])];
+    
+    const [movedItem] = list.splice(draggedItemIndex, 1);
+    list.splice(targetIdx, 0, movedItem);
+
+    if (isSpecs) {
+      setCategorySpecs(prev => ({ ...prev, [selectedSpecCategory]: list }));
+    } else {
+      setCategorySubcategories(prev => ({ ...prev, [selectedSpecCategory]: list }));
+    }
+    
+    setDraggedItemIndex(null);
   };
 
   const sections = [
@@ -210,15 +1344,17 @@ export default function Admin() {
       icon: <Users size={24} color="#A6CE39" />,
       actions: [
         { id: 'userDatabase', label: t('admin.actions.userDatabase'), icon: <List size={16} /> },
-        { id: 'blockUser', label: t('admin.actions.blockUser'), icon: <AlertCircle size={16} /> },
         { id: 'editBlog', label: t('admin.actions.editBlog'), icon: <FileText size={16} /> },
       ]
     }
   ];
 
   const handleActionClick = (actionId: string) => {
-    if (['products', 'specs', 'categories', 'subcategories'].includes(actionId)) {
+    if (['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase'].includes(actionId)) {
       setActiveView(actionId as any);
+      setSelectedSpecCategory(null); // Reset category when switching views
+      setIsEditingSpecs(false);
+      setIsAddingParam(false);
     } else {
       alert(`Feature "${actionId}" is coming soon!`);
     }
@@ -295,6 +1431,14 @@ export default function Admin() {
             </>
           ) : activeView === 'products' ? (
             <AdminProducts onBack={() => setActiveView('dashboard')} />
+          ) : activeView === 'viewOrders' ? (
+            <AdminOrders onBack={() => setActiveView('dashboard')} />
+          ) : activeView === 'tradeInRequests' ? (
+            <AdminTradeIn onBack={() => setActiveView('dashboard')} />
+          ) : activeView === 'editBlog' ? (
+            <AdminBlog onBack={() => setActiveView('dashboard')} />
+          ) : activeView === 'userDatabase' ? (
+            <AdminUsers onBack={() => setActiveView('dashboard')} />
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
@@ -322,7 +1466,7 @@ export default function Admin() {
                 </button>
                 <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
                   {activeView === 'specs' ? t('admin.actions.specs') : 
-                   activeView === 'categories' ? t('admin.actions.categories') : 
+                   activeView === 'categories' ? t('admin.actions.categoriesAndSubcategories') : 
                    t('admin.actions.subcategories')}
                 </h2>
               </div>
@@ -331,6 +1475,7 @@ export default function Admin() {
                 <div style={{ width: '280px', flexShrink: 0 }}>
                   <AdminSpecFilters 
                     selectedCategory={selectedSpecCategory}
+                    hideTitle={activeView === 'categories'}
                     onSelect={(cat) => {
                       setSelectedSpecCategory(prev => prev === cat ? null : cat);
                       setIsEditingSpecs(false);
@@ -397,22 +1542,99 @@ export default function Admin() {
                     <div style={{ color: '#888', textAlign: 'center', marginTop: '100px' }} />
                   ) : (
                     <div style={{ marginTop: '60px', color: '#fff', animation: 'fadeIn 0.3s ease' }}>
-                      {isEditingSpecs && (
-                        <div style={{ marginBottom: '20px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                        {(activeView === 'specs' ? (categorySpecs[selectedSpecCategory] || []) : (categorySubcategories[selectedSpecCategory] || [])).map((spec, idx) => (
+                          <div 
+                            key={`${selectedSpecCategory}-${idx}`}
+                            draggable={isEditingSpecs}
+                            onDragStart={() => handleDragStart(idx)}
+                            onDragOver={handleDragOver}
+                            onDrop={() => handleDrop(idx)}
+                            style={{ 
+                              padding: isEditingSpecs ? '4px 4px 4px 12px' : '12px 16px', 
+                              backgroundColor: draggedItemIndex === idx ? 'rgba(166, 206, 57, 0.1)' : 'rgba(255,255,255,0.03)', 
+                              borderRadius: '8px',
+                              border: draggedItemIndex === idx ? '1px dashed var(--primary-color)' : '1px solid var(--border-color)',
+                              fontSize: '14px',
+                              color: '#fff',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              height: '45px',
+                              cursor: isEditingSpecs ? 'grab' : 'default',
+                              opacity: draggedItemIndex === idx ? 0.8 : 1,
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            {isEditingSpecs ? (
+                              <>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                                  <GripVertical size={16} color="#444" style={{ cursor: 'grab' }} />
+                                  <input 
+                                    type="text"
+                                    value={spec}
+                                    onChange={(e) => handleUpdateParam(spec, e.target.value)}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      border: 'none',
+                                      color: '#fff',
+                                      fontSize: '14px',
+                                      width: '100%',
+                                      outline: 'none',
+                                      padding: 0
+                                    }}
+                                  />
+                                </div>
+                                <button 
+                                  onClick={() => handleDeleteParam(spec)}
+                                  style={{ 
+                                    background: 'none', 
+                                    border: 'none', 
+                                    color: '#888', 
+                                    cursor: 'pointer',
+                                    width: '37px',
+                                    height: '37px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s',
+                                    borderRadius: '6px'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color = '#ef4444';
+                                    e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color = '#888';
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }}
+                                  title={t('common.delete')}
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </>
+                            ) : (
+                              spec
+                            )}
+                          </div>
+                        ))}
+
+                        {isEditingSpecs && !isAddingParam && (
                           <button 
                             onClick={() => setIsAddingParam(true)}
                             style={{ 
                               backgroundColor: 'transparent', 
                               border: '1px dashed var(--primary-color)', 
                               color: 'var(--primary-color)',
-                              padding: '10px 20px',
+                              padding: '12px 16px',
                               borderRadius: '8px',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '8px',
                               fontSize: '14px',
-                              transition: 'all 0.2s'
+                              transition: 'all 0.2s',
+                              height: '45px'
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.backgroundColor = 'rgba(166, 206, 57, 0.05)';
@@ -422,87 +1644,86 @@ export default function Admin() {
                             }}
                           >
                             <Plus size={16} />
-                            {t('common.add')} параметр
+                            {t('common.add')} {activeView === 'specs' ? 'параметр' : 'подкатегорию'}
                           </button>
-                        </div>
-                      )}
+                        )}
 
-                      {isAddingParam && (
-                        <div style={{ 
-                          marginBottom: '25px', 
-                          backgroundColor: 'rgba(255,255,255,0.02)', 
-                          padding: '15px', 
-                          borderRadius: '8px',
-                          border: '1px solid var(--border-color)',
-                          display: 'flex',
-                          gap: '10px'
-                        }}>
-                          <input 
-                            autoFocus
-                            type="text" 
-                            placeholder="Название параметра (напр. Процессор)" 
-                            value={newParamName}
-                            onChange={(e) => setNewParamName(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleAddParam()}
-                            style={{ 
-                              flex: 1, 
-                              backgroundColor: '#1a1a1a', 
-                              border: '1px solid var(--border-color)', 
-                              borderRadius: '6px', 
-                              padding: '8px 12px', 
-                              color: '#fff',
-                              fontSize: '14px'
-                            }} 
-                          />
-                          <button 
-                            onClick={handleAddParam}
-                            style={{ 
-                              backgroundColor: 'var(--primary-color)', 
-                              border: 'none', 
-                              color: '#000', 
-                              padding: '8px 16px', 
-                              borderRadius: '6px', 
-                              fontWeight: 600,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            OK
-                          </button>
-                          <button 
-                            onClick={() => setIsAddingParam(false)}
-                            style={{ 
-                              backgroundColor: 'transparent', 
-                              border: '1px solid #444', 
-                              color: '#888', 
-                              padding: '8px 16px', 
-                              borderRadius: '6px', 
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Отмена
-                          </button>
-                        </div>
-                      )}
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {(categorySpecs[selectedSpecCategory] || []).map((spec, idx) => (
-                          <div 
-                            key={idx}
-                            style={{ 
-                              padding: '12px 16px', 
-                              backgroundColor: 'rgba(255,255,255,0.03)', 
-                              borderRadius: '8px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '14px',
-                              color: '#fff',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center'
-                            }}
-                          >
-                            {spec}
+                        {isAddingParam && (
+                          <div style={{ 
+                            display: 'flex',
+                            gap: '8px',
+                            height: '45px',
+                            alignItems: 'center'
+                          }}>
+                            <input 
+                              autoFocus
+                              type="text" 
+                              placeholder={activeView === 'specs' ? "Название параметра" : "Название подкатегории"} 
+                              value={newParamName}
+                              onChange={(e) => setNewParamName(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleAddParam()}
+                              style={{ 
+                                flex: 1, 
+                                backgroundColor: 'rgba(255,255,255,0.03)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '8px', 
+                                padding: '12px 16px', 
+                                color: '#fff',
+                                fontSize: '14px',
+                                height: '100%',
+                                transition: 'border-color 0.2s'
+                              }} 
+                              onFocus={(e) => e.currentTarget.style.borderColor = 'var(--primary-color)'}
+                              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                            />
+                            <button 
+                              onClick={handleAddParam}
+                              style={{ 
+                                backgroundColor: 'var(--primary-color)', 
+                                border: 'none', 
+                                color: '#000', 
+                                padding: '0 16px', 
+                                borderRadius: '8px', 
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                height: '100%',
+                                fontSize: '14px',
+                                transition: 'transform 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                              OK
+                            </button>
+                            <button 
+                              onClick={() => setIsAddingParam(false)}
+                              style={{ 
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+                                border: '1px solid rgba(239, 68, 68, 0.2)', 
+                                color: '#ef4444', 
+                                width: '45px',
+                                height: '45px',
+                                borderRadius: '8px', 
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                                e.currentTarget.style.transform = 'scale(1.05)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
+                              title={t('common.delete')}
+                            >
+                              <Trash2 size={18} />
+                            </button>
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
                   )}

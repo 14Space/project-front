@@ -1,13 +1,13 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 
 interface AdminSpecFiltersProps {
   selectedCategory: string | null;
   onSelect: (category: string) => void;
+  hideTitle?: boolean;
 }
 
-export default function AdminSpecFilters({ selectedCategory, onSelect }: AdminSpecFiltersProps) {
+export default function AdminSpecFilters({ selectedCategory, onSelect, hideTitle }: AdminSpecFiltersProps) {
   const { t } = useTranslation();
   
   const categories = [
@@ -33,14 +33,18 @@ export default function AdminSpecFilters({ selectedCategory, onSelect }: AdminSp
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <div style={{ 
-        fontSize: '20px', 
-        fontWeight: 700, 
-        lineHeight: 1,
-        paddingBottom: '12px', 
-        borderBottom: '1px solid var(--border-color)',
-        margin: 0
-      }}>{t('filters.title')}</div>
+      {!hideTitle && (
+        <div style={{ 
+          fontSize: '20px', 
+          fontWeight: 700, 
+          lineHeight: 1,
+          paddingBottom: '12px', 
+          borderBottom: '1px solid var(--border-color)',
+          marginBottom: '0px'
+        }}>
+          {t('filters.title')}
+        </div>
+      )}
 
       {categories.map((cat, idx) => {
         const isSelected = selectedCategory === cat;
@@ -49,7 +53,7 @@ export default function AdminSpecFilters({ selectedCategory, onSelect }: AdminSp
             key={cat}
             style={{ 
               borderBottom: idx !== categories.length - 1 ? '1px solid var(--border-color)' : 'none', 
-              paddingTop: '20px',
+              paddingTop: idx === 0 && hideTitle ? '0px' : '20px',
               paddingBottom: idx !== categories.length - 1 ? '20px' : '0'
             }}
           >

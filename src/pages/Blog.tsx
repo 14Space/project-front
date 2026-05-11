@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 export default function Blog() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { blogPosts } = useAppContext();
 
-  const posts = [
+  const defaultPosts = [
     { 
       id: 'how-to-choose-gpu',
       title: t('home.blog.posts.how-to-choose-gpu.title'), 
@@ -45,7 +47,7 @@ export default function Blog() {
         <h1 className="title" style={{ fontSize: '32px', marginBottom: '20px', marginTop: 0 }}>{t('home.blog.title')}</h1>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-          {posts.map((post, idx) => (
+          {[...blogPosts, ...defaultPosts].map((post, idx) => (
             <div 
               key={idx} 
               onClick={() => navigate(`/blog/${post.id}`)}
@@ -57,10 +59,10 @@ export default function Blog() {
                 cursor: 'pointer'
               }}
             >
-              <img src={post.image} alt={post.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }} />
+              <img src={post.image} alt={post.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
               <div style={{ padding: '20px' }}>
                 <div style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '8px' }}>{post.date}</div>
-                <div style={{ fontWeight: 600, fontSize: '18px', color: 'var(--text-color)', transition: 'color 0.2s' }}
+                <div style={{ fontWeight: 600, fontSize: '18px', color: 'var(--text-color)', transition: 'color 0.2s', lineHeight: '1.4' }}
                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-color)'}
                 >

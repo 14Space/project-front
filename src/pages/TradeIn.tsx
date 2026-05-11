@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Camera, Repeat, Plus, X } from 'lucide-react';
+import { ChevronDown, Camera, Repeat, Plus, X, Check } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 export default function TradeIn() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { user, tradeInRequests, createTradeInRequest, updateTradeInRequest, deleteTradeInRequest } = useAppContext();
 
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,21 +18,10 @@ export default function TradeIn() {
     description: '',
   });
 
-  const [requests, setRequests] = useState<any[]>([]);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('tradeInRequests');
-    if (saved) {
-      setRequests(JSON.parse(saved));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (requests.length > 0) {
-      localStorage.setItem('tradeInRequests', JSON.stringify(requests));
-    }
-  }, [requests]);
+  // Filter requests for the current user
+  const userRequests = tradeInRequests.filter(req => req.userId === user?.id && req.status !== 'rejected');
 
   const categories = [
     'computers', 'laptops', 'components', 'monitors', 'peripherals', 'consoles', 'networking'
@@ -49,24 +40,37 @@ export default function TradeIn() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result as string;
+    const base64Photos: string[] = [];
+    
+    // Process all files
+    const processFiles = async () => {
+      for (const file of selectedFiles) {
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+        base64Photos.push(base64);
+      }
+
       const newRequest = {
-        id: Date.now().toString(),
+        id: `TRD-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        userId: user?.id || 'guest',
         ...formData,
-        photo: base64,
-        status: 'pending'
+        photos: base64Photos,
+        status: 'pending' as const,
+        date: new Date().toISOString()
       };
 
-      setRequests(prev => [newRequest, ...prev]);
+      createTradeInRequest(newRequest);
       setIsModalOpen(false);
 
       // Reset form
       setFormData({ category: '', condition: 'used', description: '' });
       setSelectedFiles([]);
     };
-    reader.readAsDataURL(selectedFiles[0]);
+    
+    processFiles();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,9 +89,7 @@ export default function TradeIn() {
 
   const handleDeleteRequest = () => {
     if (requestToDelete) {
-      const updatedRequests = requests.filter(req => req.id !== requestToDelete);
-      setRequests(updatedRequests);
-      localStorage.setItem('tradeInRequests', JSON.stringify(updatedRequests));
+      deleteTradeInRequest(requestToDelete);
       setRequestToDelete(null);
     }
   };
@@ -106,7 +108,7 @@ export default function TradeIn() {
 
 
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            {requests.map(request => (
+            {userRequests.map(request => (
               <div
                 key={request.id}
                 style={{
@@ -124,7 +126,7 @@ export default function TradeIn() {
                 }}
               >
                 <div style={{ width: '100%', height: '220px', overflow: 'hidden' }}>
-                  <img src={request.photo} alt="request" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={request.photos?.[0] || (request as any).photo} alt="request" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '5px 10px 10px 10px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ color: '#fff', fontSize: '18px', fontWeight: 700, marginBottom: '5px' }}>
@@ -142,53 +144,89 @@ export default function TradeIn() {
                   </div>
                   <div style={{
                     display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: '15px'
+                    flexDirection: 'column',
+                    gap: '10px',
+                    marginTop: 'auto'
                   }}>
-                    <div style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      height: '32px',
-                      padding: '0 16px',
-                      borderRadius: '30px',
-                      backgroundColor: 'rgba(255, 171, 0, 0.1)',
-                      color: '#FFAB00',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      width: 'fit-content'
-                    }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#FFAB00' }} />
-                      {t('tradeIn.form.statusUnderReview')}
-                    </div>
+                    {request.status === 'evaluated' && request.offerAmount && (
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: '8px',
+                        padding: '10px',
+                        backgroundColor: 'rgba(166, 206, 57, 0.05)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(166, 206, 57, 0.2)'
+                      }}>
+                        <div style={{ color: '#fff', fontSize: '13px', textAlign: 'center' }}>
+                          Оценка: <span style={{ color: '#A6CE39', fontWeight: 700, fontSize: '15px' }}>{request.offerAmount.toLocaleString()} MDL</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => updateTradeInRequest(request.id, { status: 'accepted' })}
+                            style={{ flex: 1, padding: '6px', borderRadius: '6px', backgroundColor: '#A6CE39', color: '#000', border: 'none', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            Принять
+                          </button>
+                          <button
+                            onClick={() => updateTradeInRequest(request.id, { status: 'rejected' })}
+                            style={{ flex: 1, padding: '6px', borderRadius: '6px', backgroundColor: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            Отклонить
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
-                    <button
-                      onClick={() => setRequestToDelete(request.id)}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        backgroundColor: 'rgba(255, 77, 77, 0.1)',
-                        color: '#ff4d4d',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        border: '1px solid rgba(255, 77, 77, 0.2)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#ff4d4d';
-                        e.currentTarget.style.color = '#fff';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 77, 77, 0.1)';
-                        e.currentTarget.style.color = '#ff4d4d';
-                      }}
-                    >
-                      <X size={18} />
-                    </button>
+                    {request.status === 'accepted' && (
+                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px', backgroundColor: 'rgba(166, 206, 57, 0.1)', borderRadius: '8px', color: '#A6CE39', fontSize: '13px', fontWeight: 600 }}>
+                          <Check size={16} /> Сделка подтверждена
+                       </div>
+                    )}
+
+                    {request.status === 'rejected' && (
+                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px', backgroundColor: 'rgba(255, 77, 77, 0.1)', borderRadius: '8px', color: '#ff4d4d', fontSize: '13px', fontWeight: 600 }}>
+                          <X size={16} /> Сделка отклонена
+                       </div>
+                    )}
+
+                    {request.status === 'pending' && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          height: '32px',
+                          padding: '0 16px',
+                          borderRadius: '30px',
+                          backgroundColor: 'rgba(255, 171, 0, 0.1)',
+                          color: '#FFAB00',
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          width: 'fit-content'
+                        }}>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#FFAB00' }} />
+                          В обработке
+                        </div>
+                        <button
+                          onClick={() => setRequestToDelete(request.id)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(255, 77, 77, 0.1)',
+                            color: '#ff4d4d',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            border: '1px solid rgba(255, 77, 77, 0.2)'
+                          }}
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

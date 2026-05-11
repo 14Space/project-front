@@ -33,16 +33,25 @@ export default function OrderStatus() {
                 const product = HOT_DEALS.find(p => p.id === item.id);
                 const imagePath = product?.images[0] || item.image;
 
-                // Dynamic Status Translation (with legacy support)
+                // Dynamic Status Translation
                 let displayStatus = order.status;
-                if (order.status === 'preparing') {
-                  displayStatus = t('orderStatus.preparing');
-                } else if (i18n.language.startsWith('en')) {
-                  // Legacy support for hardcoded RU statuses
-                  if (order.status === 'Готовится к отправке') displayStatus = 'Preparing for shipment';
-                } else if (i18n.language.startsWith('ru')) {
-                  if (order.status === 'Preparing for shipment') displayStatus = 'Готовится к отправке';
+                if (order.status === 'pending') {
+                  displayStatus = i18n.language.startsWith('ru') ? 'В обработке' : 'Pending';
+                } else if (order.status === 'shipped') {
+                  displayStatus = i18n.language.startsWith('ru') ? 'Отправлен' : 'Shipped';
+                } else if (order.status === 'delivered') {
+                  displayStatus = i18n.language.startsWith('ru') ? 'Доставлен' : 'Delivered';
                 }
+
+                const getStatusColor = (status: string) => {
+                  switch (status) {
+                    case 'pending': return '#eab308'; // Yellow
+                    case 'shipped': return '#3b82f6'; // Blue
+                    case 'delivered': return '#A6CE39'; // Green
+                    default: return '#888';
+                  }
+                };
+                const statusColor = getStatusColor(order.status);
 
                 // Dynamic Date Formatting (with legacy support)
                 let displayDate = order.date;
@@ -105,8 +114,9 @@ export default function OrderStatus() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                         <span style={{ color: '#fff', fontSize: '18px', fontWeight: 700 }}>#{order.id}</span>
                         <span style={{ 
-                          backgroundColor: 'rgba(166, 206, 57, 0.1)', 
-                          color: '#A6CE39', 
+                          backgroundColor: `${statusColor}20`, 
+                          color: statusColor, 
+                          border: `1px solid ${statusColor}40`,
                           fontSize: '12px', 
                           fontWeight: 700, 
                           padding: '4px 12px', 

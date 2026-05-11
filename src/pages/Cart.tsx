@@ -30,7 +30,8 @@ export default function Cart() {
     }
 
     const orderData = {
-      id: `FRM-${Math.floor(100000 + Math.random() * 900000)}`,
+      id: `ORD-${Math.floor(10000000 + Math.random() * 90000000)}`, // 8-digit format as requested
+      userId: user.id,
       items: cartProducts.map(p => ({ 
         id: p.id, 
         quantity: cart[p.id], 
@@ -39,8 +40,8 @@ export default function Cart() {
         image: p.images[0]
       })),
       totalPrice,
-      status: 'preparing', // Store key instead of localized string
-      date: new Date().toISOString() // Store ISO string for dynamic formatting
+      status: 'pending', // Use 'pending' as default status
+      date: new Date().toISOString()
     };
 
     createOrder(orderData);
