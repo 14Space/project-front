@@ -14,9 +14,29 @@ interface User {
 
 export interface Order {
   id: string;
+  userId: string;
   items: { id: string; quantity: number; title: string; price: number; image: string }[];
   totalPrice: number;
   status: string;
+  date: string;
+}
+
+export interface TradeInRequest {
+  id: string;
+  userId: string;
+  category: string;
+  condition: string;
+  description: string;
+  photos: string[];
+  status: 'pending' | 'evaluated' | 'accepted' | 'rejected';
+  offerAmount?: number;
+  date: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  image: string;
   date: string;
 }
 export const MOCK_USER: User = {
@@ -58,10 +78,19 @@ interface AppContextType {
   updateUser: (userData: Partial<User>) => void;
   orders: Order[];
   createOrder: (order: Order) => void;
+  updateOrderStatus: (orderId: string, status: string) => void;
+  tradeInRequests: TradeInRequest[];
+  createTradeInRequest: (request: TradeInRequest) => void;
+  updateTradeInRequest: (requestId: string, updates: Partial<TradeInRequest>) => void;
+  deleteTradeInRequest: (requestId: string) => void;
   isCatalogOpen: boolean;
   setIsCatalogOpen: (open: boolean) => void;
   catalogCategory: string | null;
   setCatalogCategory: (cat: string | null) => void;
+  blogPosts: BlogPost[];
+  addBlogPost: (post: BlogPost) => void;
+  deleteBlogPost: (id: string) => void;
+  users: User[];
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -99,8 +128,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('orders');
+    const saved = localStorage.getItem('app_orders');
     return saved ? JSON.parse(saved) : [];
+  });
+
+  const [tradeInRequests, setTradeInRequests] = useState<TradeInRequest[]>(() => {
+    const saved = localStorage.getItem('app_tradein');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(() => {
+    const saved = localStorage.getItem('app_blog_posts');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [users, setUsers] = useState<User[]>(() => {
+    const saved = localStorage.getItem('app_users');
+    return saved ? JSON.parse(saved) : [MOCK_USER, MOCK_USER_REGULAR];
   });
 
   useEffect(() => {
@@ -124,8 +168,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('orders', JSON.stringify(orders));
+    localStorage.setItem('app_orders', JSON.stringify(orders));
   }, [orders]);
+
+  useEffect(() => {
+    localStorage.setItem('app_tradein', JSON.stringify(tradeInRequests));
+  }, [tradeInRequests]);
+
+  useEffect(() => {
+    localStorage.setItem('app_blog_posts', JSON.stringify(blogPosts));
+  }, [blogPosts]);
+
+  useEffect(() => {
+    localStorage.setItem('app_users', JSON.stringify(users));
+  }, [users]);
 
   const toggleFavorite = (id: string) => {
     setFavorites(prev => 
@@ -180,15 +236,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateUser = (userData: Partial<User>) => {
-    setUser(prev => prev ? { ...prev, ...userData } : null);
+    setUser(prev => {
+      const updatedUser = prev ? { ...prev, ...userData } : null;
+      if (updatedUser) {
+        setUsers(currentUsers => currentUsers.map(u => u.id === updatedUser.id ? { ...u, ...updatedUser } : u));
+      }
+      return updatedUser;
+    });
   };
 
   const createOrder = (order: Order) => {
     setOrders(prev => [order, ...prev]);
   };
 
+  const updateOrderStatus = (orderId: string, status: string) => {
+    setOrders(prev => prev.map(order => 
+      order.id === orderId ? { ...order, status } : order
+    ));
+  };
+
+  const createTradeInRequest = (request: TradeInRequest) => {
+    setTradeInRequests(prev => [request, ...prev]);
+  };
+
+  const updateTradeInRequest = (requestId: string, updates: Partial<TradeInRequest>) => {
+    setTradeInRequests(prev => prev.map(req => 
+      req.id === requestId ? { ...req, ...updates } : req
+    ));
+  };
+
+  const deleteTradeInRequest = (requestId: string) => {
+    setTradeInRequests(prev => prev.filter(req => req.id !== requestId));
+  };
+
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [catalogCategory, setCatalogCategory] = useState<string | null>(null);
+
+  const addBlogPost = (post: BlogPost) => {
+    setBlogPosts(prev => [post, ...prev]);
+  };
+
+  const deleteBlogPost = (id: string) => {
+    setBlogPosts(prev => prev.filter(post => post.id !== id));
+  };
 
   return (
     <AppContext.Provider value={{ 
@@ -209,10 +299,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateUser,
       orders,
       createOrder,
+      updateOrderStatus,
+      tradeInRequests,
+      createTradeInRequest,
+      updateTradeInRequest,
+      deleteTradeInRequest,
       isCatalogOpen,
       setIsCatalogOpen,
       catalogCategory,
-      setCatalogCategory
+      setCatalogCategory,
+      blogPosts,
+      addBlogPost,
+      deleteBlogPost,
+      users
     }}>
       {children}
     </AppContext.Provider>

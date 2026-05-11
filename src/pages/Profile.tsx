@@ -544,7 +544,8 @@ const Profile: React.FC = () => {
                   padding: '20px',
                   border: '1px solid var(--border-color)',
                   display: 'flex',
-                  flexDirection: 'column'
+                  flexDirection: 'column',
+                  marginTop: '20px'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                     <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#fff', lineHeight: 1 }}>

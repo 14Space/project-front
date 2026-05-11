@@ -82,9 +82,6 @@ export default function Laptops() {
     return result;
   }, [activeSort, selectedSubcategories, minPrice, maxPrice]);
 
-  const breadcrumbItems = [
-    { label: t('catalog.laptops.title'), active: true }
-  ];
 
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
