@@ -24,21 +24,63 @@ import AdminProductFilters from '../components/admin/AdminProductFilters';
 import AdminSpecFilters from '../components/admin/AdminSpecFilters';
 import { useAppContext } from '../context/AppContext';
 
+// Categories mapping
+const CATEGORIES_DATA = {
+  'PCs': {
+    label: 'Компьютеры',
+    subcategories: ['Игровые', 'Мини-ПК', 'Моноблоки', 'Рабочие станции']
+  },
+  'Laptops': {
+    label: 'Ноутбуки',
+    subcategories: ['Игровые', 'Для учёбы', 'MacBook', 'Ультрабуки']
+  },
+  'Components': {
+    label: 'Комплектующие',
+    subcategories: ['Процессоры', 'Видеокарты', 'Материнские платы', 'Оперативная память', 'Накопители', 'Блоки питания', 'Корпуса', 'Охлаждение']
+  },
+  'Monitors': {
+    label: 'Мониторы',
+    subcategories: ['Игровые', '4K', 'Ultrawide', 'Офисные']
+  },
+  'Peripherals': {
+    label: 'Периферия',
+    subcategories: ['Клавиатуры', 'Мыши', 'Наушники', 'Коврики']
+  }
+};
+
 // Sub-components for Admin views
 const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'products' | 'brands'>('products');
+  const [isAddingBrand, setIsAddingBrand] = useState(false);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [productForm, setProductForm] = useState({
+    title: '',
+    price: '',
+    category: '',
+    subcategory: '',
+    images: [] as string[]
+  });
+  const [brands, setBrands] = useState([
+    { id: 1, name: 'MSI' },
+    { id: 2, name: 'ASUS' },
+    { id: 3, name: 'Gigabyte' },
+    { id: 4, name: 'AMD' },
+    { id: 5, name: 'Intel' },
+  ]);
 
-  // Example data (in a real app this would come from an API or store)
-  const allProducts = [
+  const [products, setProducts] = useState([
     { id: '100101', name: 'Product Name Example 1', price: 26000, category: 'PCs', subcategory: 'Gaming' },
     { id: '100102', name: 'Product Name Example 2', price: 27000, category: 'PCs', subcategory: 'Gaming' },
     { id: '100103', name: 'Product Name Example 3', price: 28000, category: 'PCs', subcategory: 'Gaming' },
     { id: '100104', name: 'Product Name Example 4', price: 29000, category: 'PCs', subcategory: 'Gaming' },
     { id: '100105', name: 'Product Name Example 5', price: 30000, category: 'PCs', subcategory: 'Gaming' },
-  ];
+  ]);
 
-  const filteredProducts = allProducts.filter(p => 
+  const filteredProducts = products.filter(p => 
     p.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -79,12 +121,57 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
         <div style={{ 
           backgroundColor: 'var(--card-bg)', 
           borderRadius: '12px', 
-          padding: '20px 20px 0 20px',
+          padding: '20px 20px 0px 20px',
           border: '1px solid var(--border-color)',
           flex: 1,
-          height: 'fit-content'
+          height: 'fit-content',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', gap: '15px' }}>
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
+            <button 
+              onClick={() => setActiveTab('products')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: activeTab === 'products' ? 'var(--primary-color)' : '#888',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                padding: '5px 0',
+                position: 'relative',
+                transition: 'all 0.2s'
+              }}
+            >
+              Товары
+              {activeTab === 'products' && (
+                <div style={{ position: 'absolute', bottom: '-11px', left: 0, right: 0, height: '2px', backgroundColor: 'var(--primary-color)' }} />
+              )}
+            </button>
+            <button 
+              onClick={() => setActiveTab('brands')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: activeTab === 'brands' ? 'var(--primary-color)' : '#888',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                padding: '5px 0',
+                position: 'relative',
+                transition: 'all 0.2s'
+              }}
+            >
+              Бренды
+              {activeTab === 'brands' && (
+                <div style={{ position: 'absolute', bottom: '-11px', left: 0, right: 0, height: '2px', backgroundColor: 'var(--primary-color)' }} />
+              )}
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px' }}>
             <div style={{ position: 'relative', flex: 1 }}>
               <Search size={18} color="#666" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
               <input 
@@ -103,65 +190,526 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                 }} 
               />
             </div>
-            <button style={{ 
-              backgroundColor: 'var(--primary-color)', 
-              color: '#000', 
-              border: 'none', 
-              padding: '0 20px', 
-              borderRadius: '8px', 
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              cursor: 'pointer'
-            }}>
-              <Plus size={18} />
-              {t('common.add')}
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => {
+                  if (activeTab === 'brands') {
+                    setIsAddingBrand(true);
+                  } else {
+                    setIsProductModalOpen(true);
+                  }
+                }}
+                style={{ 
+                  backgroundColor: 'var(--primary-color)', 
+                  color: '#000', 
+                  border: 'none', 
+                  padding: '10px 20px', 
+                  borderRadius: '8px', 
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  height: '100%'
+                }}
+              >
+                <Plus size={18} />
+                {t('common.add')}
+              </button>
+            </div>
           </div>
 
-          <table style={{ width: '100%', borderCollapse: 'collapse', color: '#fff' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #333', textAlign: 'left' }}>
-                <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>ID</th>
-                <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('common.title')}</th>
-                <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('common.price')}</th>
-                <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('admin.actions.categories')}</th>
-                <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('admin.actions.subcategories')}</th>
-                <th style={{ padding: '12px', fontSize: '14px', color: '#888', textAlign: 'right' }}>{t('common.actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((p, idx) => (
-                <tr key={p.id} style={{ borderBottom: idx === filteredProducts.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
-                  <td style={{ padding: '12px', fontSize: '14px' }}>{p.id}</td>
-                  <td style={{ padding: '12px', fontSize: '14px', fontWeight: 500 }}>
-                    {p.name}
-                  </td>
-                  <td style={{ padding: '12px', fontSize: '14px' }}>{p.price} MDL</td>
-                  <td style={{ padding: '12px', fontSize: '14px' }}>
-                    {p.category}
-                  </td>
-                  <td style={{ padding: '12px', fontSize: '14px' }}>
-                    {p.subcategory}
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '25px', justifyContent: 'flex-end' }}>
-                      <button style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}><Edit2 size={16} /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}><Trash2 size={16} /></button>
+          {isAddingBrand && (
+            <div style={{ 
+              padding: '15px', 
+              backgroundColor: 'rgba(255, 255, 255, 0.02)', 
+              border: '1px solid #333', 
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '15px',
+              animation: 'fadeIn 0.2s ease',
+              marginBottom: '20px'
+            }}>
+              <input 
+                autoFocus
+                type="text" 
+                placeholder="Введите название бренда..."
+                value={newBrandName}
+                onChange={(e) => setNewBrandName(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: '10px 15px',
+                  backgroundColor: '#111',
+                  border: '1px solid #333',
+                  borderRadius: '6px',
+                  color: '#fff',
+                  outline: 'none'
+                }}
+              />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  onClick={() => {
+                    if (newBrandName.trim()) {
+                      setBrands([...brands, { id: Date.now(), name: newBrandName.trim() }]);
+                      setNewBrandName('');
+                      setIsAddingBrand(false);
+                      setActiveTab('brands');
+                    }
+                  }}
+                  style={{
+                    padding: '8px 20px',
+                    backgroundColor: 'var(--primary-color)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Сохранить
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsAddingBrand(false);
+                    setNewBrandName('');
+                  }}
+                  style={{
+                    padding: '8px 20px',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    color: '#fff',
+                    border: '1px solid #333',
+                    borderRadius: '6px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'products' ? (
+            <table style={{ width: '100%', borderCollapse: 'collapse', color: '#fff' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #333', textAlign: 'left' }}>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>ID</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('common.title')}</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('common.price')}</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('admin.actions.categories')}</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>{t('admin.actions.subcategories')}</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888', textAlign: 'right' }}>{t('common.actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((p, idx) => (
+                  <tr key={p.id} style={{ borderBottom: idx === filteredProducts.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
+                    <td style={{ padding: '12px', fontSize: '14px' }}>{p.id}</td>
+                    <td style={{ padding: '12px', fontSize: '14px', fontWeight: 500 }}>
+                      {p.name}
+                    </td>
+                    <td style={{ padding: '12px', fontSize: '14px' }}>{p.price} MDL</td>
+                    <td style={{ padding: '12px', fontSize: '14px' }}>
+                      {p.category}
+                    </td>
+                    <td style={{ padding: '12px', fontSize: '14px' }}>
+                      {p.subcategory}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: '25px', justifyContent: 'flex-end' }}>
+                        <button 
+                          onClick={() => {
+                            setEditingProduct(p);
+                            setProductForm({
+                              title: p.name,
+                              price: p.price.toString(),
+                              category: Object.keys(CATEGORIES_DATA).find(key => (CATEGORIES_DATA as any)[key].label === p.category) || p.category,
+                              subcategory: p.subcategory,
+                              images: [] // In real app, load existing images
+                            });
+                            setIsProductModalOpen(true);
+                          }}
+                          style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (window.confirm('Вы уверены, что хотите удалить этот товар?')) {
+                              setProducts(products.filter(item => item.id !== p.id));
+                            }
+                          }}
+                          style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                      {t('common.noData')}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', color: '#fff' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #333', textAlign: 'left' }}>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>ID</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888' }}>Название бренда</th>
+                  <th style={{ padding: '12px', fontSize: '14px', color: '#888', textAlign: 'right' }}>{t('common.actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {brands.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase())).map((b, idx, arr) => (
+                  <tr key={b.id} style={{ borderBottom: idx === arr.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
+                    <td style={{ padding: '12px', fontSize: '14px' }}>{b.id}</td>
+                    <td style={{ padding: '12px', fontSize: '14px', fontWeight: 500 }}>{b.name}</td>
+                    <td style={{ padding: '12px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: '25px', justifyContent: 'flex-end' }}>
+                        <button 
+                          onClick={() => {
+                            const newName = prompt('Введите новое название бренда:', b.name);
+                            if (newName && newName.trim()) {
+                              setBrands(brands.map(item => item.id === b.id ? { ...item, name: newName.trim() } : item));
+                            }
+                          }}
+                          style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (window.confirm(`Вы уверены, что хотите удалить бренд "${b.name}"?`)) {
+                              setBrands(brands.filter(item => item.id !== b.id));
+                            }
+                          }}
+                          style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {brands.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                  <tr>
+                    <td colSpan={3} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                      {t('common.noData')}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
+
+          {/* Add Product Modal */}
+          {isProductModalOpen && (
+            <div style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              backgroundColor: 'rgba(0,0,0,0.8)', 
+              backdropFilter: 'blur(5px)',
+              zIndex: 1000,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }}>
+              <div style={{ 
+                backgroundColor: '#1a1b1c', 
+                width: '100%', 
+                maxWidth: '600px', 
+                borderRadius: '16px', 
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                animation: 'fadeInScale 0.3s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                maxHeight: '90vh'
+              }}>
+                <div style={{ padding: '20px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '20px' }}>
+                    {editingProduct ? 'Редактирование товара' : 'Добавление товара'}
+                  </h3>
+                  <button 
+                    onClick={() => {
+                      setIsProductModalOpen(false);
+                      setEditingProduct(null);
+                      setProductForm({ title: '', price: '', category: '', subcategory: '', images: [] });
+                    }}
+                    style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+                
+                <div style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Заголовок товара</label>
+                    <input 
+                      type="text" 
+                      placeholder="Например: Видеокарта Asus ROG Strix..."
+                      value={productForm.title}
+                      onChange={(e) => setProductForm({...productForm, title: e.target.value})}
+                      style={{ width: '100%', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '15px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Цена (MDL)</label>
+                      <input 
+                        type="text" 
+                        placeholder="0"
+                        value={productForm.price}
+                        onKeyDown={(e) => {
+                          // Allow: backspace, delete, tab, escape, enter and .
+                          if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
+                             // Allow: Ctrl+A, Command+A
+                            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                             // Allow: home, end, left, right, down, up
+                            (e.keyCode >= 35 && e.keyCode <= 40)) {
+                                 // let it happen, don't do anything
+                                 return;
+                          }
+                          // Ensure that it is a number and stop the keypress
+                          if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                              e.preventDefault();
+                          }
+                        }}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || /^\d+$/.test(val)) {
+                            setProductForm({...productForm, price: val});
+                          }
+                        }}
+                        style={{ 
+                          width: '100%', 
+                          padding: '12px', 
+                          backgroundColor: '#111', 
+                          border: '1px solid #333', 
+                          borderRadius: '8px', 
+                          color: '#fff', 
+                          outline: 'none',
+                          // Hide spinners (though type is text now, good practice)
+                          appearance: 'none'
+                        }}
+                      />
                     </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredProducts.length === 0 && (
-                <tr>
-                  <td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-                    {t('common.noData')}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Категория</label>
+                      <select 
+                        value={productForm.category}
+                        onChange={(e) => setProductForm({...productForm, category: e.target.value, subcategory: ''})}
+                        style={{ 
+                          width: '100%', 
+                          padding: '12px', 
+                          backgroundColor: '#111', 
+                          border: '1px solid #333', 
+                          borderRadius: '8px', 
+                          color: '#fff', 
+                          outline: 'none', 
+                          cursor: 'pointer',
+                          height: '45px' // Match input height
+                        }}
+                      >
+                        <option value="">Выберите...</option>
+                        {Object.entries(CATEGORIES_DATA).map(([key, data]) => (
+                          <option key={key} value={key}>{data.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Подкатегория</label>
+                    <select 
+                      disabled={!productForm.category}
+                      value={productForm.subcategory}
+                      onChange={(e) => setProductForm({...productForm, subcategory: e.target.value})}
+                      style={{ 
+                        width: '100%', 
+                        padding: '12px', 
+                        backgroundColor: '#111', 
+                        border: '1px solid #333', 
+                        borderRadius: '8px', 
+                        color: productForm.category ? '#fff' : '#444', 
+                        outline: 'none', 
+                        cursor: productForm.category ? 'pointer' : 'not-allowed',
+                        height: '45px'
+                      }}
+                    >
+                      <option value="">{productForm.category ? 'Выберите...' : 'Сначала выберите категорию'}</option>
+                      {productForm.category && (CATEGORIES_DATA as any)[productForm.category].subcategories.map((sub: string) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Фотографии (до 5 шт.)</label>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      {/* Existing Previews */}
+                      {productForm.images.map((img, i) => (
+                        <div 
+                          key={i} 
+                          style={{ 
+                            width: '100px', 
+                            height: '100px', 
+                            borderRadius: '8px', 
+                            border: 'none', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            position: 'relative',
+                            overflow: 'hidden',
+                            backgroundColor: '#000'
+                          }}
+                        >
+                          <img src={img} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <div 
+                            style={{ 
+                              position: 'absolute', 
+                              top: 0, 
+                              left: 0, 
+                              right: 0, 
+                              bottom: 0, 
+                              backgroundColor: 'rgba(0,0,0,0.5)', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              opacity: 0, 
+                              transition: 'opacity 0.2s',
+                              cursor: 'pointer'
+                            }} 
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} 
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}
+                            onClick={() => {
+                              const newImages = [...productForm.images];
+                              newImages.splice(i, 1);
+                              setProductForm({...productForm, images: newImages});
+                            }}
+                          >
+                            <Trash2 size={20} color="#fff" />
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Add Button (only if less than 5) */}
+                      {productForm.images.length < 5 && (
+                        <div 
+                          onClick={() => document.getElementById('product-image-upload')?.click()}
+                          style={{ 
+                            width: '100px', 
+                            height: '100px', 
+                            borderRadius: '8px', 
+                            border: '2px dashed #333', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            backgroundColor: 'transparent'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--primary-color)'}
+                          onMouseLeave={(e) => e.currentTarget.style.borderColor = '#333'}
+                        >
+                          <Plus size={24} color="#333" />
+                          <input 
+                            type="file" 
+                            id="product-image-upload"
+                            accept="image/*"
+                            multiple
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              const remainingSlots = 5 - productForm.images.length;
+                              const filesToProcess = files.slice(0, remainingSlots);
+                              
+                              filesToProcess.forEach(file => {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setProductForm(prev => ({
+                                    ...prev,
+                                    images: [...prev.images, reader.result as string].slice(0, 5)
+                                  }));
+                                };
+                                reader.readAsDataURL(file);
+                              });
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div style={{ padding: '20px', borderTop: '1px solid #333', display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
+                  <button 
+                    onClick={() => setIsProductModalOpen(false)}
+                    style={{ padding: '10px 25px', backgroundColor: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    Отмена
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (!productForm.title.trim()) {
+                        alert('Пожалуйста, введите название товара');
+                        return;
+                      }
+                      
+                      if (editingProduct) {
+                        setProducts(products.map(p => p.id === editingProduct.id ? {
+                          ...p,
+                          name: productForm.title.trim(),
+                          price: Number(productForm.price) || 0,
+                          category: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Other',
+                          subcategory: productForm.subcategory || 'Default'
+                        } : p));
+                        alert('Товар успешно обновлен!');
+                      } else {
+                        const newProduct = {
+                          id: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                          name: productForm.title.trim(),
+                          price: Number(productForm.price) || 0,
+                          category: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Other',
+                          subcategory: productForm.subcategory || 'Default'
+                        };
+                        
+                        setProducts([newProduct, ...products]);
+                        alert('Товар успешно добавлен!');
+                      }
+                      
+                      setIsProductModalOpen(false);
+                      setEditingProduct(null);
+                      setProductForm({ title: '', price: '', category: '', subcategory: '', images: [] });
+                    }}
+                    style={{ padding: '10px 25px', backgroundColor: 'var(--primary-color)', border: 'none', borderRadius: '8px', color: '#000', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    Сохранить
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1671,7 +2219,7 @@ export default function Admin() {
                   backgroundColor: 'var(--card-bg)', 
                   borderRadius: '12px', 
                   border: '1px solid var(--border-color)',
-                  padding: '15px 20px 20px 20px',
+                  padding: '20px 20px 0px 20px',
                   minHeight: '600px',
                   position: 'relative'
                 }}>

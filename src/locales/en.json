@@ -11,7 +11,7 @@
       "users": "User Database & Content"
     },
     "actions": {
-      "addEditDelete": "Add, edit, delete products",
+      "addEditDelete": "Add, edit, delete",
       "specs": "Specifications Management",
       "categoriesAndSubcategories": "Categories & Subcategories",
       "categories": "Categories",
@@ -170,7 +170,7 @@
     "copyright": "© FRAME since 2026. All rights reserved"
   },
   "catalog": {
-    "search": "Search products...",
+    "search": "Search...",
     "computers": {
       "title": "Computers",
       "groups": [
