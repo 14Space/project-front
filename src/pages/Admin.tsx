@@ -15,7 +15,9 @@ import {
   Edit2,
   Trash2,
   GripVertical,
-  X
+  X,
+  MessageSquare,
+  Check
 } from 'lucide-react';
 
 import AdminProductFilters from '../components/admin/AdminProductFilters';
@@ -1223,9 +1225,188 @@ const AdminUsers = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
+const AdminReviews = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const [reviews, setReviews] = useState([
+    { id: 1, product: '87101195', user: 'user-regular', rating: 5, comment: 'Отличная видеокарта, тянет всё на ультра!', status: 'pending', date: '12.05.2026' },
+    { id: 2, product: '45291032', user: 'user-3', rating: 4, comment: 'Хороший проц, но греется прилично.', status: 'approved', date: '10.05.2026' },
+    { id: 3, product: '11928374', user: 'user-4', rating: 2, comment: 'Пришел с браком экрана...', status: 'rejected', date: '08.05.2026' },
+  ]);
+
+  const handleStatusChange = (id: number, newStatus: 'approved' | 'rejected') => {
+    setReviews(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+  };
+
+  const handleDelete = (id: number) => {
+    if (window.confirm('Удалить этот отзыв?')) {
+      setReviews(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
+  const filteredReviews = reviews.filter(r => 
+    r.product.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.comment.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
+        <button 
+          onClick={onBack}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#fff', 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            padding: 0,
+            position: 'absolute',
+            left: 0,
+            transition: 'color 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
+        >
+          <ChevronLeft size={18} />
+          {t('common.back')}
+        </button>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
+          Модерация отзывов
+        </h2>
+        
+        <div style={{ position: 'absolute', right: 0, width: '300px' }}>
+          <input 
+            type="text" 
+            placeholder="Поиск по ID товара, ID клиента или тексту..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              width: '100%', 
+              padding: '10px 15px 10px 40px', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-color)', 
+              backgroundColor: '#111', 
+              color: '#fff',
+              fontSize: '14px',
+              outline: 'none'
+            }}
+          />
+          <Search size={16} color="#888" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Товара</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Оценка</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Комментарий</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Статус</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredReviews.map((review, idx) => (
+                <tr key={review.id} style={{ borderBottom: idx === filteredReviews.length - 1 ? 'none' : '1px solid var(--border-color)' }}>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
+                    <button 
+                      onClick={() => alert(`Opening product details for ${review.product}...`)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0,
+                        fontWeight: 600,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {review.product}
+                    </button>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
+                    <button 
+                      onClick={() => alert(`Opening client profile for ${review.user}...`)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-color)', 
+                        cursor: 'pointer', 
+                        fontSize: '14px', 
+                        padding: 0,
+                        fontWeight: 600,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {review.user}
+                    </button>
+                  </td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>{review.rating}/5</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', maxWidth: '300px' }}>{review.comment}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
+                    <span style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '12px', 
+                      fontWeight: 600,
+                      backgroundColor: review.status === 'approved' ? 'rgba(166, 206, 57, 0.1)' : review.status === 'rejected' ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                      color: review.status === 'approved' ? 'var(--primary-color)' : review.status === 'rejected' ? '#ff4d4d' : '#aaa'
+                    }}>
+                      {review.status === 'approved' ? 'Одобрен' : review.status === 'rejected' ? 'Отклонен' : 'Ожидает'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '15px 20px' }}>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      {review.status !== 'approved' && (
+                        <button 
+                          onClick={() => handleStatusChange(review.id, 'approved')}
+                          style={{ background: 'none', border: 'none', color: '#A6CE39', cursor: 'pointer' }}
+                          title="Одобрить"
+                        >
+                          <Check size={18} />
+                        </button>
+                      )}
+                      {review.status !== 'rejected' && (
+                        <button 
+                          onClick={() => handleStatusChange(review.id, 'rejected')}
+                          style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}
+                          title="Отклонить"
+                        >
+                          <X size={18} />
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => handleDelete(review.id)}
+                        style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
+                        title="Удалить"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Admin() {
   const { t } = useTranslation();
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'reviewModeration'>('dashboard');
   const [selectedSpecCategory, setSelectedSpecCategory] = useState<string | null>(null);
   const [categorySpecs, setCategorySpecs] = useState<Record<string, string[]>>({});
   const [isAddingParam, setIsAddingParam] = useState(false);
@@ -1345,12 +1526,13 @@ export default function Admin() {
       actions: [
         { id: 'userDatabase', label: t('admin.actions.userDatabase'), icon: <List size={16} /> },
         { id: 'editBlog', label: t('admin.actions.editBlog'), icon: <FileText size={16} /> },
+        { id: 'reviewModeration', label: t('admin.actions.reviewModeration'), icon: <MessageSquare size={16} /> },
       ]
     }
   ];
 
   const handleActionClick = (actionId: string) => {
-    if (['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase'].includes(actionId)) {
+    if (['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(actionId)) {
       setActiveView(actionId as any);
       setSelectedSpecCategory(null); // Reset category when switching views
       setIsEditingSpecs(false);
@@ -1439,6 +1621,8 @@ export default function Admin() {
             <AdminBlog onBack={() => setActiveView('dashboard')} />
           ) : activeView === 'userDatabase' ? (
             <AdminUsers onBack={() => setActiveView('dashboard')} />
+          ) : activeView === 'reviewModeration' ? (
+            <AdminReviews onBack={() => setActiveView('dashboard')} />
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>

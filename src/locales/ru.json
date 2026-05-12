@@ -21,7 +21,8 @@
       "tradeInRequests": "Заявки на оценку Trade-In",
       "userDatabase": "Список клиентов и управление",
       "blockUser": "Управление доступом",
-      "editBlog": "Редактировать статьи блога"
+      "editBlog": "Редактировать статьи блога",
+      "reviewModeration": "Модерация отзывов"
     }
   },
   "common": {
