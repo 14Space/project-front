@@ -164,6 +164,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : [MOCK_USER, MOCK_USER_REGULAR, MOCK_USER_MANAGER];
   });
 
+  // Always-fresh reference to users — avoids stale closure in cycleUser
+  const usersRef = React.useRef(users);
+  useEffect(() => { usersRef.current = users; }, [users]);
+
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -255,12 +259,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateUser = (userData: Partial<User>) => {
-    setUser(prev => {
-      const updatedUser = prev ? { ...prev, ...userData } : null;
-      if (updatedUser) {
-        setUsers(currentUsers => currentUsers.map(u => u.id === updatedUser.id ? { ...u, ...updatedUser } : u));
-      }
-      return updatedUser;
+    if (!user) return;
+    const updatedUser = { ...user, ...userData };
+    setUser(updatedUser);
+    setUsers(prev => {
+      const updated = prev.map(u => u.id === updatedUser.id ? { ...u, ...updatedUser } : u);
+      // Synchronously write to localStorage so cycleUser always gets fresh data
+      localStorage.setItem('app_users', JSON.stringify(updated));
+      return updated;
     });
   };
 
@@ -304,10 +310,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const cycleUser = () => {
-    const mockUsers = [MOCK_USER, MOCK_USER_MANAGER, MOCK_USER_REGULAR];
-    const currentIndex = mockUsers.findIndex(u => u.email === user?.email);
-    const nextIndex = (currentIndex + 1) % mockUsers.length;
-    login(mockUsers[nextIndex]);
+    const mockList = [MOCK_USER, MOCK_USER_MANAGER, MOCK_USER_REGULAR];
+    const currentIndex = mockList.findIndex(u => u.email === user?.email);
+    const nextMock = mockList[(currentIndex + 1) % mockList.length];
+
+    // Use ref — always points to the latest users array without closure staleness
+    const nextUser = usersRef.current.find(u => u.email === nextMock.email) || nextMock;
+    console.log('[cycleUser] next:', nextUser.name, nextUser.email);
+    login(nextUser);
   };
 
   return (

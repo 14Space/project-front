@@ -147,7 +147,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                 transition: 'all 0.2s'
               }}
             >
-              Товары
+              <span>{t('adminPage.products.items')}</span>
               {activeTab === 'products' && (
                 <div style={{ position: 'absolute', bottom: '-11px', left: 0, right: 0, height: '2px', backgroundColor: 'var(--primary-color)' }} />
               )}
@@ -166,7 +166,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                 transition: 'all 0.2s'
               }}
             >
-              Бренды
+              <span>{t('adminPage.products.brands')}</span>
               {activeTab === 'brands' && (
                 <div style={{ position: 'absolute', bottom: '-11px', left: 0, right: 0, height: '2px', backgroundColor: 'var(--primary-color)' }} />
               )}
@@ -236,7 +236,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
               <input 
                 autoFocus
                 type="text" 
-                placeholder="Введите название бренда..."
+                placeholder={t('adminPage.products.enterBrandName')}
                 value={newBrandName}
                 onChange={(e) => setNewBrandName(e.target.value)}
                 style={{
@@ -269,7 +269,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     cursor: 'pointer'
                   }}
                 >
-                  Сохранить
+                  {t('common.save')}
                 </button>
                 <button 
                   onClick={() => {
@@ -286,7 +286,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     cursor: 'pointer'
                   }}
                 >
-                  Отмена
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -340,7 +340,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         </button>
                         <button 
                           onClick={() => {
-                            if (window.confirm('Вы уверены, что хотите удалить этот товар?')) {
+                            if (window.confirm(t('adminPage.products.deleteConfirm'))) {
                               setProducts(products.filter(item => item.id !== p.id));
                             }
                           }}
@@ -449,7 +449,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
               }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ margin: 0, color: '#fff', fontSize: '20px' }}>
-                    {editingProduct ? 'Редактирование товара' : 'Добавление товара'}
+                  {editingProduct ? t('adminPage.products.editProduct') : t('adminPage.products.addProduct')}
                   </h3>
                   <button 
                     onClick={() => {
@@ -465,10 +465,10 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                 
                 <div style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div>
-                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Заголовок товара</label>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.titleLabel')}</label>
                     <input 
                       type="text" 
-                      placeholder="Например: Видеокарта Asus ROG Strix..."
+                      placeholder={t('adminPage.products.titlePlaceholder')}
                       value={productForm.title}
                       onChange={(e) => setProductForm({...productForm, title: e.target.value})}
                       style={{ width: '100%', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none' }}
@@ -477,7 +477,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
 
                   <div style={{ display: 'flex', gap: '15px' }}>
                     <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Цена (MDL)</label>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.priceLabel')}</label>
                       <input 
                         type="text" 
                         placeholder="0"
@@ -517,7 +517,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                       />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Категория</label>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.categoryLabel')}</label>
                       <select 
                         value={productForm.category}
                         onChange={(e) => setProductForm({...productForm, category: e.target.value, subcategory: ''})}
@@ -542,7 +542,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Подкатегория</label>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.subcategoryLabel')}</label>
                     <select 
                       disabled={!productForm.category}
                       value={productForm.subcategory}
@@ -567,7 +567,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                   </div>
                   
                   <div>
-                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Фотографии (до 5 шт.)</label>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.imagesLabel')}</label>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                       {/* Existing Previews */}
                       {productForm.images.map((img, i) => (
@@ -669,12 +669,12 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     onClick={() => setIsProductModalOpen(false)}
                     style={{ padding: '10px 25px', backgroundColor: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
                   >
-                    Отмена
+                    {t('common.cancel')}
                   </button>
                   <button 
                     onClick={() => {
                       if (!productForm.title.trim()) {
-                        alert('Пожалуйста, введите название товара');
+                        alert(t('adminPage.products.noTitle'));
                         return;
                       }
                       
@@ -686,7 +686,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                           category: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Other',
                           subcategory: productForm.subcategory || 'Default'
                         } : p));
-                        alert('Товар успешно обновлен!');
+                        alert(t('adminPage.products.savedOk'));
                       } else {
                         const newProduct = {
                           id: Math.floor(10000000 + Math.random() * 90000000).toString(),
@@ -697,7 +697,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         };
                         
                         setProducts([newProduct, ...products]);
-                        alert('Товар успешно добавлен!');
+                        alert(t('adminPage.products.addedOk'));
                       }
                       
                       setIsProductModalOpen(false);
@@ -774,7 +774,7 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
           <input 
             type="text" 
-            placeholder="Поиск по ID заказа или клиента..." 
+            placeholder={t('adminPage.orders.searchPlaceholder')} 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ 
@@ -795,13 +795,13 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>ID Заказа</th>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Дата</th>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Товары</th>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Сумма</th>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Статус</th>
-                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>Управление</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.idOrder')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.date')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.idClient')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.items')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.total')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.status')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '14px', color: '#888', fontWeight: 500 }}>{t('adminPage.orders.management')}</th>
               </tr>
             </thead>
             <tbody>
@@ -858,7 +858,7 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                       color: getStatusColor(order.status),
                       border: `1px solid ${getStatusColor(order.status)}40`
                     }}>
-                      {order.status === 'pending' ? 'В обработке' : order.status === 'shipped' ? 'Отправлен' : 'Доставлен'}
+                      {order.status === 'pending' ? t('adminPage.orders.statusPending') : order.status === 'shipped' ? t('adminPage.orders.statusShipped') : t('adminPage.orders.statusDelivered')}
                     </span>
                   </td>
                   <td style={{ padding: '15px 20px' }}>
@@ -876,7 +876,7 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                         padding: 0 
                       }}
                     >
-                      Изменить статус
+                      {t('adminPage.orders.changeStatus')}
                     </button>
                   </td>
                 </tr>
@@ -910,9 +910,9 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
             position: 'relative'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Изменить статус</h3>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>{t('adminPage.orders.changeStatusTitle')}</h3>
             <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>
-              Выберите новый статус для заказа <span style={{ color: 'var(--primary-color)' }}>{statusModal.orderId}</span>
+              {t('adminPage.orders.changeStatusDesc')} <span style={{ color: 'var(--primary-color)' }}>{statusModal.orderId}</span>
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
@@ -989,7 +989,7 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                Подтвердить
+                {t('common.confirm')}
               </button>
             </div>
           </div>
@@ -1028,10 +1028,10 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending': return 'В ожидании';
-      case 'evaluated': return 'Оценен';
-      case 'accepted': return 'Принят';
-      case 'rejected': return 'Отклонен';
+      case 'pending': return t('adminPage.tradeIn.statusPending');
+      case 'evaluated': return t('adminPage.tradeIn.statusEvaluated');
+      case 'accepted': return t('adminPage.tradeIn.statusAccepted');
+      case 'rejected': return t('adminPage.tradeIn.statusRejected');
       default: return status;
     }
   };
@@ -1059,13 +1059,13 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
           {t('common.back')}
         </button>
         <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
-          Заявки на оценку Trade-In
+          {t('admin.actions.tradeInRequests')}
         </h2>
         
         <div style={{ position: 'absolute', right: 0, width: '300px' }}>
           <input 
             type="text" 
-            placeholder="Поиск по ID заявки или клиента..." 
+            placeholder={t('adminPage.tradeIn.searchPlaceholder')} 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ 
@@ -1088,13 +1088,13 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '160px' }}>ID Заявки</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Дата</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Категория</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Статус</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Оценка (MDL)</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '150px' }}>Состояние</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '160px' }}>{t('adminPage.tradeIn.idRequest')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.date')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.idClient')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.category')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.status')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.appraisal')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '150px' }}>{t('adminPage.tradeIn.condition')}</th>
               </tr>
             </thead>
             <tbody>
@@ -1156,9 +1156,9 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                   </td>
                   <td style={{ padding: '15px 20px' }}>
                     {req.status === 'rejected' ? (
-                      <span style={{ color: '#ff4d4d', fontSize: '13px', fontWeight: 600 }}>Отказ</span>
+                      <span style={{ color: '#ff4d4d', fontSize: '13px', fontWeight: 600 }}>{t('adminPage.tradeIn.rejected')}</span>
                     ) : req.status === 'accepted' ? (
-                      <span style={{ color: '#A6CE39', fontSize: '13px', fontWeight: 600 }}>Принято</span>
+                      <span style={{ color: '#A6CE39', fontSize: '13px', fontWeight: 600 }}>{t('adminPage.tradeIn.accepted')}</span>
                     ) : (
                       <button 
                         onClick={() => setEvalModal({ id: req.id, amount: req.offerAmount ? req.offerAmount.toString() : '' })}
@@ -1177,7 +1177,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
                         onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                       >
-                        {req.status === 'pending' ? 'Оценить' : 'Изменить оценку'}
+                        {req.status === 'pending' ? t('adminPage.tradeIn.evaluate') : t('adminPage.tradeIn.changeAppraisal')}
                       </button>
                     )}
                   </td>
@@ -1186,7 +1186,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
               {filteredRequests.length === 0 && (
                 <tr>
                   <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
-                    Заявки не найдены
+                    {t('common.noData')}
                   </td>
                 </tr>
               )}
@@ -1217,9 +1217,9 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
             position: 'relative'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Оценка заявки</h3>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>{t('adminPage.tradeIn.evalTitle')}</h3>
             <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>
-              Введите предложенную сумму для заявки <span style={{ color: 'var(--primary-color)' }}>{evalModal.id}</span>
+              {t('adminPage.tradeIn.evalDesc')} <span style={{ color: 'var(--primary-color)' }}>{evalModal.id}</span>
             </p>
 
             <div style={{ marginBottom: '30px' }}>
@@ -1230,7 +1230,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                   const val = e.target.value.replace(/\D/g, '');
                   setEvalModal({ ...evalModal, amount: val });
                 }}
-                placeholder="Сумма в MDL"
+                placeholder={t('adminPage.tradeIn.evalPlaceholder')}
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -1271,7 +1271,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                   if (!isNaN(num) && num > 0) {
                     handleEvaluate(evalModal.id, num);
                   } else {
-                    alert('Введите корректную сумму');
+                    alert(t('adminPage.tradeIn.evalInvalid'));
                   }
                 }}
                 style={{ 
@@ -1289,7 +1289,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                Оценить
+                {t('adminPage.tradeIn.evaluate')}
               </button>
             </div>
           </div>
@@ -1322,7 +1322,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <div>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Детали заявки</h3>
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>{t('adminPage.tradeIn.detailsTitle')}</h3>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--primary-color)' }}>{detailsModal.id}</p>
               </div>
               <button 
@@ -1336,29 +1336,29 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '25px' }}>
               <div style={{ display: 'flex', gap: '15px' }}>
                 <div style={{ flex: 1, padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>Категория</div>
+                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{t('adminPage.tradeIn.category')}</div>
                   <div style={{ fontSize: '14px', color: '#fff', fontWeight: 500 }}>{t(`tradeIn.form.categories.${detailsModal.category}`)}</div>
                 </div>
 
                 <div style={{ flex: 1, padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>Состояние</div>
+                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{t('adminPage.tradeIn.condition')}</div>
                   <div style={{ fontSize: '14px', color: '#fff', fontWeight: 500 }}>
-                    {detailsModal.condition === 'new' ? 'Новое' : 'Б/У'}
+                    {detailsModal.condition === 'new' ? t('adminPage.tradeIn.conditionNew') : t('adminPage.tradeIn.conditionUsed')}
                   </div>
                 </div>
               </div>
 
               <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>Описание от пользователя</div>
+                <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>{t('adminPage.tradeIn.descLabel')}</div>
                 <div style={{ fontSize: '14px', color: '#fff', lineHeight: '1.5', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
-                  {detailsModal.description || <span style={{ color: '#555', fontStyle: 'italic' }}>Нет описания</span>}
+                  {detailsModal.description || <span style={{ color: '#555', fontStyle: 'italic' }}>{t('adminPage.tradeIn.noDescription')}</span>}
                 </div>
               </div>
             </div>
 
             {(detailsModal.photos && detailsModal.photos.length > 0) ? (
               <div style={{ marginBottom: '20px' }}>
-                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>Фотографии устройства ({detailsModal.photos.length})</div>
+                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>{t('adminPage.tradeIn.photosLabel')} ({detailsModal.photos.length})</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {detailsModal.photos.map((photo: string, idx: number) => (
                     <img 
@@ -1372,7 +1372,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
               </div>
             ) : detailsModal.photo ? (
               <div style={{ marginBottom: '20px' }}>
-                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>Фотографии устройства</div>
+                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>{t('adminPage.tradeIn.photosLabel')}</div>
                 <img 
                   src={detailsModal.photo} 
                   alt="Item" 
@@ -1398,7 +1398,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
             >
-              Закрыть
+              {t('common.close')}
             </button>
           </div>
         </div>
@@ -1528,7 +1528,7 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
           }}>
             <Plus size={28} color="#A6CE39" />
           </div>
-          <span style={{ color: '#fff', fontSize: '15px', fontWeight: 600 }}>Добавить статью</span>
+          <span style={{ color: '#fff', fontSize: '15px', fontWeight: 600 }}>{t('adminPage.blog.addArticle')}</span>
         </div>
 
         {[...blogPosts, ...defaultPosts].map((post, idx) => (
@@ -1609,7 +1609,7 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#fff' }}>Новая статья</h3>
+              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#fff' }}>{t('adminPage.blog.newArticle')}</h3>
               <button 
                 onClick={() => setIsAdding(false)}
                 style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: '5px' }}
@@ -1620,17 +1620,17 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '25px' }}>
               <div>
-                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Заголовок статьи</label>
+                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>{t('adminPage.blog.titleLabel')}</label>
                 <input 
                   type="text" 
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
-                  placeholder="Введите заголовок..."
+                  placeholder={t('adminPage.blog.titlePlaceholder')}
                   style={{ width: '100%', padding: '12px 15px', borderRadius: '8px', border: '1px solid #333', backgroundColor: 'rgba(255,255,255,0.02)', color: '#fff', fontSize: '14px', outline: 'none' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>URL обложки</label>
+                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>{t('adminPage.blog.imageLabel')}</label>
                 <input 
                   type="text" 
                   value={newImage}
@@ -1656,7 +1656,7 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
                 transition: 'all 0.2s'
               }}
             >
-              Создать статью
+              {t('adminPage.blog.createArticle')}
             </button>
           </div>
         </div>
@@ -1719,13 +1719,13 @@ const AdminReviews = ({ onBack }: { onBack: () => void }) => {
           {t('common.back')}
         </button>
         <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
-          Модерация отзывов
+          {t('admin.actions.reviewModeration')}
         </h2>
         
         <div style={{ position: 'absolute', right: 0, width: '300px' }}>
           <input 
             type="text" 
-            placeholder="Поиск по ID товара, ID клиента или тексту..." 
+            placeholder={t('adminPage.reviews.searchPlaceholder')} 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ 
@@ -2085,7 +2085,7 @@ export default function Admin() {
           ) : activeView === 'userDatabase' ? (
             <AdminUsers onBack={() => navigate('/profile')} />
           ) : activeView === 'reviewModeration' ? (
-            <AdminReviews onBack={() => navigate('/profile')} />
+            <div style={{ color: '#888', textAlign: 'center', padding: '100px 0' }}>{t('common.featureInProgress')}</div>
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
@@ -2291,7 +2291,7 @@ export default function Admin() {
                             }}
                           >
                             <Plus size={16} />
-                            {t('common.add')} {activeView === 'specs' ? 'параметр' : 'подкатегорию'}
+                            {t('common.add')} {activeView === 'specs' ? t('adminPage.products.addParamSpec') : t('adminPage.products.addParamSubcat')}
                           </button>
                         )}
 
