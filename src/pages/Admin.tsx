@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { 
   Package, 
   ShoppingBag, 
@@ -22,6 +23,7 @@ import {
 
 import AdminProductFilters from '../components/admin/AdminProductFilters';
 import AdminSpecFilters from '../components/admin/AdminSpecFilters';
+import AdminUsers from '../components/admin/AdminUsers';
 import { useAppContext } from '../context/AppContext';
 
 // Categories mapping
@@ -1662,116 +1664,8 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
     </div>
   );
 };
-const AdminUsers = ({ onBack }: { onBack: () => void }) => {
-  const { t } = useTranslation();
-  const { users } = useAppContext();
-  const [searchQuery, setSearchQuery] = useState('');
+// AdminUsers now imported from components
 
-  const filteredUsers = users.filter(u => 
-    u.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
-        <button 
-          onClick={onBack}
-          style={{ 
-            background: 'none', 
-            border: 'none', 
-            color: '#fff', 
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontSize: '14px',
-            padding: 0,
-            position: 'absolute',
-            left: 0,
-            transition: 'color 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
-        >
-          <ChevronLeft size={18} />
-          {t('common.back')}
-        </button>
-        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
-          Список клиентов и управление
-        </h2>
-        
-        <div style={{ position: 'absolute', right: 0, width: '300px' }}>
-          <input 
-            type="text" 
-            placeholder="Поиск по ID, имени или email..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ 
-              width: '100%', 
-              padding: '10px 15px 10px 40px', 
-              borderRadius: '8px', 
-              border: '1px solid var(--border-color)', 
-              backgroundColor: '#111', 
-              color: '#fff',
-              fontSize: '14px',
-              outline: 'none'
-            }}
-          />
-          <Search size={16} color="#888" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />
-        </div>
-      </div>
-
-      <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Имя</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Фамилия</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Email</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Телефон</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Роль</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((u, idx) => (
-                <tr key={u.id} style={{ borderBottom: idx === filteredUsers.length - 1 ? 'none' : '1px solid var(--border-color)', transition: 'background-color 0.2s' }}>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: 'var(--primary-color)' }}>{u.id}</td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.name}</td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.lastName || '--'}</td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#aaa' }}>{u.email}</td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#aaa' }}>{u.phone && u.phone !== '+373' ? u.phone : '--'}</td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
-                    <span style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      fontSize: '12px', 
-                      fontWeight: 600,
-                      backgroundColor: u.role === 'admin' ? 'rgba(166, 206, 57, 0.1)' : 'rgba(255,255,255,0.05)',
-                      color: u.role === 'admin' ? 'var(--primary-color)' : '#aaa'
-                    }}>
-                      {u.role === 'admin' ? 'Администратор' : 'Пользователь'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {filteredUsers.length === 0 && (
-                <tr>
-                  <td colSpan={6} style={{ padding: '30px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
-                    Пользователи не найдены
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const AdminReviews = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
@@ -1954,7 +1848,28 @@ const AdminReviews = ({ onBack }: { onBack: () => void }) => {
 
 export default function Admin() {
   const { t } = useTranslation();
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'reviewModeration'>('dashboard');
+  const { user } = useAppContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'reviewModeration'>(
+    user?.role === 'manager' ? 'userDatabase' : 'dashboard'
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view && ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(view)) {
+      setActiveView(view as any);
+    } else if (user?.role === 'admin') {
+      // Since dashboard moved to profile, redirect admin to profile if no view is specified
+      navigate('/profile');
+    }
+  }, [user, navigate]);
   const [selectedSpecCategory, setSelectedSpecCategory] = useState<string | null>(null);
   const [categorySpecs, setCategorySpecs] = useState<Record<string, string[]>>({});
   const [isAddingParam, setIsAddingParam] = useState(false);
@@ -2160,22 +2075,22 @@ export default function Admin() {
               </div>
             </>
           ) : activeView === 'products' ? (
-            <AdminProducts onBack={() => setActiveView('dashboard')} />
+            <AdminProducts onBack={() => navigate('/profile')} />
           ) : activeView === 'viewOrders' ? (
-            <AdminOrders onBack={() => setActiveView('dashboard')} />
+            <AdminOrders onBack={() => navigate('/profile')} />
           ) : activeView === 'tradeInRequests' ? (
-            <AdminTradeIn onBack={() => setActiveView('dashboard')} />
+            <AdminTradeIn onBack={() => navigate('/profile')} />
           ) : activeView === 'editBlog' ? (
-            <AdminBlog onBack={() => setActiveView('dashboard')} />
+            <AdminBlog onBack={() => navigate('/profile')} />
           ) : activeView === 'userDatabase' ? (
-            <AdminUsers onBack={() => setActiveView('dashboard')} />
+            <AdminUsers onBack={() => navigate('/profile')} />
           ) : activeView === 'reviewModeration' ? (
-            <AdminReviews onBack={() => setActiveView('dashboard')} />
+            <AdminReviews onBack={() => navigate('/profile')} />
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
                 <button 
-                  onClick={() => setActiveView('dashboard')}
+                  onClick={() => navigate('/profile')}
                   style={{ 
                     background: 'none', 
                     border: 'none', 
