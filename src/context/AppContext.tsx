@@ -9,7 +9,7 @@ interface User {
   city?: string;
   street?: string;
   avatar?: string;
-  role?: 'user' | 'admin';
+  role?: 'user' | 'admin' | 'manager';
 }
 
 export interface Order {
@@ -60,6 +60,17 @@ export const MOCK_USER_REGULAR: User = {
   street: 'Stefan cel Mare 1',
   role: 'user'
 };
+
+export const MOCK_USER_MANAGER: User = {
+  id: 'user-manager',
+  name: 'Claude',
+  lastName: 'Green',
+  email: 'm12.claude.green@gmail.com',
+  phone: '+37368888888',
+  city: 'Chisinau',
+  street: 'Bulevardul Dacia 1',
+  role: 'manager'
+};
 interface AppContextType {
   favorites: string[];
   compareList: string[];
@@ -91,6 +102,8 @@ interface AppContextType {
   addBlogPost: (post: BlogPost) => void;
   deleteBlogPost: (id: string) => void;
   users: User[];
+  addUser: (userData: User) => void;
+  cycleUser: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -121,8 +134,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('user');
     const parsedUser = saved ? JSON.parse(saved) : null;
-    if (parsedUser && parsedUser.email === '14t.space@gmail.com') {
-      parsedUser.role = 'admin';
+    if (parsedUser) {
+      if (parsedUser.email === '14t.space@gmail.com') {
+        parsedUser.role = 'admin';
+      } else if (parsedUser.email === 'm12.claude.green@gmail.com') {
+        parsedUser.role = 'manager';
+      }
     }
     return parsedUser;
   });
@@ -144,7 +161,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('app_users');
-    return saved ? JSON.parse(saved) : [MOCK_USER, MOCK_USER_REGULAR];
+    return saved ? JSON.parse(saved) : [MOCK_USER, MOCK_USER_REGULAR, MOCK_USER_MANAGER];
   });
 
   useEffect(() => {
@@ -225,6 +242,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const login = (userData: User) => {
     if (userData.email === '14t.space@gmail.com') {
       userData.role = 'admin';
+    } else if (userData.email === 'm12.claude.green@gmail.com') {
+      userData.role = 'manager';
     } else {
       userData.role = 'user';
     }
@@ -279,6 +298,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteBlogPost = (id: string) => {
     setBlogPosts(prev => prev.filter(post => post.id !== id));
   };
+  
+  const addUser = (userData: User) => {
+    setUsers(prev => [...prev, userData]);
+  };
+
+  const cycleUser = () => {
+    const mockUsers = [MOCK_USER, MOCK_USER_MANAGER, MOCK_USER_REGULAR];
+    const currentIndex = mockUsers.findIndex(u => u.email === user?.email);
+    const nextIndex = (currentIndex + 1) % mockUsers.length;
+    login(mockUsers[nextIndex]);
+  };
 
   return (
     <AppContext.Provider value={{ 
@@ -311,7 +341,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       blogPosts,
       addBlogPost,
       deleteBlogPost,
-      users
+      users,
+      addUser,
+      cycleUser
     }}>
       {children}
     </AppContext.Provider>
