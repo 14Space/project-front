@@ -81,7 +81,7 @@ const AdminProfile: React.FC = () => {
                   fontWeight: 700,
                   textTransform: 'uppercase'
                 }}>
-                  ADMIN
+                  {t('common.adminBadge')}
                 </div>
               </div>
               {!isEditing && (
@@ -109,16 +109,7 @@ const AdminProfile: React.FC = () => {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.email')}</label>
-                {isEditing ? (
-                  <input 
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: `1px solid ${emailError ? '#ff4d4d' : '#A6CE39'}`, backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                  />
-                ) : (
-                  <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff', height: '48px', display: 'flex', alignItems: 'center' }}>{user.email}</div>
-                )}
+                <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#888', height: '48px', display: 'flex', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.02)' }}>{user.email}</div>
               </div>
               <div>
                 <button 
@@ -161,7 +152,7 @@ const AdminProfile: React.FC = () => {
           {!isEditing && (
             <AdminDashboard 
               onAction={(actionId) => {
-                const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'];
+                const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase'];
                 if (allowedViews.includes(actionId)) {
                   navigate(`/admin?view=${actionId}`);
                 } else {

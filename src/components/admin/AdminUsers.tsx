@@ -30,14 +30,14 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
 
   const handleAddAdmin = () => {
     if (!newAdmin.name || !newAdmin.email) {
-      alert('Пожалуйста, заполните все поля');
+      alert(t('adminPage.users.allFieldsRequired'));
       return;
     }
     
     // Simple email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newAdmin.email)) {
-      alert('Пожалуйста, введите корректный email');
+      alert(t('adminPage.users.invalidEmail'));
       return;
     }
 
@@ -63,9 +63,9 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
               <ChevronLeft size={18} /> {t('common.back')}
             </button>
           )}
-          <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{user?.role === 'manager' ? 'База пользователей' : 'Список клиентов'}</h2>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{user?.role === 'manager' ? t('adminPage.users.title') : t('adminPage.users.clientList')}</h2>
           <div style={{ position: 'absolute', right: 0, width: '300px' }}>
-            <input type="text" placeholder="Поиск..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '10px 15px 10px 40px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: '#111', color: '#fff', fontSize: '14px', outline: 'none' }} />
+            <input type="text" placeholder={t('adminPage.users.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '10px 15px 10px 40px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: '#111', color: '#fff', fontSize: '14px', outline: 'none' }} />
             <Search size={16} color="#888" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />
           </div>
         </div>
@@ -75,12 +75,12 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
       {hideHeader && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0 }}>База пользователей</h2>
+            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0 }}>{t('adminPage.users.title')}</h2>
             
             <div style={{ position: 'relative', width: '250px' }}>
               <input 
                 type="text" 
-                placeholder="Поиск..." 
+                placeholder={t('adminPage.users.searchPlaceholder')} 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
                 style={{ 
@@ -103,14 +103,14 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', animation: 'slideInRight 0.3s ease' }}>
               <input 
                 type="text" 
-                placeholder="Введите имя" 
+                placeholder={t('adminPage.users.enterName')} 
                 value={newAdmin.name}
                 onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
                 style={{ height: '40px', padding: '0 12px', borderRadius: '6px', border: '1px solid var(--primary-color)', backgroundColor: '#111', color: '#fff', fontSize: '13px', outline: 'none', width: '150px' }}
               />
               <input 
                 type="email" 
-                placeholder="Введите почту" 
+                placeholder={t('adminPage.users.enterEmail')} 
                 value={newAdmin.email}
                 onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
                 style={{ height: '40px', padding: '0 12px', borderRadius: '6px', border: '1px solid var(--primary-color)', backgroundColor: '#111', color: '#fff', fontSize: '13px', outline: 'none', width: '180px' }}
@@ -154,7 +154,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#A6CE39'}
             >
               <UserPlus size={16} />
-              Добавить администратора
+              {t('adminPage.users.addAdmin')}
             </button>
           )}
         </div>
@@ -165,12 +165,12 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>ID Клиента</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Имя</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Фамилия</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Email</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Телефон</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>Роль</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.users.idClient')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.users.firstName')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.users.lastName')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.users.email')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.users.phone')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.users.role')}</th>
               </tr>
             </thead>
             <tbody>
@@ -190,7 +190,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
                       backgroundColor: u.role === 'admin' ? 'rgba(166, 206, 57, 0.1)' : u.role === 'manager' ? 'rgba(166, 206, 57, 0.05)' : 'rgba(255,255,255,0.05)',
                       color: u.role === 'admin' ? 'var(--primary-color)' : u.role === 'manager' ? '#fff' : '#aaa'
                     }}>
-                      {u.role === 'admin' ? 'Администратор' : u.role === 'manager' ? 'Менеджер' : 'Пользователь'}
+                      {u.role === 'admin' ? t('adminPage.users.roleAdmin') : u.role === 'manager' ? t('adminPage.users.roleManager') : t('adminPage.users.roleUser')}
                     </span>
                   </td>
                 </tr>

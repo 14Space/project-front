@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { HOT_DEALS } from '../constants/products';
 
 export default function OrderStatus() {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const { orders } = useAppContext();
 
   // Flatten orders: split each order into separate blocks per item
@@ -36,11 +36,11 @@ export default function OrderStatus() {
                 // Dynamic Status Translation
                 let displayStatus = order.status;
                 if (order.status === 'pending') {
-                  displayStatus = i18n.language.startsWith('ru') ? 'В обработке' : 'Pending';
+                  displayStatus = t('adminPage.orders.statusPending');
                 } else if (order.status === 'shipped') {
-                  displayStatus = i18n.language.startsWith('ru') ? 'Отправлен' : 'Shipped';
+                  displayStatus = t('adminPage.orders.statusShipped');
                 } else if (order.status === 'delivered') {
-                  displayStatus = i18n.language.startsWith('ru') ? 'Доставлен' : 'Delivered';
+                  displayStatus = t('adminPage.orders.statusDelivered');
                 }
 
                 const getStatusColor = (status: string) => {
