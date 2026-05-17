@@ -373,34 +373,34 @@
     "cpus": {
       "title": "Процессоры",
       "groups": [
-        { "title": "AMD с 3D V-Cache", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=AMD с 3D V-Cache" },
-        { "title": "Производительная iGPU", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=Производительная iGPU" },
-        { "title": "Для игровых ПК", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=Для игровых ПК" },
-        { "title": "Для рабочих станций", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=Для рабочих станций" }
+        { "title": "AMD с 3D V-Cache", "items": [], "image": "/subcategories/SUBCATEGORIES-amd-v-3-cache.png", "path": "/cpus?subcategory=AMD с 3D V-Cache" },
+        { "title": "Производительная iGPU", "items": [], "image": "/subcategories/SUBCATEGORIES-high-performance-igpu.png", "path": "/cpus?subcategory=Производительная iGPU" },
+        { "title": "Для игровых ПК", "items": [], "image": "/subcategories/SUBCATEGORIES-for-gaming-pcs.png", "path": "/cpus?subcategory=Для игровых ПК" },
+        { "title": "Для рабочих станций", "items": [], "image": "/subcategories/SUBCATEGORIES-for-workstations.png", "path": "/cpus?subcategory=Для рабочих станций" }
       ]
     },
     "gpus": {
       "title": "Видеокарты",
       "groups": [
-        { "title": "Игровые NVIDIA", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Игровые NVIDIA" },
-        { "title": "Игровые AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Игровые AMD" },
-        { "title": "Профессиональные", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Профессиональные" }
+        { "title": "Игровые NVIDIA", "items": [], "image": "/subcategories/SUBCATEGORIES-gaming-nvidia.png", "path": "/gpus?subcategory=Игровые NVIDIA" },
+        { "title": "Игровые AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-gaming-amd.png", "path": "/gpus?subcategory=Игровые AMD" },
+        { "title": "Профессиональные", "items": [], "image": "/subcategories/SUBCATEGORIES-professional.png", "path": "/gpus?subcategory=Профессиональные" }
       ]
     },
     "motherboards": {
       "title": "Материнские платы",
       "groups": [
-        { "title": "для AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=для AMD" },
-        { "title": "для Intel", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=для Intel" },
-        { "title": "с Wi-Fi", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=с Wi-Fi" }
+        { "title": "для AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-for-amd.png", "path": "/motherboards?subcategory=для AMD" },
+        { "title": "для Intel", "items": [], "image": "/subcategories/SUBCATEGORIES-for-intel.png", "path": "/motherboards?subcategory=для Intel" },
+        { "title": "с Wi-Fi", "items": [], "image": "/subcategories/SUBCATEGORIES-with-wifi.png", "path": "/motherboards?subcategory=с Wi-Fi" }
       ]
     },
     "ram": {
       "title": "Оперативная память",
       "groups": [
-        { "title": "2x16 ГБ DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x16 ГБ DDR5" },
-        { "title": "2x8 ГБ DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x8 ГБ DDR5" },
-        { "title": "DDR5 6000 МТ/с CL30", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=DDR5 6000 МТ/с CL30" }
+        { "title": "2x16 ГБ DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-2x16-gb-ddr5.png", "path": "/ram?subcategory=2x16 ГБ DDR5" },
+        { "title": "2x8 ГБ DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-2x8-gb-ddr5.png", "path": "/ram?subcategory=2x8 ГБ DDR5" },
+        { "title": "DDR5 6000 МТ/с CL30", "items": [], "image": "/subcategories/SUBCATEGORIES-ddr5-6000-mts-cl30.png", "path": "/ram?subcategory=DDR5 6000 МТ/с CL30" }
       ]
     },
     "storage": {

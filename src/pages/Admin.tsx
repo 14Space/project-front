@@ -1667,7 +1667,7 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
 // AdminUsers now imported from components
 
 
-const AdminReviews = ({ onBack }: { onBack: () => void }) => {
+const _AdminReviews = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
 

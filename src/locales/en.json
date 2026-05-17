@@ -310,34 +310,34 @@
     "cpus": {
       "title": "Processors",
       "groups": [
-        { "title": "AMD with 3D V-Cache", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=AMD with 3D V-Cache" },
-        { "title": "High-performance iGPU", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=High-performance iGPU" },
-        { "title": "For Gaming PCs", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=For Gaming PCs" },
-        { "title": "For Workstations", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cpus?subcategory=For Workstations" }
+        { "title": "AMD with 3D V-Cache", "items": [], "image": "/subcategories/SUBCATEGORIES-amd-v-3-cache.png", "path": "/cpus?subcategory=AMD with 3D V-Cache" },
+        { "title": "High-performance iGPU", "items": [], "image": "/subcategories/SUBCATEGORIES-high-performance-igpu.png", "path": "/cpus?subcategory=High-performance iGPU" },
+        { "title": "For Gaming PCs", "items": [], "image": "/subcategories/SUBCATEGORIES-for-gaming-pcs.png", "path": "/cpus?subcategory=For Gaming PCs" },
+        { "title": "For Workstations", "items": [], "image": "/subcategories/SUBCATEGORIES-for-workstations.png", "path": "/cpus?subcategory=For Workstations" }
       ]
     },
     "gpus": {
       "title": "Graphics Cards",
       "groups": [
-        { "title": "Gaming NVIDIA", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Gaming NVIDIA" },
-        { "title": "Gaming AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Gaming AMD" },
-        { "title": "Professional", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/gpus?subcategory=Professional" }
+        { "title": "Gaming NVIDIA", "items": [], "image": "/subcategories/SUBCATEGORIES-gaming-nvidia.png", "path": "/gpus?subcategory=Gaming NVIDIA" },
+        { "title": "Gaming AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-gaming-amd.png", "path": "/gpus?subcategory=Gaming AMD" },
+        { "title": "Professional", "items": [], "image": "/subcategories/SUBCATEGORIES-professional.png", "path": "/gpus?subcategory=Professional" }
       ]
     },
     "motherboards": {
       "title": "Motherboards",
       "groups": [
-        { "title": "for AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=for AMD" },
-        { "title": "for Intel", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=for Intel" },
-        { "title": "with Wi-Fi", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/motherboards?subcategory=with Wi-Fi" }
+        { "title": "for AMD", "items": [], "image": "/subcategories/SUBCATEGORIES-for-amd.png", "path": "/motherboards?subcategory=for AMD" },
+        { "title": "for Intel", "items": [], "image": "/subcategories/SUBCATEGORIES-for-intel.png", "path": "/motherboards?subcategory=for Intel" },
+        { "title": "with Wi-Fi", "items": [], "image": "/subcategories/SUBCATEGORIES-with-wifi.png", "path": "/motherboards?subcategory=with Wi-Fi" }
       ]
     },
     "ram": {
       "title": "RAM",
       "groups": [
-        { "title": "2x16 GB DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x16 GB DDR5" },
-        { "title": "2x8 GB DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=2x8 GB DDR5" },
-        { "title": "DDR5 6000 MT/s CL30", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/ram?subcategory=DDR5 6000 MT/s CL30" }
+        { "title": "2x16 GB DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-2x16-gb-ddr5.png", "path": "/ram?subcategory=2x16 GB DDR5" },
+        { "title": "2x8 GB DDR5", "items": [], "image": "/subcategories/SUBCATEGORIES-2x8-gb-ddr5.png", "path": "/ram?subcategory=2x8 GB DDR5" },
+        { "title": "DDR5 6000 MT/s CL30", "items": [], "image": "/subcategories/SUBCATEGORIES-ddr5-6000-mts-cl30.png", "path": "/ram?subcategory=DDR5 6000 MT/s CL30" }
       ]
     },
     "storage": {
