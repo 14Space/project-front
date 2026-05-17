@@ -1,17 +1,14 @@
 import React, { useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, Edit2, Save, X } from 'lucide-react';
+import { LogOut, Edit2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AdminUsers from '../../components/admin/AdminUsers';
 
 const ManagerProfile: React.FC = () => {
-  const { user, logout, updateUser, cycleUser } = useAppContext();
-  const navigate = useNavigate();
+  const { user, updateUser, cycleUser } = useAppContext();
   const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = React.useState(false);
-  const [emailError, setEmailError] = React.useState(false);
   const [formData, setFormData] = React.useState({
     name: '',
     lastName: '',
@@ -35,7 +32,7 @@ const ManagerProfile: React.FC = () => {
   const handleSave = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setEmailError(true);
+      // Basic validation
       return;
     }
     updateUser(formData);
@@ -50,7 +47,6 @@ const ManagerProfile: React.FC = () => {
       phone: user.phone || '',
     });
     setIsEditing(false);
-    setEmailError(false);
   };
 
   return (
