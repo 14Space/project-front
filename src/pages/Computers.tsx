@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import PCFilters from '../components/product/PCFilters';
-import { MOCK_COMPUTERS } from '../data/mockProducts';
+import { useCategoryProducts } from '../hooks/useCategoryProducts';
 
 export default function Computers() {
   const { t } = useTranslation();
@@ -12,6 +12,7 @@ export default function Computers() {
   const subcategory = searchParams.get('subcategory');
   
   const [activeSort, setActiveSort] = useState('popularity');
+  const { products: apiProducts, isLoading } = useCategoryProducts('Компьютеры');
   
   // Состояния фильтров
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
@@ -42,7 +43,7 @@ export default function Computers() {
 
   // Сортировка и Фильтрация данных
   const filteredAndSortedProducts = useMemo(() => {
-    let result = [...MOCK_COMPUTERS];
+    let result = [...apiProducts];
 
     // 1. Фильтрация по подкатегориям
     if (selectedSubcategories.length > 0) {
@@ -67,7 +68,8 @@ export default function Computers() {
     }
 
     return result;
-  }, [activeSort, selectedSubcategories, minPrice, maxPrice]);
+  }, [activeSort, selectedSubcategories, minPrice, maxPrice, apiProducts]);
+
 
 
   return (
@@ -78,9 +80,12 @@ export default function Computers() {
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
-        <ProductGrid 
-          products={filteredAndSortedProducts} 
-          sidebar={
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
+        ) : (
+          <ProductGrid 
+            products={filteredAndSortedProducts} 
+            sidebar={
             <PCFilters 
               selectedSubcategories={selectedSubcategories}
               onSubcategoryChange={handleSubcategoryChange}
@@ -98,6 +103,7 @@ export default function Computers() {
             />
           } 
         />
+        )}
       </div>
     </div>
   );

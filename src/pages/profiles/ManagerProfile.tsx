@@ -4,8 +4,11 @@ import { LogOut, Edit2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AdminUsers from '../../components/admin/AdminUsers';
 
+import { useNavigate } from 'react-router-dom';
+
 const ManagerProfile: React.FC = () => {
-  const { user, updateUser, cycleUser } = useAppContext();
+  const { user, updateUser, logout } = useAppContext();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = React.useState(false);
@@ -111,7 +114,7 @@ const ManagerProfile: React.FC = () => {
               </div>
               <div>
                 <button 
-                  onClick={cycleUser}
+                  onClick={() => { logout(); navigate('/'); }}
                   style={{
                     width: '100%',
                     height: '48px',

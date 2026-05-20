@@ -19,7 +19,7 @@ export default function ProductCard({
   code = '402123', 
   title = 'Видеокарта MSI GeForce RTX 5060 Ti 16G GAMING OC', 
   price = 16999, 
-  oldPrice = 18599, 
+  oldPrice, 
   inStock = true, 
   specs = ['16GB GDDR6', 'DLSS 3.0', 'Ray Tracing'], 
   images = ['/products/GPU-zaglushka.png'] 
