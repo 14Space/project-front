@@ -5,7 +5,7 @@ import { User as UserIcon, LogOut, Edit2, Save, X, Plus, ChevronDown } from 'luc
 import { useTranslation } from 'react-i18next';
 
 const UserProfile: React.FC = () => {
-  const { user, logout, updateUser, cycleUser } = useAppContext();
+  const { user, logout, updateUser } = useAppContext();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -109,7 +109,7 @@ const UserProfile: React.FC = () => {
                 marginBottom: '15px'
               }}>
                 <button 
-                  onClick={cycleUser}
+                  onClick={() => { logout(); navigate('/'); }}
                   style={{
                     width: '100%',
                     display: 'flex',

@@ -4,12 +4,13 @@ import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import PSUFilters from '../components/product/PSUFilters';
-import { HOT_DEALS } from '../constants/products';
+import { useCategoryProducts } from '../hooks/useCategoryProducts';
 
 export default function PSUs() {
   const { t } = useTranslation();
   
   const [activeSort, setActiveSort] = useState('popularity');
+  const { products: apiProducts, isLoading } = useCategoryProducts('Блоки питания');
   
   // Состояния фильтров
   const [minPrice, setMinPrice] = useState('');
@@ -45,9 +46,9 @@ export default function PSUs() {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
   };
 
-  // Фильтрация (демонстрация на HOT_DEALS)
+  // Фильтрация
   const filteredProducts = useMemo(() => {
-    let result = HOT_DEALS.filter(p => p.category === 'psu');
+    let result = [...apiProducts];
 
     if (minPrice) result = result.filter(p => p.price >= parseInt(minPrice));
     if (maxPrice) result = result.filter(p => p.price <= parseInt(maxPrice));
@@ -57,7 +58,7 @@ export default function PSUs() {
     else if (activeSort === 'price_desc') result.sort((a, b) => b.price - a.price);
 
     return result;
-  }, [activeSort, minPrice, maxPrice]);
+  }, [activeSort, minPrice, maxPrice, apiProducts]);
 
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
@@ -67,9 +68,12 @@ export default function PSUs() {
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
-        <ProductGrid 
-          products={filteredProducts}
-          sidebar={
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
+        ) : (
+          <ProductGrid 
+            products={filteredProducts}
+            sidebar={
             <PSUFilters 
               minPrice={minPrice}
               onMinPriceChange={setMinPrice}
@@ -94,6 +98,7 @@ export default function PSUs() {
             />
           } 
         />
+        )}
       </div>
     </div>
   );

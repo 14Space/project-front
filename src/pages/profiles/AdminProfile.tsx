@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AdminDashboard from '../../components/admin/AdminDashboard';
 
 const AdminProfile: React.FC = () => {
-  const { user, updateUser, cycleUser } = useAppContext();
+  const { user, updateUser, logout } = useAppContext();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -111,7 +111,7 @@ const AdminProfile: React.FC = () => {
               </div>
               <div>
                 <button 
-                  onClick={cycleUser}
+                  onClick={() => { logout(); navigate('/'); }}
                   style={{
                     width: '100%',
                     height: '48px',

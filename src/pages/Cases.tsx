@@ -4,12 +4,13 @@ import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import CaseFilters from '../components/product/CaseFilters';
-import { HOT_DEALS } from '../constants/products';
+import { useCategoryProducts } from '../hooks/useCategoryProducts';
 
 export default function Cases() {
   const { t } = useTranslation();
   
   const [activeSort, setActiveSort] = useState('popularity');
+  const { products: apiProducts, isLoading } = useCategoryProducts('Корпуса');
   
   // Состояния фильтров
   const [minPrice, setMinPrice] = useState('');
@@ -41,9 +42,9 @@ export default function Cases() {
     setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
   };
 
-  // Фильтрация (демонстрация на HOT_DEALS)
+  // Фильтрация
   const filteredProducts = useMemo(() => {
-    let result = HOT_DEALS.filter(p => p.category === 'case');
+    let result = [...apiProducts];
 
     if (minPrice) result = result.filter(p => p.price >= parseInt(minPrice));
     if (maxPrice) result = result.filter(p => p.price <= parseInt(maxPrice));
@@ -53,7 +54,7 @@ export default function Cases() {
     else if (activeSort === 'price_desc') result.sort((a, b) => b.price - a.price);
 
     return result;
-  }, [activeSort, minPrice, maxPrice]);
+  }, [activeSort, minPrice, maxPrice, apiProducts]);
 
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
@@ -63,9 +64,12 @@ export default function Cases() {
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
-        <ProductGrid 
-          products={filteredProducts}
-          sidebar={
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
+        ) : (
+          <ProductGrid 
+            products={filteredProducts}
+            sidebar={
             <CaseFilters 
               minPrice={minPrice}
               onMinPriceChange={setMinPrice}
@@ -86,6 +90,7 @@ export default function Cases() {
             />
           } 
         />
+        )}
       </div>
     </div>
   );

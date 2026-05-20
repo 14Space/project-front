@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
 import LaptopFilters from '../components/product/LaptopFilters';
-import { MOCK_LAPTOPS } from '../data/mockProducts';
+import { useCategoryProducts } from '../hooks/useCategoryProducts';
 
 export default function Laptops() {
   const { t } = useTranslation();
@@ -12,6 +12,7 @@ export default function Laptops() {
   const subcategory = searchParams.get('subcategory');
   
   const [activeSort, setActiveSort] = useState('popularity');
+  const { products: apiProducts, isLoading } = useCategoryProducts('Ноутбуки');
   
   // Состояния фильтров
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
@@ -55,7 +56,7 @@ export default function Laptops() {
 
   // Сортировка и Фильтрация данных
   const filteredAndSortedProducts = useMemo(() => {
-    let result = [...MOCK_LAPTOPS];
+    let result = [...apiProducts];
 
     // 1. Фильтрация по подкатегориям
     if (selectedSubcategories.length > 0) {
@@ -91,9 +92,12 @@ export default function Laptops() {
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
-        <ProductGrid 
-          products={filteredAndSortedProducts} 
-          sidebar={
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
+        ) : (
+          <ProductGrid 
+            products={filteredAndSortedProducts} 
+            sidebar={
             <LaptopFilters 
               selectedSubcategories={selectedSubcategories}
               onSubcategoryChange={handleSubcategoryChange}
@@ -121,6 +125,7 @@ export default function Laptops() {
             />
           } 
         />
+        )}
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ import AdminProductFilters from '../components/admin/AdminProductFilters';
 import AdminSpecFilters from '../components/admin/AdminSpecFilters';
 import AdminUsers from '../components/admin/AdminUsers';
 import { useAppContext } from '../context/AppContext';
+import { api } from '../api';
 
 // Categories mapping
 const CATEGORIES_DATA = {
@@ -64,7 +65,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     price: '',
     category: '',
     subcategory: '',
-    images: [] as string[]
+    images: [] as string[],
+    imageFiles: [] as File[]
   });
   const [brands, setBrands] = useState([
     { id: 1, name: 'MSI' },
@@ -328,7 +330,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                               price: p.price.toString(),
                               category: Object.keys(CATEGORIES_DATA).find(key => (CATEGORIES_DATA as any)[key].label === p.category) || p.category,
                               subcategory: p.subcategory,
-                              images: [] // In real app, load existing images
+                              images: [], // In real app, load existing images
+                              imageFiles: []
                             });
                             setIsProductModalOpen(true);
                           }}
@@ -455,7 +458,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     onClick={() => {
                       setIsProductModalOpen(false);
                       setEditingProduct(null);
-                      setProductForm({ title: '', price: '', category: '', subcategory: '', images: [] });
+                      setProductForm({ title: '', price: '', category: '', subcategory: '', images: [], imageFiles: [] });
                     }}
                     style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
                   >
@@ -606,8 +609,10 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                             onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}
                             onClick={() => {
                               const newImages = [...productForm.images];
+                              const newImageFiles = [...productForm.imageFiles];
                               newImages.splice(i, 1);
-                              setProductForm({...productForm, images: newImages});
+                              newImageFiles.splice(i, 1);
+                              setProductForm({...productForm, images: newImages, imageFiles: newImageFiles});
                             }}
                           >
                             <Trash2 size={20} color="#fff" />
@@ -651,7 +656,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                                 reader.onloadend = () => {
                                   setProductForm(prev => ({
                                     ...prev,
-                                    images: [...prev.images, reader.result as string].slice(0, 5)
+                                    images: [...prev.images, reader.result as string].slice(0, 5),
+                                    imageFiles: [...prev.imageFiles, file].slice(0, 5)
                                   }));
                                 };
                                 reader.readAsDataURL(file);
@@ -672,41 +678,72 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     {t('common.cancel')}
                   </button>
                   <button 
-                    onClick={() => {
+                    onClick={async () => {
                       if (!productForm.title.trim()) {
                         alert(t('adminPage.products.noTitle'));
                         return;
                       }
                       
-                      if (editingProduct) {
-                        setProducts(products.map(p => p.id === editingProduct.id ? {
-                          ...p,
+                      try {
+                        // 1. Upload images first
+                        const uploadedUrls: string[] = [];
+                        for (const file of productForm.imageFiles) {
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          const res: any = await api.upload('/Files/upload', formData);
+                          if (res && res.url) {
+                            uploadedUrls.push(res.url);
+                          }
+                        }
+
+                        // 2. Create product DTO
+                        const newProductDto = {
                           name: productForm.title.trim(),
                           price: Number(productForm.price) || 0,
-                          category: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Other',
-                          subcategory: productForm.subcategory || 'Default'
-                        } : p));
-                        alert(t('adminPage.products.savedOk'));
-                      } else {
-                        const newProduct = {
-                          id: Math.floor(10000000 + Math.random() * 90000000).toString(),
-                          name: productForm.title.trim(),
-                          price: Number(productForm.price) || 0,
-                          category: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Other',
-                          subcategory: productForm.subcategory || 'Default'
+                          categoryName: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Другое',
+                          subcategoryName: productForm.subcategory || 'По умолчанию',
+                          images: uploadedUrls
                         };
+
+                        if (editingProduct) {
+                          // Update logic (we will just mock it for now on frontend as requested previously or do real put)
+                          // await api.put(`/Products/${editingProduct.id}`, newProductDto);
+                          setProducts(products.map(p => p.id === editingProduct.id ? {
+                            ...p,
+                            name: productForm.title.trim(),
+                            price: Number(productForm.price) || 0,
+                            category: newProductDto.categoryName,
+                            subcategory: newProductDto.subcategoryName
+                          } : p));
+                          alert(t('adminPage.products.savedOk'));
+                        } else {
+                          // 3. Send to backend
+                          const createdProduct: any = await api.post('/Products', newProductDto);
+                          
+                          // 4. Update UI
+                          const mappedProduct = {
+                            id: createdProduct.id.toString(),
+                            name: createdProduct.name,
+                            price: createdProduct.price,
+                            category: createdProduct.categoryName || newProductDto.categoryName,
+                            subcategory: createdProduct.subcategoryName || newProductDto.subcategoryName
+                          };
+                          
+                          setProducts([mappedProduct, ...products]);
+                          alert(t('adminPage.products.addedOk'));
+                        }
                         
-                        setProducts([newProduct, ...products]);
-                        alert(t('adminPage.products.addedOk'));
+                        setIsProductModalOpen(false);
+                        setEditingProduct(null);
+                        setProductForm({ title: '', price: '', category: '', subcategory: '', images: [], imageFiles: [] });
+                      } catch (err) {
+                        console.error('Error saving product', err);
+                        alert('Ошибка при сохранении товара. Проверьте консоль.');
                       }
-                      
-                      setIsProductModalOpen(false);
-                      setEditingProduct(null);
-                      setProductForm({ title: '', price: '', category: '', subcategory: '', images: [] });
                     }}
                     style={{ padding: '10px 25px', backgroundColor: 'var(--primary-color)', border: 'none', borderRadius: '8px', color: '#000', cursor: 'pointer', fontWeight: 600 }}
                   >
-                    Сохранить
+                    {t('common.save') || 'Сохранить'}
                   </button>
                 </div>
               </div>
@@ -1667,7 +1704,7 @@ const AdminBlog = ({ onBack }: { onBack: () => void }) => {
 // AdminUsers now imported from components
 
 
-const _AdminReviews = ({ onBack }: { onBack: () => void }) => {
+export const _AdminReviews = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
 

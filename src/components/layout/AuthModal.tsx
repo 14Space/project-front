@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Check } from 'lucide-react';
-import { useAppContext, MOCK_USER, MOCK_USER_REGULAR } from '../../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
+import { api } from '../../api';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -71,6 +72,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Update active tab when modal opens or initialTab changes
   useEffect(() => {
@@ -79,33 +81,58 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
     }
   }, [isOpen, initialTab]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === '14t.space@gmail.com') {
-      login(MOCK_USER);
-    } else if (email === 'mihafelciuc@gmail.com') {
-      login(MOCK_USER_REGULAR);
-    } else {
+    try {
+      const response = await api.post('/Auth/login', { username: email, password: password });
+      
+      localStorage.setItem('token', response.token);
+      
       login({
-        id: `user-${Date.now()}`,
-        name: email.split('@')[0],
+        id: response.id.toString(),
+        name: response.username,
+        lastName: response.lastName,
+        phone: response.phone,
+        city: response.city,
+        street: response.street,
         email: email,
-        role: 'user'
+        role: response.role.toLowerCase() as 'user' | 'admin' | 'manager'
       });
+      onClose();
+    } catch (error: any) {
+      console.error('Login failed', error);
+      alert(`Ошибка входа: ${error.message}`);
     }
-    onClose();
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    login({
-      id: `user-${Date.now()}`,
-      name: firstName || email.split('@')[0],
-      lastName: lastName,
-      email: email,
-      role: 'user'
-    });
-    onClose();
+    if (password !== confirmPassword) {
+      alert(t('auth.passwordsNotMatch') || 'Пароли не совпадают');
+      return;
+    }
+    try {
+      const username = firstName || email.split('@')[0];
+      const response = await api.post('/Auth/register', { 
+         username: username,
+         email: email,
+         password: password
+      });
+      
+      localStorage.setItem('token', response.token);
+      
+      login({
+        id: response.id.toString(),
+        name: username,
+        lastName: lastName,
+        email: email,
+        role: response.role.toLowerCase() as 'user' | 'admin' | 'manager'
+      });
+      onClose();
+    } catch (error: any) {
+      console.error('Registration failed', error);
+      alert(`Ошибка регистрации: ${error.message}`);
+    }
   };
 
   if (!isOpen) return null;
@@ -275,7 +302,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
             <AuthInput label={t('auth.lastName')} value={lastName} onChange={setLastName} />
             <AuthInput label={t('auth.email')} value={email} onChange={setEmail} />
             <AuthInput label={t('auth.password')} type="password" value={password} onChange={setPassword} />
-            <AuthInput label={t('auth.confirmPassword')} type="password" value={password} onChange={setPassword} />
+            <AuthInput label={t('auth.confirmPassword')} type="password" value={confirmPassword} onChange={setConfirmPassword} />
 
             <button 
               type="submit"

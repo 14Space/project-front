@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
+import { useBrands } from '../../hooks/useBrands';
 
 interface FilterSectionProps {
   title: string;
@@ -116,6 +117,7 @@ export default function PCFilters({
   onMaxPriceChange
 }: PCFiltersProps) {
   const { t } = useTranslation();
+  const { brands } = useBrands();
   // Остальные состояния (SSD, RAM и т.д.) пока оставим локальными для простоты, 
   // так как мы оживляем только основные фильтры по просьбе пользователя.
   const [selectedVRAM, setSelectedVRAM] = useState<string[]>([]);
@@ -199,12 +201,12 @@ export default function PCFilters({
 
       {/* Производители */}
       <FilterSection title={t('filters.brands')}>
-        {['Apple', 'ASUS', 'Lenovo'].map(b => (
+        {brands.map(b => (
           <Checkbox 
-            key={b} 
-            label={b} 
-            checked={selectedBrands.includes(b)} 
-            onChange={() => onBrandsChange(b)} 
+            key={b.name} 
+            label={b.name} 
+            checked={selectedBrands.includes(b.name)} 
+            onChange={() => onBrandsChange(b.name)} 
           />
         ))}
       </FilterSection>

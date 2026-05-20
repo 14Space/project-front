@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../api';
 
 interface User {
   id: string;
@@ -39,38 +40,7 @@ export interface BlogPost {
   image: string;
   date: string;
 }
-export const MOCK_USER: User = {
-  id: 'user-admin',
-  name: 'Номинал',
-  lastName: 'Номиналович',
-  email: '14t.space@gmail.com',
-  phone: '+37369467556',
-  city: '',
-  street: '',
-  role: 'admin'
-};
-
-export const MOCK_USER_REGULAR: User = {
-  id: 'user-regular',
-  name: 'Mihai',
-  lastName: 'Felciuc',
-  email: 'mihafelciuc@gmail.com',
-  phone: '+37369000000',
-  city: 'Chisinau',
-  street: 'Stefan cel Mare 1',
-  role: 'user'
-};
-
-export const MOCK_USER_MANAGER: User = {
-  id: 'user-manager',
-  name: 'Claude',
-  lastName: 'Green',
-  email: 'm12.claude.green@gmail.com',
-  phone: '+37368888888',
-  city: 'Chisinau',
-  street: 'Bulevardul Dacia 1',
-  role: 'manager'
-};
+// Mock users removed
 interface AppContextType {
   favorites: string[];
   compareList: string[];
@@ -103,7 +73,6 @@ interface AppContextType {
   deleteBlogPost: (id: string) => void;
   users: User[];
   addUser: (userData: User) => void;
-  cycleUser: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -131,18 +100,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return parsed;
   });
 
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('user');
-    const parsedUser = saved ? JSON.parse(saved) : null;
-    if (parsedUser) {
-      if (parsedUser.email === '14t.space@gmail.com') {
-        parsedUser.role = 'admin';
-      } else if (parsedUser.email === 'm12.claude.green@gmail.com') {
-        parsedUser.role = 'manager';
-      }
+  const [user, setUser] = useState<User | null>(null);
+
+  // Check auth on mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.get('/Auth/me')
+        .then((res: any) => {
+          setUser({
+            id: res.id.toString(),
+            name: res.username,
+            lastName: res.lastName,
+            email: res.email,
+            phone: res.phone,
+            city: res.city,
+            street: res.street,
+            role: res.role.toLowerCase() as 'user' | 'admin' | 'manager'
+          });
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        });
     }
-    return parsedUser;
-  });
+  }, []);
 
   const [orders, setOrders] = useState<Order[]>(() => {
     const saved = localStorage.getItem('app_orders');
@@ -161,12 +144,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('app_users');
-    return saved ? JSON.parse(saved) : [MOCK_USER, MOCK_USER_REGULAR, MOCK_USER_MANAGER];
+    return saved ? JSON.parse(saved) : [];
   });
-
-  // Always-fresh reference to users — avoids stale closure in cycleUser
-  const usersRef = React.useRef(users);
-  useEffect(() => { usersRef.current = users; }, [users]);
 
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -249,25 +228,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } else if (userData.email === 'm12.claude.green@gmail.com') {
       userData.role = 'manager';
     } else {
-      userData.role = 'user';
+      userData.role = userData.role || 'user';
     }
     setUser(userData);
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
-  const updateUser = (userData: Partial<User>) => {
+  const updateUser = async (userData: Partial<User>) => {
     if (!user) return;
-    const updatedUser = { ...user, ...userData };
-    setUser(updatedUser);
-    setUsers(prev => {
-      const updated = prev.map(u => u.id === updatedUser.id ? { ...u, ...updatedUser } : u);
-      // Synchronously write to localStorage so cycleUser always gets fresh data
-      localStorage.setItem('app_users', JSON.stringify(updated));
-      return updated;
-    });
+    
+    try {
+      const response = await api.put('/Auth/update', {
+        username: userData.name,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        city: userData.city,
+        street: userData.street
+      });
+      
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+      }
+      
+      const updatedUser = { 
+        ...user, 
+        name: response.username,
+        lastName: response.lastName,
+        phone: response.phone,
+        city: response.city,
+        street: response.street
+      };
+      setUser(updatedUser);
+      setUsers(prev => {
+        const updated = prev.map(u => u.id === updatedUser.id ? { ...u, ...updatedUser } : u);
+        localStorage.setItem('app_users', JSON.stringify(updated));
+        return updated;
+      });
+    } catch (error: any) {
+      console.error('Failed to update user profile', error);
+      alert(`Ошибка при обновлении: ${error.message}`);
+    }
   };
 
   const createOrder = (order: Order) => {
@@ -309,17 +314,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setUsers(prev => [...prev, userData]);
   };
 
-  const cycleUser = () => {
-    const mockList = [MOCK_USER, MOCK_USER_MANAGER, MOCK_USER_REGULAR];
-    const currentIndex = mockList.findIndex(u => u.email === user?.email);
-    const nextMock = mockList[(currentIndex + 1) % mockList.length];
-
-    // Use ref — always points to the latest users array without closure staleness
-    const nextUser = usersRef.current.find(u => u.email === nextMock.email) || nextMock;
-    console.log('[cycleUser] next:', nextUser.name, nextUser.email);
-    login(nextUser);
-  };
-
   return (
     <AppContext.Provider value={{ 
       favorites, 
@@ -352,8 +346,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addBlogPost,
       deleteBlogPost,
       users,
-      addUser,
-      cycleUser
+      addUser
     }}>
       {children}
     </AppContext.Provider>
