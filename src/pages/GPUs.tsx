@@ -1,60 +1,37 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import SortButtons from '../components/product/SortButtons';
-import GPUFilters from '../components/product/GPUFilters';
+import DynamicCategoryFilters from '../components/product/DynamicCategoryFilters';
 import { useCategoryProducts } from '../hooks/useCategoryProducts';
 
 export default function GPUs() {
   const { t } = useTranslation();
   
   const [activeSort, setActiveSort] = useState('popularity');
-  const { products: apiProducts, isLoading } = useCategoryProducts('Видеокарты');
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
+  const [selectedFilters, setSelectedFilters] = useState<Record<number, string[]>>({});
   
-  // Состояния фильтров
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [selectedPopular, setSelectedPopular] = useState<string[]>([]);
-  const [selectedGPUs, setSelectedGPUs] = useState<string[]>([]);
-  const [selectedMemory, setSelectedMemory] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedBus, setSelectedBus] = useState<string[]>([]);
-  const [selectedMemoryType, setSelectedMemoryType] = useState<string[]>([]);
-  const [selectedLength, setSelectedLength] = useState<string[]>([]);
-  const [searchParams] = useSearchParams();
-
-  useEffect(() => {
-    const subcat = searchParams.get('subcategory');
-    if (subcat) {
-      const mapping: Record<string, string> = {
-        'Игровые NVIDIA': 'Игровая видеокарта NVIDIA',
-        'Игровые AMD': 'Игровая видеокарта AMD',
-        'Профессиональные': 'Профессиональная видеокарта'
-      };
-      const filterValue = mapping[subcat];
-      if (filterValue) {
-        setSelectedPopular([filterValue]);
-      }
-    }
-  }, [searchParams]);
-
-  const toggleFilter = (setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
-    setList(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
-  };
-
-  // Фильтрация
-  const filteredProducts = useMemo(() => {
+  const { products: apiProducts, isLoading } = useCategoryProducts('Видеокарты', {
+    minPrice,
+    maxPrice,
+    selectedFilters
+  });
+  
+  const filteredAndSortedProducts = useMemo(() => {
     let result = [...apiProducts];
 
-    if (minPrice) result = result.filter(p => p.price >= parseInt(minPrice));
-    if (maxPrice) result = result.filter(p => p.price <= parseInt(maxPrice));
-
-    if (activeSort === 'price_asc') result.sort((a, b) => a.price - b.price);
-    else if (activeSort === 'price_desc') result.sort((a, b) => b.price - a.price);
+    if (activeSort === 'price_asc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (activeSort === 'price_desc') {
+      result.sort((a, b) => b.price - a.price);
+    } else if (activeSort === 'popularity') {
+      result.sort((a, b) => a.id.localeCompare(b.id));
+    }
 
     return result;
-  }, [activeSort, minPrice, maxPrice, apiProducts]);
+  }, [activeSort, apiProducts]);
 
   return (
     <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', paddingBottom: '40px' }}>
@@ -68,30 +45,19 @@ export default function GPUs() {
           <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
         ) : (
           <ProductGrid 
-            products={filteredProducts}
+            products={filteredAndSortedProducts} 
             sidebar={
-            <GPUFilters 
-              minPrice={minPrice}
-              onMinPriceChange={setMinPrice}
-              maxPrice={maxPrice}
-              onMaxPriceChange={setMaxPrice}
-              selectedPopular={selectedPopular}
-              onPopularChange={(val) => toggleFilter(setSelectedPopular, val)}
-              selectedGPUs={selectedGPUs}
-              onGPUsChange={(val) => toggleFilter(setSelectedGPUs, val)}
-              selectedMemory={selectedMemory}
-              onMemoryChange={(val) => toggleFilter(setSelectedMemory, val)}
-              selectedBrands={selectedBrands}
-              onBrandsChange={(val) => toggleFilter(setSelectedBrands, val)}
-              selectedBus={selectedBus}
-              onBusChange={(val) => toggleFilter(setSelectedBus, val)}
-              selectedMemoryType={selectedMemoryType}
-              onMemoryTypeChange={(val) => toggleFilter(setSelectedMemoryType, val)}
-              selectedLength={selectedLength}
-              onLengthChange={(val) => toggleFilter(setSelectedLength, val)}
-            />
-          } 
-        />
+              <DynamicCategoryFilters 
+                categoryName="Видеокарты"
+                selectedFilters={selectedFilters}
+                onFilterChange={setSelectedFilters}
+                minPrice={minPrice}
+                onMinPriceChange={setMinPrice}
+                maxPrice={maxPrice}
+                onMaxPriceChange={setMaxPrice}
+              />
+            } 
+          />
         )}
       </div>
     </div>

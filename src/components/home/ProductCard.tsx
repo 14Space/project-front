@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ShoppingCart, Heart, Scale, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../../context/AppContext';
+import { getImgUrl } from '../../utils/image';
 
 interface ProductCardProps {
   id: string;
@@ -86,7 +87,7 @@ export default function ProductCard({ id, code, title, price, oldPrice, inStock,
           position: 'relative'
         }}>
           <img 
-            src={`/products/${images[currentImgIndex]}`} 
+            src={getImgUrl(images[currentImgIndex])} 
             alt={title} 
             style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%', height: 'auto' }} 
           />

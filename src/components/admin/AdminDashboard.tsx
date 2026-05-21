@@ -5,12 +5,10 @@ import {
   ShoppingBag, 
   Users, 
   Plus,
-  Settings,
   Layers,
   List,
   FileText,
-  MessageSquare,
-  RefreshCw
+  MessageSquare
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -27,8 +25,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onAction }) => {
       icon: <Package size={24} color="#A6CE39" />,
       actions: [
         { id: 'products', label: t('admin.actions.addEditDelete'), icon: <Plus size={16} /> },
-        { id: 'specs', label: t('admin.actions.specs'), icon: <Settings size={16} /> },
-        { id: 'categories', label: t('admin.actions.categoriesAndSubcategories'), icon: <Layers size={16} /> },
+        { id: 'categories', label: t('admin.actions.categoriesSubcategoriesSpecs'), icon: <Layers size={16} /> },
       ]
     },
     {
@@ -37,7 +34,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onAction }) => {
       icon: <ShoppingBag size={24} color="#A6CE39" />,
       actions: [
         { id: 'viewOrders', label: t('admin.actions.viewOrders'), icon: <List size={16} /> },
-        { id: 'returns', label: t('admin.actions.returns'), icon: <RefreshCw size={16} /> },
         { id: 'tradeInRequests', label: t('admin.actions.tradeInRequests'), icon: <FileText size={16} /> },
       ]
     },

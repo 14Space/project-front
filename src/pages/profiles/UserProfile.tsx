@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { User as UserIcon, LogOut, Edit2, Save, X, Plus, ChevronDown } from 'lucide-react';
+import { User as UserIcon, LogOut, Edit2, Plus, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const UserProfile: React.FC = () => {

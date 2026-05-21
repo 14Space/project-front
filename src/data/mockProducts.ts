@@ -9,6 +9,7 @@ export interface Product {
   images: string[];
   category: string;
   subcategory: string;
+  rawAttributes?: { attributeId: number; attributeName: string; value: string }[];
 }
 
 export const MOCK_COMPUTERS: Product[] = [
