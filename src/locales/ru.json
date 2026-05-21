@@ -12,12 +12,10 @@
     },
     "actions": {
       "addEditDelete": "Добавление, исправление, удаление",
-      "specs": "Управление характеристиками",
-      "categoriesAndSubcategories": "Категории и подкатегории",
+      "categoriesSubcategoriesSpecs": "Категории, фильтры, параметры",
       "categories": "Категории",
       "subcategories": "Подкатегории",
       "viewOrders": "Все заказы",
-      "returns": "Возвраты и отмены",
       "tradeInRequests": "Заявки на оценку Trade-In",
       "userDatabase": "Список клиентов и управление",
       "blockUser": "Управление доступом",
@@ -406,25 +404,25 @@
     "storage": {
       "title": "Дисковые накопители",
       "groups": [
-        { "title": "HDD накопители", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=HDD накопители" },
-        { "title": "SSD накопители", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD накопители" },
-        { "title": "SSD с PCIe 4.0", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD с PCIe 4.0" }
+        { "title": "HDD накопители", "items": [], "image": "/subcategories/SUBCATEGORIES-hdd.png", "path": "/storage?subcategory=HDD накопители" },
+        { "title": "SSD накопители", "items": [], "image": "/subcategories/SUBCATEGORIES-ssd.png", "path": "/storage?subcategory=SSD накопители" },
+        { "title": "SSD с PCIe 4.0", "items": [], "image": "/subcategories/SUBCATEGORIES-ssd-psi4.png", "path": "/storage?subcategory=SSD с PCIe 4.0" }
       ]
     },
     "cases": {
       "title": "Корпуса",
       "groups": [
-        { "title": "С вентиляторами", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=С вентиляторами" },
-        { "title": "Mini ITX корпус", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=Mini ITX корпус" },
-        { "title": "С окном из стекла", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=С окном из стекла" }
+        { "title": "С вентиляторами", "items": [], "image": "/subcategories/SUBCATEGORIES-with-culers.png", "path": "/cases?subcategory=С вентиляторами" },
+        { "title": "Mini ITX корпус", "items": [], "image": "/subcategories/SUBCATEGORIES-mini-itx.png", "path": "/cases?subcategory=Mini ITX корпус" },
+        { "title": "С окном из стекла", "items": [], "image": "/subcategories/SUBCATEGORIES-with-glass-panel.png", "path": "/cases?subcategory=С окном из стекла" }
       ]
     },
     "cooling": {
       "title": "Системы охлаждения",
       "groups": [
-        { "title": "Водяное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Водяное охлаждение" },
-        { "title": "Воздушное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Воздушное охлаждение" },
-        { "title": "Вентиляторы", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Вентиляторы" }
+        { "title": "Водяное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-water.png", "path": "/cooling?subcategory=Водяное охлаждение" },
+        { "title": "Воздушное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-air.png", "path": "/cooling?subcategory=Воздушное охлаждение" },
+        { "title": "Вентиляторы", "items": [], "image": "/subcategories/SUBCATEGORIES-culers.png", "path": "/cooling?subcategory=Вентиляторы" }
       ]
     },
     "components": {
@@ -475,9 +473,9 @@
     "psus": {
       "title": "Блоки питания",
       "groups": [
-        { "title": "1600 Вт и более", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=1600 Вт и более" },
-        { "title": "80 PLUS Titanium", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=80 PLUS Titanium" },
-        { "title": "ATX", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=ATX" }
+        { "title": "1600 Вт и более", "items": [], "image": "/subcategories/SUBCATEGORIES-bp-1600w+.png", "path": "/psus?subcategory=1600 Вт и более" },
+        { "title": "80 PLUS Titanium", "items": [], "image": "/subcategories/SUBCATEGORIES-bp-80-plus-titanium.png", "path": "/psus?subcategory=80 PLUS Titanium" },
+        { "title": "ATX", "items": [], "image": "/subcategories/SUBCATEGORIES-bp-atx.png", "path": "/psus?subcategory=ATX" }
       ]
     }
   },

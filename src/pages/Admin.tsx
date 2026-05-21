@@ -4,25 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Package, 
   ShoppingBag, 
-  RefreshCw, 
   Users, 
   Plus,
-  Settings,
   Layers,
   List,
   FileText,
   ChevronLeft,
+  ChevronRight,
+  ChevronDown,
   Search,
   Edit2,
   Trash2,
-  GripVertical,
   X,
   MessageSquare,
   Check
 } from 'lucide-react';
 
 import AdminProductFilters from '../components/admin/AdminProductFilters';
-import AdminSpecFilters from '../components/admin/AdminSpecFilters';
 import AdminUsers from '../components/admin/AdminUsers';
 import { useAppContext } from '../context/AppContext';
 import { api } from '../api';
@@ -51,6 +49,20 @@ const CATEGORIES_DATA = {
   }
 };
 
+// 10 hardcoded categories — not editable, match the sidebar filters 1:1
+const HARDCODED_CATEGORIES = [
+  { key: 'computers',    label: 'Компьютеры' },
+  { key: 'laptops',      label: 'Ноутбуки' },
+  { key: 'cpus',         label: 'Процессоры' },
+  { key: 'gpus',         label: 'Видеокарты' },
+  { key: 'motherboards', label: 'Материнские платы' },
+  { key: 'ram',          label: 'Оперативная память' },
+  { key: 'storage',      label: 'Дисковые накопители' },
+  { key: 'cases',        label: 'Корпуса' },
+  { key: 'cooling',      label: 'Охлаждение' },
+  { key: 'psus',         label: 'Блоки питания' },
+];
+
 // Sub-components for Admin views
 const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
@@ -60,32 +72,245 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [newBrandName, setNewBrandName] = useState('');
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  
   const [productForm, setProductForm] = useState({
     title: '',
     price: '',
-    category: '',
+    description: '',
+    category: '', // DB Category ID string
     subcategory: '',
+    brandId: '',
     images: [] as string[],
-    imageFiles: [] as File[]
+    imageFiles: [] as File[],
+    attributes: {} as Record<number, string>
   });
-  const [brands, setBrands] = useState([
-    { id: 1, name: 'MSI' },
-    { id: 2, name: 'ASUS' },
-    { id: 3, name: 'Gigabyte' },
-    { id: 4, name: 'AMD' },
-    { id: 5, name: 'Intel' },
-  ]);
 
-  const [products, setProducts] = useState([
-    { id: '100101', name: 'Product Name Example 1', price: 26000, category: 'PCs', subcategory: 'Gaming' },
-    { id: '100102', name: 'Product Name Example 2', price: 27000, category: 'PCs', subcategory: 'Gaming' },
-    { id: '100103', name: 'Product Name Example 3', price: 28000, category: 'PCs', subcategory: 'Gaming' },
-    { id: '100104', name: 'Product Name Example 4', price: 29000, category: 'PCs', subcategory: 'Gaming' },
-    { id: '100105', name: 'Product Name Example 5', price: 30000, category: 'PCs', subcategory: 'Gaming' },
-  ]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [brands, setBrands] = useState<{ id: number; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [attributes, setAttributes] = useState<{ id: number; name: string; options?: string[]; Options?: string[] }[]>([]);
+  const [subcategories, setSubcategories] = useState<string[]>([]);
+
+  const fetchInitialData = async () => {
+    try {
+      const [prodData, brandData, catData] = await Promise.all([
+        api.get('/Products'),
+        api.get('/Brands'),
+        api.get('/Categories')
+      ]);
+      setProducts(prodData);
+      setBrands(brandData);
+      setCategories(catData);
+    } catch (err) {
+      console.error("Failed to fetch initial admin products data:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  const handleCategoryChange = async (categoryIdStr: string) => {
+    const categoryId = categoryIdStr ? Number(categoryIdStr) : null;
+    setProductForm(prev => ({ ...prev, category: categoryIdStr, subcategory: '', attributes: {} }));
+    setAttributes([]);
+    setSubcategories([]);
+
+    if (categoryId) {
+      try {
+        const attrs = await api.get(`/Attributes?categoryId=${categoryId}`);
+        setAttributes(attrs);
+      } catch (err) {
+        console.error("Error loading attributes:", err);
+      }
+
+      const categoryObj = categories.find(c => c.id === categoryId);
+      if (categoryObj) {
+        const localKey = `subcategories_${categoryObj.name}`;
+        const stored = localStorage.getItem(localKey);
+        if (stored) {
+          setSubcategories(JSON.parse(stored));
+        } else {
+          const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
+          const initialSubcats = matched ? matched.subcategories : [];
+          setSubcategories(initialSubcats);
+          localStorage.setItem(localKey, JSON.stringify(initialSubcats));
+        }
+      }
+    }
+  };
+
+  const handleEditProductClick = async (p: any) => {
+    setEditingProduct(p);
+    
+    const categoryObj = categories.find(c => c.name === p.categoryName || c.name === p.category);
+    const categoryIdStr = categoryObj ? categoryObj.id.toString() : '';
+
+    let attrs: any[] = [];
+    let subcats: string[] = [];
+    if (categoryObj) {
+      try {
+        attrs = await api.get(`/Attributes?categoryId=${categoryObj.id}`);
+        setAttributes(attrs);
+      } catch (err) {
+        console.error("Error loading attributes:", err);
+      }
+
+      const localKey = `subcategories_${categoryObj.name}`;
+      const stored = localStorage.getItem(localKey);
+      if (stored) {
+        subcats = JSON.parse(stored);
+        setSubcategories(subcats);
+      } else {
+        const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
+        const initialSubcats = matched ? matched.subcategories : [];
+        subcats = initialSubcats;
+        setSubcategories(subcats);
+        localStorage.setItem(localKey, JSON.stringify(subcats));
+      }
+    }
+
+    const initialAttrValues: Record<number, string> = {};
+    if (p.attributes) {
+      p.attributes.forEach((attr: any) => {
+        if (attr.attributeId) {
+          initialAttrValues[attr.attributeId] = attr.value;
+        } else {
+          const match = attrs.find(a => a.name === attr.attributeName);
+          if (match) {
+            initialAttrValues[match.id] = attr.value;
+          }
+        }
+      });
+    }
+
+    setProductForm({
+      title: p.name || '',
+      price: p.price ? p.price.toString() : '',
+      description: p.description || '',
+      category: categoryIdStr,
+      subcategory: p.subcategoryName || p.subcategory || '',
+      brandId: p.brandId ? p.brandId.toString() : '',
+      images: p.images || [],
+      imageFiles: [],
+      attributes: initialAttrValues
+    });
+
+    setIsProductModalOpen(true);
+  };
+
+  const handleSaveProduct = async () => {
+    if (!productForm.title.trim()) {
+      alert(t('adminPage.products.noTitle'));
+      return;
+    }
+    if (!productForm.category) {
+      alert("Выберите категорию");
+      return;
+    }
+
+    try {
+      const uploadedUrls: string[] = [...productForm.images];
+      for (const file of productForm.imageFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res: any = await api.upload('/Files/upload', formData);
+        if (res && res.url) {
+          uploadedUrls.push(res.url);
+        }
+      }
+
+      const attributesList = Object.entries(productForm.attributes)
+        .filter(([_, value]) => value.trim() !== '')
+        .map(([idStr, value]) => ({
+          attributeId: Number(idStr),
+          value: value.trim()
+        }));
+
+      const categoryObj = categories.find(c => c.id === Number(productForm.category));
+      const categoryName = categoryObj ? categoryObj.name : '';
+
+      const productPayload = {
+        name: productForm.title.trim(),
+        price: Number(productForm.price) || 0,
+        description: productForm.description.trim(),
+        categoryName: categoryName,
+        subcategoryName: productForm.subcategory || 'По умолчанию',
+        brandId: productForm.brandId ? Number(productForm.brandId) : null,
+        images: uploadedUrls,
+        attributes: attributesList
+      };
+
+      if (editingProduct) {
+        await api.put(`/Products/${editingProduct.id}`, productPayload);
+        alert(t('adminPage.products.savedOk'));
+      } else {
+        await api.post('/Products', productPayload);
+        alert(t('adminPage.products.addedOk'));
+      }
+
+      // Reload products list
+      const updatedProducts = await api.get('/Products');
+      setProducts(updatedProducts);
+
+      setIsProductModalOpen(false);
+      setEditingProduct(null);
+      setProductForm({
+        title: '',
+        price: '',
+        description: '',
+        category: '',
+        subcategory: '',
+        brandId: '',
+        images: [],
+        imageFiles: [],
+        attributes: {}
+      });
+    } catch (err) {
+      console.error('Error saving product', err);
+      alert('Ошибка при сохранении товара. Проверьте консоль.');
+    }
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    if (window.confirm(t('adminPage.products.deleteConfirm'))) {
+      try {
+        await api.delete(`/Products/${id}`);
+        setProducts(prev => prev.filter(item => item.id !== id));
+      } catch (err) {
+        console.error("Error deleting product:", err);
+        alert("Ошибка удаления товара: " + err);
+      }
+    }
+  };
+
+  const handleAddBrand = async () => {
+    if (!newBrandName.trim()) return;
+    try {
+      const created = await api.post('/Brands', { name: newBrandName.trim() });
+      setBrands(prev => [...prev, created]);
+      setNewBrandName('');
+      setIsAddingBrand(false);
+      setActiveTab('brands');
+    } catch (err) {
+      alert("Ошибка добавления бренда: " + err);
+    }
+  };
+
+  const handleDeleteBrand = async (id: number, name: string) => {
+    if (window.confirm(`Вы уверены, что хотите удалить бренд "${name}"?`)) {
+      try {
+        await api.delete(`/Brands/${id}`);
+        setBrands(prev => prev.filter(item => item.id !== id));
+      } catch (err) {
+        console.error("Error deleting brand:", err);
+        alert("Ошибка удаления бренда: " + err);
+      }
+    }
+  };
 
   const filteredProducts = products.filter(p => 
-    p.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    p.id.toString().toLowerCase().includes(searchQuery.toLowerCase()) || 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -200,6 +425,20 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                   if (activeTab === 'brands') {
                     setIsAddingBrand(true);
                   } else {
+                    // Reset attributes, subcategories, brand list
+                    setAttributes([]);
+                    setSubcategories([]);
+                    setProductForm({
+                      title: '',
+                      price: '',
+                      description: '',
+                      category: '',
+                      subcategory: '',
+                      brandId: '',
+                      images: [],
+                      imageFiles: [],
+                      attributes: {}
+                    });
                     setIsProductModalOpen(true);
                   }
                 }}
@@ -253,14 +492,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
               />
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button 
-                  onClick={() => {
-                    if (newBrandName.trim()) {
-                      setBrands([...brands, { id: Date.now(), name: newBrandName.trim() }]);
-                      setNewBrandName('');
-                      setIsAddingBrand(false);
-                      setActiveTab('brands');
-                    }
-                  }}
+                  onClick={handleAddBrand}
                   style={{
                     padding: '8px 20px',
                     backgroundColor: 'var(--primary-color)',
@@ -315,26 +547,15 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     </td>
                     <td style={{ padding: '12px', fontSize: '14px' }}>{p.price} MDL</td>
                     <td style={{ padding: '12px', fontSize: '14px' }}>
-                      {p.category}
+                      {p.categoryName || p.category}
                     </td>
                     <td style={{ padding: '12px', fontSize: '14px' }}>
-                      {p.subcategory}
+                      {p.subcategoryName || p.subcategory}
                     </td>
                     <td style={{ padding: '12px', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '25px', justifyContent: 'flex-end' }}>
                         <button 
-                          onClick={() => {
-                            setEditingProduct(p);
-                            setProductForm({
-                              title: p.name,
-                              price: p.price.toString(),
-                              category: Object.keys(CATEGORIES_DATA).find(key => (CATEGORIES_DATA as any)[key].label === p.category) || p.category,
-                              subcategory: p.subcategory,
-                              images: [], // In real app, load existing images
-                              imageFiles: []
-                            });
-                            setIsProductModalOpen(true);
-                          }}
+                          onClick={() => handleEditProductClick(p)}
                           style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
@@ -342,11 +563,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                           <Edit2 size={16} />
                         </button>
                         <button 
-                          onClick={() => {
-                            if (window.confirm(t('adminPage.products.deleteConfirm'))) {
-                              setProducts(products.filter(item => item.id !== p.id));
-                            }
-                          }}
+                          onClick={() => handleDeleteProduct(p.id)}
                           style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
@@ -383,10 +600,15 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     <td style={{ padding: '12px', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '25px', justifyContent: 'flex-end' }}>
                         <button 
-                          onClick={() => {
+                          onClick={async () => {
                             const newName = prompt('Введите новое название бренда:', b.name);
                             if (newName && newName.trim()) {
-                              setBrands(brands.map(item => item.id === b.id ? { ...item, name: newName.trim() } : item));
+                              try {
+                                await api.put(`/Brands/${b.id}`, { name: newName.trim() });
+                                setBrands(brands.map(item => item.id === b.id ? { ...item, name: newName.trim() } : item));
+                              } catch (err) {
+                                alert("Ошибка изменения бренда: " + err);
+                              }
                             }
                           }}
                           style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
@@ -396,11 +618,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                           <Edit2 size={16} />
                         </button>
                         <button 
-                          onClick={() => {
-                            if (window.confirm(`Вы уверены, что хотите удалить бренд "${b.name}"?`)) {
-                              setBrands(brands.filter(item => item.id !== b.id));
-                            }
-                          }}
+                          onClick={() => handleDeleteBrand(b.id, b.name)}
                           style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', transition: 'color 0.2s' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
@@ -441,7 +659,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
               <div style={{ 
                 backgroundColor: '#1a1b1c', 
                 width: '100%', 
-                maxWidth: '600px', 
+                maxWidth: '650px', 
                 borderRadius: '16px', 
                 border: '1px solid var(--border-color)',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
@@ -452,13 +670,13 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
               }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ margin: 0, color: '#fff', fontSize: '20px' }}>
-                  {editingProduct ? t('adminPage.products.editProduct') : t('adminPage.products.addProduct')}
+                    {editingProduct ? t('adminPage.products.editProduct') : t('adminPage.products.addProduct')}
                   </h3>
                   <button 
                     onClick={() => {
                       setIsProductModalOpen(false);
                       setEditingProduct(null);
-                      setProductForm({ title: '', price: '', category: '', subcategory: '', images: [], imageFiles: [] });
+                      setProductForm({ title: '', price: '', description: '', category: '', subcategory: '', brandId: '', images: [], imageFiles: [], attributes: {} });
                     }}
                     style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
                   >
@@ -486,16 +704,11 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         placeholder="0"
                         value={productForm.price}
                         onKeyDown={(e) => {
-                          // Allow: backspace, delete, tab, escape, enter and .
                           if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
-                             // Allow: Ctrl+A, Command+A
                             (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
-                             // Allow: home, end, left, right, down, up
                             (e.keyCode >= 35 && e.keyCode <= 40)) {
-                                 // let it happen, don't do anything
                                  return;
                           }
-                          // Ensure that it is a number and stop the keypress
                           if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
                               e.preventDefault();
                           }
@@ -514,16 +727,16 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                           borderRadius: '8px', 
                           color: '#fff', 
                           outline: 'none',
-                          // Hide spinners (though type is text now, good practice)
                           appearance: 'none'
                         }}
                       />
                     </div>
+                    
                     <div style={{ flex: 1 }}>
                       <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.categoryLabel')}</label>
                       <select 
                         value={productForm.category}
-                        onChange={(e) => setProductForm({...productForm, category: e.target.value, subcategory: ''})}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
                         style={{ 
                           width: '100%', 
                           padding: '12px', 
@@ -533,41 +746,112 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                           color: '#fff', 
                           outline: 'none', 
                           cursor: 'pointer',
-                          height: '45px' // Match input height
+                          height: '45px'
                         }}
                       >
                         <option value="">Выберите...</option>
-                        {Object.entries(CATEGORIES_DATA).map(([key, data]) => (
-                          <option key={key} value={key}>{data.label}</option>
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id.toString()}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '15px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.subcategoryLabel')}</label>
+                      <select 
+                        disabled={!productForm.category}
+                        value={productForm.subcategory}
+                        onChange={(e) => setProductForm({...productForm, subcategory: e.target.value})}
+                        style={{ 
+                          width: '100%', 
+                          padding: '12px', 
+                          backgroundColor: '#111', 
+                          border: '1px solid #333', 
+                          borderRadius: '8px', 
+                          color: productForm.category ? '#fff' : '#444', 
+                          outline: 'none', 
+                          cursor: productForm.category ? 'pointer' : 'not-allowed',
+                          height: '45px'
+                        }}
+                      >
+                        <option value="">{productForm.category ? 'Выберите...' : 'Сначала выберите категорию'}</option>
+                        {subcategories.map((sub: string) => (
+                          <option key={sub} value={sub}>{sub}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Бренд</label>
+                      <select 
+                        value={productForm.brandId}
+                        onChange={(e) => setProductForm({...productForm, brandId: e.target.value})}
+                        style={{ 
+                          width: '100%', 
+                          padding: '12px', 
+                          backgroundColor: '#111', 
+                          border: '1px solid #333', 
+                          borderRadius: '8px', 
+                          color: '#fff', 
+                          outline: 'none', 
+                          cursor: 'pointer',
+                          height: '45px'
+                        }}
+                      >
+                        <option value="">Выберите бренд (опционально)...</option>
+                        {brands.map((b) => (
+                          <option key={b.id} value={b.id.toString()}>{b.name}</option>
                         ))}
                       </select>
                     </div>
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.subcategoryLabel')}</label>
-                    <select 
-                      disabled={!productForm.category}
-                      value={productForm.subcategory}
-                      onChange={(e) => setProductForm({...productForm, subcategory: e.target.value})}
-                      style={{ 
-                        width: '100%', 
-                        padding: '12px', 
-                        backgroundColor: '#111', 
-                        border: '1px solid #333', 
-                        borderRadius: '8px', 
-                        color: productForm.category ? '#fff' : '#444', 
-                        outline: 'none', 
-                        cursor: productForm.category ? 'pointer' : 'not-allowed',
-                        height: '45px'
-                      }}
-                    >
-                      <option value="">{productForm.category ? 'Выберите...' : 'Сначала выберите категорию'}</option>
-                      {productForm.category && (CATEGORIES_DATA as any)[productForm.category].subcategories.map((sub: string) => (
-                        <option key={sub} value={sub}>{sub}</option>
-                      ))}
-                    </select>
+                    <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Описание</label>
+                    <textarea 
+                      placeholder="Введите описание товара..."
+                      value={productForm.description}
+                      onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                      style={{ width: '100%', height: '80px', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none', resize: 'vertical' }}
+                    />
                   </div>
+
+                  {/* Dynamic Characteristics */}
+                  {attributes.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <label style={{ display: 'block', color: '#888', fontSize: '14px', fontWeight: 600, borderBottom: '1px solid #333', paddingBottom: '6px' }}>
+                        Характеристики категории
+                      </label>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                        {attributes.map(attr => (
+                          <div key={attr.id} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <label style={{ display: 'block', color: '#aaa', fontSize: '13px' }}>{attr.name}</label>
+                            <input 
+                              type="text" 
+                              placeholder="Значение"
+                              list={`attr-options-${attr.id}`}
+                              value={productForm.attributes[attr.id] || ''}
+                              onChange={(e) => setProductForm({
+                                ...productForm,
+                                attributes: {
+                                  ...productForm.attributes,
+                                  [attr.id]: e.target.value
+                                }
+                              })}
+                              style={{ width: '100%', padding: '10px 12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none', fontSize: '14px' }}
+                            />
+                            <datalist id={`attr-options-${attr.id}`}>
+                              {(attr.options || attr.Options || []).map((opt: string) => (
+                                <option key={opt} value={opt} />
+                              ))}
+                            </datalist>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   <div>
                     <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.imagesLabel')}</label>
@@ -620,7 +904,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         </div>
                       ))}
 
-                      {/* Add Button (only if less than 5) */}
+                      {/* Add Button */}
                       {productForm.images.length < 5 && (
                         <div 
                           onClick={() => document.getElementById('product-image-upload')?.click()}
@@ -672,75 +956,17 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                 
                 <div style={{ padding: '20px', borderTop: '1px solid #333', display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
                   <button 
-                    onClick={() => setIsProductModalOpen(false)}
+                    onClick={() => {
+                      setIsProductModalOpen(false);
+                      setEditingProduct(null);
+                      setProductForm({ title: '', price: '', description: '', category: '', subcategory: '', brandId: '', images: [], imageFiles: [], attributes: {} });
+                    }}
                     style={{ padding: '10px 25px', backgroundColor: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
                   >
                     {t('common.cancel')}
                   </button>
                   <button 
-                    onClick={async () => {
-                      if (!productForm.title.trim()) {
-                        alert(t('adminPage.products.noTitle'));
-                        return;
-                      }
-                      
-                      try {
-                        // 1. Upload images first
-                        const uploadedUrls: string[] = [];
-                        for (const file of productForm.imageFiles) {
-                          const formData = new FormData();
-                          formData.append('file', file);
-                          const res: any = await api.upload('/Files/upload', formData);
-                          if (res && res.url) {
-                            uploadedUrls.push(res.url);
-                          }
-                        }
-
-                        // 2. Create product DTO
-                        const newProductDto = {
-                          name: productForm.title.trim(),
-                          price: Number(productForm.price) || 0,
-                          categoryName: (CATEGORIES_DATA as any)[productForm.category]?.label || productForm.category || 'Другое',
-                          subcategoryName: productForm.subcategory || 'По умолчанию',
-                          images: uploadedUrls
-                        };
-
-                        if (editingProduct) {
-                          // Update logic (we will just mock it for now on frontend as requested previously or do real put)
-                          // await api.put(`/Products/${editingProduct.id}`, newProductDto);
-                          setProducts(products.map(p => p.id === editingProduct.id ? {
-                            ...p,
-                            name: productForm.title.trim(),
-                            price: Number(productForm.price) || 0,
-                            category: newProductDto.categoryName,
-                            subcategory: newProductDto.subcategoryName
-                          } : p));
-                          alert(t('adminPage.products.savedOk'));
-                        } else {
-                          // 3. Send to backend
-                          const createdProduct: any = await api.post('/Products', newProductDto);
-                          
-                          // 4. Update UI
-                          const mappedProduct = {
-                            id: createdProduct.id.toString(),
-                            name: createdProduct.name,
-                            price: createdProduct.price,
-                            category: createdProduct.categoryName || newProductDto.categoryName,
-                            subcategory: createdProduct.subcategoryName || newProductDto.subcategoryName
-                          };
-                          
-                          setProducts([mappedProduct, ...products]);
-                          alert(t('adminPage.products.addedOk'));
-                        }
-                        
-                        setIsProductModalOpen(false);
-                        setEditingProduct(null);
-                        setProductForm({ title: '', price: '', category: '', subcategory: '', images: [], imageFiles: [] });
-                      } catch (err) {
-                        console.error('Error saving product', err);
-                        alert('Ошибка при сохранении товара. Проверьте консоль.');
-                      }
-                    }}
+                    onClick={handleSaveProduct}
                     style={{ padding: '10px 25px', backgroundColor: 'var(--primary-color)', border: 'none', borderRadius: '8px', color: '#000', cursor: 'pointer', fontWeight: 600 }}
                   >
                     {t('common.save') || 'Сохранить'}
@@ -1893,110 +2119,280 @@ export default function Admin() {
       navigate('/');
     }
   }, [user, navigate]);
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'specs' | 'categories' | 'subcategories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'reviewModeration'>(
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'categories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'reviewModeration'>(
     user?.role === 'manager' ? 'userDatabase' : 'dashboard'
   );
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view');
-    if (view && ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(view)) {
+    if (view && ['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(view)) {
       setActiveView(view as any);
     } else if (user?.role === 'admin') {
       // Since dashboard moved to profile, redirect admin to profile if no view is specified
       navigate('/profile');
     }
   }, [user, navigate]);
-  const [selectedSpecCategory, setSelectedSpecCategory] = useState<string | null>(null);
-  const [categorySpecs, setCategorySpecs] = useState<Record<string, string[]>>({});
-  const [isAddingParam, setIsAddingParam] = useState(false);
-  const [newParamName, setNewParamName] = useState('');
-  const [isEditingSpecs, setIsEditingSpecs] = useState(false);
-  const [categorySubcategories, setCategorySubcategories] = useState<Record<string, string[]>>({});
-  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [dbCategories, setDbCategories] = useState<{ id: number; name: string }[]>([]);
+  const [selectedDbCategory, setSelectedDbCategory] = useState<{ id: number; name: string } | null>(null);
+  const [dbAttributes, setDbAttributes] = useState<{ id: number; name: string; categoryId: number | null; options?: string[]; Options?: string[] }[]>([]);
+  const [subcategories, setSubcategories] = useState<string[]>([]);
 
-  const handleAddParam = () => {
-    if (!selectedSpecCategory || !newParamName.trim()) return;
+  useEffect(() => {
+    // subcategories are stored but not yet rendered in the admin panel
+    if (subcategories.length > 0) {
+      console.log("Subcategories stored in state:", subcategories);
+    }
+  }, [subcategories]);
+  
+  // UI editing states for attributes
+  const [editingAttributeId, setEditingAttributeId] = useState<number | null>(null);
+  const [editingAttributeName, setEditingAttributeName] = useState('');
+  const [isAddingAttribute, setIsAddingAttribute] = useState(false);
+  const [newAttributeName, setNewAttributeName] = useState('');
+  const [newAttributeNameEn, setNewAttributeNameEn] = useState('');
+
+  // UI states for attribute parameters
+  const [attributeParams, setAttributeParams] = useState<Record<number, string[]>>({});
+  const [addingParamAttributeId, setAddingParamAttributeId] = useState<number | null>(null);
+  const [newParamName, setNewParamName] = useState('');
+  const [newParamNameEn, setNewParamNameEn] = useState('');
+  const [editingParamAttributeId, setEditingParamAttributeId] = useState<number | null>(null);
+  const [editingParamIndex, setEditingParamIndex] = useState<number | null>(null);
+  const [editingParamValue, setEditingParamValue] = useState('');
+
+  // const [editingSubcategoryIndex, setEditingSubcategoryIndex] = useState<number | null>(null);
+  // const [editingSubcategoryName, setEditingSubcategoryName] = useState('');
+  // const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
+  // const [newSubcategoryName, setNewSubcategoryName] = useState('');
+
+  // const [categoryPriceFrom, setCategoryPriceFrom] = useState('');
+  // const [categoryPriceTo, setCategoryPriceTo] = useState('');
+  const [expandedFilterId, setExpandedFilterId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setAddingParamAttributeId(null);
+    setNewParamName('');
+    setNewParamNameEn('');
+    setEditingAttributeId(null);
+    setEditingAttributeName('');
+    setEditingParamAttributeId(null);
+    setEditingParamIndex(null);
+    setEditingParamValue('');
+  }, [expandedFilterId]);
+
+  const loadCategories = async () => {
+    try {
+      const data = await api.get('/Categories');
+      setDbCategories(data);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeView === 'categories') {
+      loadCategories();
+    }
+  }, [activeView]);
+
+  const handleSelectCategory = async (category: { id: number; name: string }) => {
+    setSelectedDbCategory(category);
+    setAddingParamAttributeId(null);
+    setNewParamName('');
+    setNewParamNameEn('');
+    setIsAddingAttribute(false);
+    setNewAttributeName('');
+    setNewAttributeNameEn('');
+    setEditingAttributeId(null);
+    setEditingAttributeName('');
+    setExpandedFilterId(null);
+    setEditingParamAttributeId(null);
+    setEditingParamIndex(null);
+    setEditingParamValue('');
     
-    const trimmedName = newParamName.trim();
-    const isSpecs = activeView === 'specs';
-    const currentData = isSpecs ? (categorySpecs[selectedSpecCategory] || []) : (categorySubcategories[selectedSpecCategory] || []);
-    
-    if (currentData.some(p => p.toLowerCase() === trimmedName.toLowerCase())) {
-      alert(`Такой ${isSpecs ? 'параметр' : 'подкатегория'} уже существует в этой категории`);
+    // Load attributes from database
+    try {
+      const attrs = await api.get(`/Attributes?categoryId=${category.id}`);
+      setDbAttributes(attrs);
+
+      // Load parameters for each attribute from the backend options list
+      const paramsMap: Record<number, string[]> = {};
+      attrs.forEach((attr: any) => {
+        paramsMap[attr.id] = attr.options || attr.Options || [];
+      });
+      setAttributeParams(paramsMap);
+    } catch (err) {
+      console.error("Failed to load attributes:", err);
+    }
+
+    // Load subcategories from localStorage or seed
+    const localKey = `subcategories_${category.name}`;
+    const stored = localStorage.getItem(localKey);
+    if (stored) {
+      setSubcategories(JSON.parse(stored));
+    } else {
+      const matched = Object.values(CATEGORIES_DATA).find(c => c.label === category.name);
+      const initialSubcats = matched ? matched.subcategories : [];
+      setSubcategories(initialSubcats);
+      localStorage.setItem(localKey, JSON.stringify(initialSubcats));
+    }
+  };
+
+  const handleAddAttribute = async () => {
+    if (!selectedDbCategory || !newAttributeName.trim()) return;
+    const combinedName = newAttributeNameEn.trim() ? `${newAttributeName.trim()} / ${newAttributeNameEn.trim()}` : newAttributeName.trim();
+    try {
+      const created = await api.post('/Attributes', {
+        name: combinedName,
+        categoryId: selectedDbCategory.id
+      });
+      setDbAttributes(prev => [...prev, created]);
+      setAttributeParams(prev => ({ ...prev, [created.id]: [] }));
+      setNewAttributeName('');
+      setNewAttributeNameEn('');
+      setIsAddingAttribute(false);
+    } catch (err) {
+      alert("Error adding characteristic: " + err);
+    }
+  };
+
+  const handleUpdateAttribute = async (id: number) => {
+    if (!selectedDbCategory || !editingAttributeName.trim()) return;
+    try {
+      await api.put(`/Attributes/${id}`, {
+        name: editingAttributeName.trim(),
+        categoryId: selectedDbCategory.id
+      });
+      setDbAttributes(prev => prev.map(a => a.id === id ? { ...a, name: editingAttributeName.trim() } : a));
+      setEditingAttributeId(null);
+    } catch (err) {
+      alert("Error updating characteristic: " + err);
+    }
+  };
+
+  const handleDeleteAttribute = async (id: number) => {
+    if (!window.confirm("Удалить эту характеристику?")) return;
+    try {
+      await api.delete(`/Attributes/${id}`);
+      setDbAttributes(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      alert("Error deleting characteristic: " + err);
+    }
+  };
+
+  const handleAddParam = async (attributeId: number) => {
+    const trimmedRu = newParamName.trim();
+    const trimmedEn = newParamNameEn.trim();
+    if (!trimmedRu) return;
+    const combinedParam = trimmedEn ? `${trimmedRu} / ${trimmedEn}` : trimmedRu;
+
+    const attribute = dbAttributes.find(a => a.id === attributeId);
+    if (!attribute) return;
+
+    const currentParams = attributeParams[attributeId] || [];
+    if (currentParams.includes(combinedParam)) {
+      alert("Этот параметр уже добавлен");
       return;
     }
 
-    if (isSpecs) {
-      setCategorySpecs(prev => ({
-        ...prev,
-        [selectedSpecCategory]: [...currentData, trimmedName]
-      }));
-    } else {
-      setCategorySubcategories(prev => ({
-        ...prev,
-        [selectedSpecCategory]: [...currentData, trimmedName]
-      }));
-    }
-    setNewParamName('');
-    setIsAddingParam(false);
-  };
-
-  const handleDeleteParam = (paramToDelete: string) => {
-    if (!selectedSpecCategory) return;
-    if (activeView === 'specs') {
-      setCategorySpecs(prev => ({
-        ...prev,
-        [selectedSpecCategory]: prev[selectedSpecCategory].filter(p => p !== paramToDelete)
-      }));
-    } else {
-      setCategorySubcategories(prev => ({
-        ...prev,
-        [selectedSpecCategory]: prev[selectedSpecCategory].filter(p => p !== paramToDelete)
-      }));
+    const updated = [...currentParams, combinedParam];
+    try {
+      await api.put(`/Attributes/${attributeId}`, {
+        name: attribute.name,
+        categoryId: attribute.categoryId,
+        options: updated
+      });
+      setAttributeParams(prev => ({ ...prev, [attributeId]: updated }));
+      setNewParamName('');
+      setNewParamNameEn('');
+      setAddingParamAttributeId(null);
+    } catch (err) {
+      alert("Ошибка добавления параметра: " + err);
     }
   };
 
-  const handleUpdateParam = (oldName: string, newName: string) => {
-    if (!selectedSpecCategory) return;
-    if (activeView === 'specs') {
-      setCategorySpecs(prev => ({
-        ...prev,
-        [selectedSpecCategory]: prev[selectedSpecCategory].map(p => p === oldName ? newName : p)
-      }));
-    } else {
-      setCategorySubcategories(prev => ({
-        ...prev,
-        [selectedSpecCategory]: prev[selectedSpecCategory].map(p => p === oldName ? newName : p)
-      }));
-    }
-  };
-
-  const handleDragStart = (idx: number) => {
-    setDraggedItemIndex(idx);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (targetIdx: number) => {
-    if (draggedItemIndex === null || draggedItemIndex === targetIdx || !selectedSpecCategory) return;
-
-    const isSpecs = activeView === 'specs';
-    const list = isSpecs ? [...(categorySpecs[selectedSpecCategory] || [])] : [...(categorySubcategories[selectedSpecCategory] || [])];
+  const handleDeleteParam = async (attributeId: number, indexToDelete: number) => {
+    if (!window.confirm("Удалить этот параметр?")) return;
     
-    const [movedItem] = list.splice(draggedItemIndex, 1);
-    list.splice(targetIdx, 0, movedItem);
+    const attribute = dbAttributes.find(a => a.id === attributeId);
+    if (!attribute) return;
 
-    if (isSpecs) {
-      setCategorySpecs(prev => ({ ...prev, [selectedSpecCategory]: list }));
-    } else {
-      setCategorySubcategories(prev => ({ ...prev, [selectedSpecCategory]: list }));
+    const currentParams = attributeParams[attributeId] || [];
+    const updated = currentParams.filter((_, idx) => idx !== indexToDelete);
+    try {
+      await api.put(`/Attributes/${attributeId}`, {
+        name: attribute.name,
+        categoryId: attribute.categoryId,
+        options: updated
+      });
+      setAttributeParams(prev => ({ ...prev, [attributeId]: updated }));
+    } catch (err) {
+      alert("Ошибка удаления параметра: " + err);
     }
-    
-    setDraggedItemIndex(null);
   };
+
+  const handleUpdateParam = async (attributeId: number, indexToUpdate: number) => {
+    const trimmed = editingParamValue.trim();
+    if (!trimmed) return;
+
+    const attribute = dbAttributes.find(a => a.id === attributeId);
+    if (!attribute) return;
+
+    const currentParams = attributeParams[attributeId] || [];
+    if (currentParams.some((p, idx) => p.toLowerCase() === trimmed.toLowerCase() && idx !== indexToUpdate)) {
+      alert("Этот параметр уже существует");
+      return;
+    }
+
+    const updated = currentParams.map((p, idx) => idx === indexToUpdate ? trimmed : p);
+    try {
+      await api.put(`/Attributes/${attributeId}`, {
+        name: attribute.name,
+        categoryId: attribute.categoryId,
+        options: updated
+      });
+      setAttributeParams(prev => ({ ...prev, [attributeId]: updated }));
+      setEditingParamAttributeId(null);
+      setEditingParamIndex(null);
+      setEditingParamValue('');
+    } catch (err) {
+      alert("Ошибка изменения параметра: " + err);
+    }
+  };
+
+  // const updateSubcategoriesStorage = (newSubcats: string[]) => {
+  //   if (!selectedDbCategory) return;
+  //   setSubcategories(newSubcats);
+  //   localStorage.setItem(`subcategories_${selectedDbCategory.name}`, JSON.stringify(newSubcats));
+  // };
+
+  // const handleAddSubcategory = () => {
+  //   if (!newSubcategoryName.trim() || !selectedDbCategory) return;
+  //   const trimmed = newSubcategoryName.trim();
+  //   if (subcategories.some(s => s.toLowerCase() === trimmed.toLowerCase())) {
+  //     alert("Такая подкатегория уже существует");
+  //     return;
+  //   }
+  //   const updated = [...subcategories, trimmed];
+  //   updateSubcategoriesStorage(updated);
+  //   setNewSubcategoryName('');
+  //   setIsAddingSubcategory(false);
+  // };
+
+  // const handleUpdateSubcategory = (index: number) => {
+  //   if (!editingSubcategoryName.trim() || !selectedDbCategory) return;
+  //   const trimmed = editingSubcategoryName.trim();
+  //   const updated = subcategories.map((s, idx) => idx === index ? trimmed : s);
+  //   updateSubcategoriesStorage(updated);
+  //   setEditingSubcategoryIndex(null);
+  // };
+
+  // const handleDeleteSubcategory = (index: number) => {
+  //   if (!window.confirm("Удалить подкатегорию?") || !selectedDbCategory) return;
+  //   const updated = subcategories.filter((_, idx) => idx !== index);
+  //   updateSubcategoriesStorage(updated);
+  // };
 
   const sections = [
     {
@@ -2005,8 +2401,7 @@ export default function Admin() {
       icon: <Package size={24} color="#A6CE39" />,
       actions: [
         { id: 'products', label: t('admin.actions.addEditDelete'), icon: <Plus size={16} /> },
-        { id: 'specs', label: t('admin.actions.specs'), icon: <Settings size={16} /> },
-        { id: 'categories', label: t('admin.actions.categoriesAndSubcategories'), icon: <Layers size={16} /> },
+        { id: 'categories', label: t('admin.actions.categoriesSubcategoriesSpecs'), icon: <Layers size={16} /> },
       ]
     },
     {
@@ -2015,7 +2410,6 @@ export default function Admin() {
       icon: <ShoppingBag size={24} color="#A6CE39" />,
       actions: [
         { id: 'viewOrders', label: t('admin.actions.viewOrders'), icon: <List size={16} /> },
-        { id: 'returns', label: t('admin.actions.returns'), icon: <RefreshCw size={16} /> },
         { id: 'tradeInRequests', label: t('admin.actions.tradeInRequests'), icon: <FileText size={16} /> },
       ]
     },
@@ -2032,11 +2426,11 @@ export default function Admin() {
   ];
 
   const handleActionClick = (actionId: string) => {
-    if (['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(actionId)) {
+    if (['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(actionId)) {
       setActiveView(actionId as any);
-      setSelectedSpecCategory(null); // Reset category when switching views
-      setIsEditingSpecs(false);
-      setIsAddingParam(false);
+      setSelectedDbCategory(null); // Reset category when switching views
+      setDbAttributes([]);
+      setSubcategories([]);
     } else {
       alert(`Feature "${actionId}" is coming soon!`);
     }
@@ -2125,6 +2519,7 @@ export default function Admin() {
             <div style={{ color: '#888', textAlign: 'center', padding: '100px 0' }}>{t('common.featureInProgress')}</div>
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
+              {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
                 <button 
                   onClick={() => navigate('/profile')}
@@ -2149,269 +2544,578 @@ export default function Admin() {
                   {t('common.back')}
                 </button>
                 <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: '#fff' }}>
-                  {activeView === 'specs' ? t('admin.actions.specs') : 
-                   activeView === 'categories' ? t('admin.actions.categoriesAndSubcategories') : 
-                   t('admin.actions.subcategories')}
+                  {t('admin.actions.categoriesSubcategoriesSpecs')}
                 </h2>
               </div>
 
-              <div style={{ display: 'flex', gap: '25px' }}>
-                <div style={{ width: '280px', flexShrink: 0 }}>
-                  <AdminSpecFilters 
-                    selectedCategory={selectedSpecCategory}
-                    hideTitle={activeView === 'categories'}
-                    onSelect={(cat) => {
-                      setSelectedSpecCategory(prev => prev === cat ? null : cat);
-                      setIsEditingSpecs(false);
-                    }}
-                  />
-                </div>
+              {/* Main Panel Grid */}
+              <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+                
+                {/* Categories Left Panel — 1:1 visual match with Filters sidebar */}
                 <div style={{ 
-                  flex: 1, 
-                  backgroundColor: 'var(--card-bg)', 
-                  borderRadius: '12px', 
+                  backgroundColor: '#0c0d0d',
                   border: '1px solid var(--border-color)',
-                  padding: '20px 20px 0px 20px',
-                  minHeight: '600px',
-                  position: 'relative'
+                  borderRadius: '12px',
+                  padding: '20px',
+                  color: 'var(--text-color)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '280px',
+                  flexShrink: 0
                 }}>
-                  {selectedSpecCategory && (
-                    <div style={{ 
-                      position: 'absolute', 
-                      top: '15px', 
-                      left: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      animation: 'fadeIn 0.3s ease'
-                    }}>
-                      <span style={{ fontSize: '18px', fontWeight: 600, color: '#fff' }}>
-                        {selectedSpecCategory}
-                      </span>
-                      <button 
-                        onClick={() => {
-                          const nextEditing = !isEditingSpecs;
-                          setIsEditingSpecs(nextEditing);
-                          if (!nextEditing) {
-                            setIsAddingParam(false);
-                            setNewParamName('');
-                          }
-                        }}
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          color: isEditingSpecs ? '#fff' : 'var(--primary-color)', 
-                          backgroundColor: isEditingSpecs ? 'var(--primary-color)' : 'transparent',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          padding: '4px',
-                          transition: 'all 0.2s',
-                          transform: isEditingSpecs ? 'scale(1.1)' : 'scale(1)'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isEditingSpecs) e.currentTarget.style.transform = 'scale(1.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isEditingSpecs) e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                        title={t('common.edit')}
-                      >
-                        <Edit2 size={20} />
-                      </button>
-                    </div>
-                  )}
-                  
-                  {!selectedSpecCategory ? (
-                    <div style={{ color: '#888', textAlign: 'center', marginTop: '100px' }} />
-                  ) : (
-                    <div style={{ marginTop: '60px', color: '#fff', animation: 'fadeIn 0.3s ease' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                        {(activeView === 'specs' ? (categorySpecs[selectedSpecCategory] || []) : (categorySubcategories[selectedSpecCategory] || [])).map((spec, idx) => (
-                          <div 
-                            key={`${selectedSpecCategory}-${idx}`}
-                            draggable={isEditingSpecs}
-                            onDragStart={() => handleDragStart(idx)}
-                            onDragOver={handleDragOver}
-                            onDrop={() => handleDrop(idx)}
-                            style={{ 
-                              padding: isEditingSpecs ? '4px 4px 4px 12px' : '12px 16px', 
-                              backgroundColor: draggedItemIndex === idx ? 'rgba(166, 206, 57, 0.1)' : 'rgba(255,255,255,0.03)', 
-                              borderRadius: '8px',
-                              border: draggedItemIndex === idx ? '1px dashed var(--primary-color)' : '1px solid var(--border-color)',
-                              fontSize: '14px',
-                              color: '#fff',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              height: '45px',
-                              cursor: isEditingSpecs ? 'grab' : 'default',
-                              opacity: draggedItemIndex === idx ? 0.8 : 1,
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            {isEditingSpecs ? (
-                              <>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                                  <GripVertical size={16} color="#444" style={{ cursor: 'grab' }} />
-                                  <input 
-                                    type="text"
-                                    value={spec}
-                                    onChange={(e) => handleUpdateParam(spec, e.target.value)}
-                                    style={{
-                                      backgroundColor: 'transparent',
-                                      border: 'none',
-                                      color: '#fff',
-                                      fontSize: '14px',
-                                      width: '100%',
-                                      outline: 'none',
-                                      padding: 0
-                                    }}
-                                  />
-                                </div>
-                                <button 
-                                  onClick={() => handleDeleteParam(spec)}
-                                  style={{ 
-                                    background: 'none', 
-                                    border: 'none', 
-                                    color: '#888', 
-                                    cursor: 'pointer',
-                                    width: '37px',
-                                    height: '37px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    transition: 'all 0.2s',
-                                    borderRadius: '6px'
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = '#ef4444';
-                                    e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#888';
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }}
-                                  title={t('common.delete')}
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              </>
-                            ) : (
-                              spec
-                            )}
-                          </div>
-                        ))}
-
-                        {isEditingSpecs && !isAddingParam && (
-                          <button 
-                            onClick={() => setIsAddingParam(true)}
-                            style={{ 
-                              backgroundColor: 'transparent', 
-                              border: '1px dashed var(--primary-color)', 
-                              color: 'var(--primary-color)',
-                              padding: '12px 16px',
-                              borderRadius: '8px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              fontSize: '14px',
-                              transition: 'all 0.2s',
-                              height: '45px'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = 'rgba(166, 206, 57, 0.05)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                            }}
-                          >
-                            <Plus size={16} />
-                            {t('common.add')} {activeView === 'specs' ? t('adminPage.products.addParamSpec') : t('adminPage.products.addParamSubcat')}
-                          </button>
-                        )}
-
-                        {isAddingParam && (
-                          <div style={{ 
+                  {/* Category rows */}
+                  {HARDCODED_CATEGORIES.map((cat, idx) => {
+                    const isSelected = selectedDbCategory?.name === cat.label;
+                    const isLast = idx === HARDCODED_CATEGORIES.length - 1;
+                    return (
+                      <div key={cat.key} style={{
+                        borderBottom: isLast ? 'none' : '1px solid var(--border-color)',
+                        paddingTop: idx === 0 ? '0' : '20px',
+                        paddingBottom: isLast ? '0' : '20px'
+                      }}>
+                        <button 
+                          onClick={async () => {
+                            // Toggle: if already selected — collapse/hide right panel
+                            if (isSelected) {
+                              setSelectedDbCategory(null);
+                              setDbAttributes([]);
+                              setSubcategories([]);
+                              setAddingParamAttributeId(null);
+                              setNewParamName('');
+                              setIsAddingAttribute(false);
+                              setNewAttributeName('');
+                              setEditingAttributeId(null);
+                              setEditingAttributeName('');
+                              setExpandedFilterId(null);
+                              setEditingParamAttributeId(null);
+                              setEditingParamIndex(null);
+                              setEditingParamValue('');
+                              return;
+                            }
+                            const dbCat = dbCategories.find(c => c.name === cat.label);
+                            if (dbCat) {
+                              handleSelectCategory(dbCat);
+                            } else {
+                              setSelectedDbCategory({ id: -1, name: cat.label });
+                              setDbAttributes([]);
+                              setSubcategories([]);
+                              setAddingParamAttributeId(null);
+                              setNewParamName('');
+                              setIsAddingAttribute(false);
+                              setNewAttributeName('');
+                              setEditingAttributeId(null);
+                              setEditingAttributeName('');
+                              setExpandedFilterId(null);
+                              setEditingParamAttributeId(null);
+                              setEditingParamIndex(null);
+                              setEditingParamValue('');
+                            }
+                          }}
+                          style={{ 
+                            width: '100%', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            background: 'none',
+                            border: 'none',
+                            color: isSelected ? 'var(--primary-color)' : 'var(--text-color)',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            lineHeight: 1.4,
+                            cursor: 'pointer',
+                            padding: 0,
+                            textAlign: 'left'
+                          }}
+                        >
+                          {cat.label}
+                          <div style={{
                             display: 'flex',
-                            gap: '8px',
-                            height: '45px',
-                            alignItems: 'center'
+                            color: isSelected ? 'var(--primary-color)' : 'inherit'
                           }}>
-                            <input 
-                              autoFocus
-                              type="text" 
-                              placeholder={activeView === 'specs' ? "Название параметра" : "Название подкатегории"} 
-                              value={newParamName}
-                              onChange={(e) => setNewParamName(e.target.value)}
-                              onKeyDown={(e) => e.key === 'Enter' && handleAddParam()}
-                              style={{ 
-                                flex: 1, 
-                                backgroundColor: 'rgba(255,255,255,0.03)', 
-                                border: '1px solid var(--border-color)', 
-                                borderRadius: '8px', 
-                                padding: '12px 16px', 
-                                color: '#fff',
-                                fontSize: '14px',
-                                height: '100%',
-                                transition: 'border-color 0.2s'
-                              }} 
-                              onFocus={(e) => e.currentTarget.style.borderColor = 'var(--primary-color)'}
-                              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
-                            />
-                            <button 
-                              onClick={handleAddParam}
-                              style={{ 
-                                backgroundColor: 'var(--primary-color)', 
-                                border: 'none', 
-                                color: '#000', 
-                                padding: '0 16px', 
-                                borderRadius: '8px', 
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                height: '100%',
-                                fontSize: '14px',
-                                transition: 'transform 0.2s'
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                              OK
-                            </button>
-                            <button 
-                              onClick={() => setIsAddingParam(false)}
-                              style={{ 
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-                                border: '1px solid rgba(239, 68, 68, 0.2)', 
-                                color: '#ef4444', 
-                                width: '45px',
-                                height: '45px',
-                                borderRadius: '8px', 
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-                                e.currentTarget.style.transform = 'scale(1.05)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                                e.currentTarget.style.transform = 'scale(1)';
-                              }}
-                              title={t('common.delete')}
-                            >
-                              <Trash2 size={18} />
-                            </button>
+                            {isSelected ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
                           </div>
-                        )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Right Panel Details (Subcategories & Characteristics) */}
+                <div style={{ flex: 1 }}>
+                  {!selectedDbCategory ? (
+                    <div style={{ 
+                      backgroundColor: 'var(--card-bg)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '12px',
+                      padding: '80px 20px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '15px',
+                      textAlign: 'center',
+                      minHeight: '400px'
+                    }}>
+                      <Layers size={48} color="#666" />
+                      <div style={{ color: '#888', fontSize: '16px' }}>
+                        Выберите категорию в меню слева для управления её характеристиками и подкатегориями
                       </div>
                     </div>
+                  ) : (
+                    <div style={{
+                      backgroundColor: 'var(--card-bg)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      minHeight: '400px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px'
+                    }}>
+
+                      {/* Filters section */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+
+                        {/* Filters list — above the add button */}
+                        {dbAttributes.map((attr, attrIdx) => {
+                          const isExpanded = expandedFilterId === attr.id;
+                          const isEditing = editingAttributeId === attr.id;
+                          return (
+                            <div key={attr.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                              {/* Filter row */}
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingTop: attrIdx === 0 ? '0' : '20px',
+                                paddingBottom: isExpanded ? '10px' : '20px'
+                              }}>
+                                {isEditing ? (
+                                  <div style={{ display: 'flex', gap: '6px', flex: 1, alignItems: 'center' }}>
+                                    <input
+                                      autoFocus
+                                      type="text"
+                                      value={editingAttributeName}
+                                      onChange={(e) => setEditingAttributeName(e.target.value)}
+                                      onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateAttribute(attr.id); if (e.key === 'Escape') setEditingAttributeId(null); }}
+                                      style={{
+                                        flex: 1,
+                                        backgroundColor: 'rgba(0,0,0,0.3)',
+                                        border: '1px solid var(--primary-color)',
+                                        borderRadius: '6px',
+                                        color: '#fff',
+                                        padding: '6px 10px',
+                                        fontSize: '20px',
+                                        outline: 'none'
+                                      }}
+                                    />
+                                    <button onClick={() => handleUpdateAttribute(attr.id)} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', display: 'flex' }}>
+                                      <Check size={16} />
+                                    </button>
+                                    <button onClick={() => setEditingAttributeId(null)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', display: 'flex' }}>
+                                      <X size={16} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setExpandedFilterId(isExpanded ? null : attr.id)}
+                                    style={{
+                                      flex: 1,
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      background: 'none',
+                                      border: 'none',
+                                      color: isExpanded ? 'var(--primary-color)' : 'var(--text-color)',
+                                      fontSize: '20px',
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                      padding: 0,
+                                      textAlign: 'left'
+                                    }}
+                                  >
+                                    {attr.name}
+                                    {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                                  </button>
+                                )}
+                                {!isEditing && (
+                                  <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
+                                    <button
+                                      onClick={() => { setEditingAttributeId(attr.id); setEditingAttributeName(attr.name); }}
+                                      style={{ 
+                                        background: 'none', 
+                                        border: 'none', 
+                                        color: '#555', 
+                                        cursor: 'pointer', 
+                                        padding: '4px', 
+                                        display: 'flex',
+                                        transition: 'color 0.2s'
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = '#555'}
+                                      title="Редактировать"
+                                    >
+                                      <Edit2 size={14} />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteAttribute(attr.id)}
+                                      style={{ 
+                                        background: 'none', 
+                                        border: 'none', 
+                                        color: '#555', 
+                                        cursor: 'pointer', 
+                                        padding: '4px', 
+                                        display: 'flex',
+                                        transition: 'color 0.2s'
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = '#555'}
+                                      title="Удалить"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Expanded block */}
+                              {isExpanded && (
+                                <div style={{ 
+                                  paddingBottom: '20px', 
+                                  paddingLeft: '20px', 
+                                  display: 'flex', 
+                                  flexDirection: 'column', 
+                                  gap: '10px' 
+                                }}>
+                                  {/* Parameters List */}
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {(attributeParams[attr.id] || []).map((param, paramIdx) => {
+                                      const isEditingParam = editingParamAttributeId === attr.id && editingParamIndex === paramIdx;
+                                      return isEditingParam ? (
+                                        <div 
+                                          key={paramIdx} 
+                                          style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}
+                                        >
+                                          <input
+                                            autoFocus
+                                            type="text"
+                                            value={editingParamValue}
+                                            onChange={(e) => setEditingParamValue(e.target.value)}
+                                            onKeyDown={(e) => { 
+                                              if (e.key === 'Enter') handleUpdateParam(attr.id, paramIdx); 
+                                              if (e.key === 'Escape') {
+                                                setEditingParamAttributeId(null);
+                                                setEditingParamIndex(null);
+                                                setEditingParamValue('');
+                                              } 
+                                            }}
+                                            style={{
+                                              width: '50%',
+                                              backgroundColor: 'rgba(0,0,0,0.3)',
+                                              border: '1px solid var(--primary-color)',
+                                              borderRadius: '8px',
+                                              padding: '12px 16px',
+                                              color: '#fff',
+                                              fontSize: '14px',
+                                              outline: 'none',
+                                              boxSizing: 'border-box',
+                                              height: '46px'
+                                            }}
+                                          />
+                                          <button 
+                                            onClick={() => handleUpdateParam(attr.id, paramIdx)} 
+                                            style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', display: 'flex', padding: '4px' }} 
+                                            title="Подтвердить"
+                                          >
+                                            <Check size={18} />
+                                          </button>
+                                          <button 
+                                            onClick={() => {
+                                              setEditingParamAttributeId(null);
+                                              setEditingParamIndex(null);
+                                              setEditingParamValue('');
+                                            }} 
+                                            style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', display: 'flex', padding: '4px' }} 
+                                            title="Отмена"
+                                          >
+                                            <X size={18} />
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div 
+                                          key={paramIdx} 
+                                          style={{ 
+                                            display: 'flex', 
+                                            justifyContent: 'space-between', 
+                                            alignItems: 'center', 
+                                            padding: '12px 16px', 
+                                            backgroundColor: 'rgba(255,255,255,0.02)', 
+                                            border: '1px solid var(--border-color)', 
+                                            borderRadius: '8px',
+                                            width: '50%',
+                                            boxSizing: 'border-box',
+                                            height: '46px'
+                                          }}
+                                        >
+                                          <span style={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}>{param}</span>
+                                          <div style={{ display: 'flex', gap: '4px' }}>
+                                            <button
+                                              onClick={() => {
+                                                setEditingParamAttributeId(attr.id);
+                                                setEditingParamIndex(paramIdx);
+                                                setEditingParamValue(param);
+                                              }}
+                                              style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                color: '#666', 
+                                                cursor: 'pointer', 
+                                                display: 'flex', 
+                                                padding: '4px',
+                                                transition: 'color 0.2s'
+                                              }}
+                                              onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+                                              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+                                              title="Редактировать параметр"
+                                            >
+                                              <Edit2 size={14} />
+                                            </button>
+                                            <button 
+                                              onClick={() => handleDeleteParam(attr.id, paramIdx)} 
+                                              style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                color: '#666', 
+                                                cursor: 'pointer', 
+                                                display: 'flex', 
+                                                padding: '4px',
+                                                transition: 'color 0.2s'
+                                              }}
+                                              onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
+                                              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+                                              title="Удалить параметр"
+                                            >
+                                              <Trash2 size={14} />
+                                            </button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {/* Add Parameter Button / Inline Form */}
+                                  {addingParamAttributeId !== attr.id ? (
+                                    <button
+                                      onClick={() => { setAddingParamAttributeId(attr.id); setNewParamName(''); setNewParamNameEn(''); }}
+                                      style={{
+                                        width: '50%',
+                                        backgroundColor: 'transparent',
+                                        border: '1px dashed var(--border-color)',
+                                        borderRadius: '8px',
+                                        color: '#888',
+                                        fontSize: '14px',
+                                        fontWeight: 500,
+                                        padding: '12px 16px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        textAlign: 'left',
+                                        boxSizing: 'border-box',
+                                        height: '46px',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--primary-color)';
+                                        e.currentTarget.style.color = 'var(--primary-color)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                                        e.currentTarget.style.color = '#888';
+                                      }}
+                                    >
+                                      + Добавить параметр
+                                    </button>
+                                  ) : (
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+                                      <div style={{
+                                        display: 'flex',
+                                        width: '50%',
+                                        backgroundColor: 'rgba(0,0,0,0.3)',
+                                        border: '1px solid var(--primary-color)',
+                                        borderRadius: '8px',
+                                        padding: '0 16px',
+                                        alignItems: 'center',
+                                        boxSizing: 'border-box',
+                                        height: '46px'
+                                      }}>
+                                        <input
+                                          autoFocus
+                                          type="text"
+                                          placeholder="RU"
+                                          value={newParamName}
+                                          onChange={(e) => setNewParamName(e.target.value)}
+                                          onKeyDown={(e) => { 
+                                            if (e.key === 'Enter') {
+                                              e.preventDefault();
+                                              document.getElementById(`newParamNameEn-${attr.id}`)?.focus();
+                                            }
+                                            if (e.key === 'Escape') setAddingParamAttributeId(null); 
+                                          }}
+                                          style={{
+                                            flex: 1,
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
+                                            color: '#fff',
+                                            fontSize: '14px',
+                                            outline: 'none',
+                                            padding: '12px 0'
+                                          }}
+                                        />
+                                        <span style={{ color: '#888', margin: '0 8px' }}>/</span>
+                                        <input
+                                          id={`newParamNameEn-${attr.id}`}
+                                          type="text"
+                                          placeholder="EN"
+                                          value={newParamNameEn}
+                                          onChange={(e) => setNewParamNameEn(e.target.value)}
+                                          onKeyDown={(e) => { 
+                                            if (e.key === 'Enter') handleAddParam(attr.id); 
+                                            if (e.key === 'Escape') setAddingParamAttributeId(null); 
+                                          }}
+                                          style={{
+                                            flex: 1,
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
+                                            color: '#fff',
+                                            fontSize: '14px',
+                                            outline: 'none',
+                                            padding: '12px 0'
+                                          }}
+                                        />
+                                      </div>
+                                      <button 
+                                        onClick={() => handleAddParam(attr.id)} 
+                                        style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', display: 'flex', padding: '4px' }} 
+                                        title="Подтвердить"
+                                      >
+                                        <Check size={18} />
+                                      </button>
+                                      <button 
+                                        onClick={() => setAddingParamAttributeId(null)} 
+                                        style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', display: 'flex', padding: '4px' }} 
+                                        title="Отмена"
+                                      >
+                                        <X size={18} />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                        {/* Add filter button / inline form — always at the bottom */}
+                        <div style={{ paddingTop: dbAttributes.length > 0 ? '20px' : '0px' }}>
+                          {!isAddingAttribute ? (
+                            <button
+                              onClick={() => { setIsAddingAttribute(true); setNewAttributeName(''); setNewAttributeNameEn(''); }}
+                              style={{
+                                width: '100%',
+                                backgroundColor: 'transparent',
+                                border: '1px dashed var(--border-color)',
+                                borderRadius: '8px',
+                                color: '#888',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                padding: '12px 16px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                textAlign: 'left'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--primary-color)';
+                                e.currentTarget.style.color = 'var(--primary-color)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--border-color)';
+                                e.currentTarget.style.color = '#888';
+                              }}
+                            >
+                              + Добавить фильтр
+                            </button>
+                          ) : (
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                              <div style={{
+                                flex: 1,
+                                display: 'flex',
+                                backgroundColor: 'rgba(0,0,0,0.3)',
+                                border: '1px solid var(--primary-color)',
+                                borderRadius: '6px',
+                                alignItems: 'center',
+                                padding: '0 12px'
+                              }}>
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  placeholder="RU"
+                                  value={newAttributeName}
+                                  onChange={(e) => setNewAttributeName(e.target.value)}
+                                  onKeyDown={(e) => { 
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      document.getElementById('newAttributeNameEn')?.focus();
+                                    }
+                                    if (e.key === 'Escape') setIsAddingAttribute(false); 
+                                  }}
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    color: '#fff',
+                                    fontSize: '20px',
+                                    outline: 'none',
+                                    padding: '8px 0'
+                                  }}
+                                />
+                                <span style={{ color: '#888', margin: '0 8px' }}>/</span>
+                                <input
+                                  id="newAttributeNameEn"
+                                  type="text"
+                                  placeholder="EN"
+                                  value={newAttributeNameEn}
+                                  onChange={(e) => setNewAttributeNameEn(e.target.value)}
+                                  onKeyDown={(e) => { 
+                                    if (e.key === 'Enter') handleAddAttribute(); 
+                                    if (e.key === 'Escape') setIsAddingAttribute(false); 
+                                  }}
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    color: '#fff',
+                                    fontSize: '20px',
+                                    outline: 'none',
+                                    padding: '8px 0'
+                                  }}
+                                />
+                              </div>
+                              <button onClick={handleAddAttribute} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', display: 'flex', padding: '4px' }} title="Подтвердить">
+                                <Check size={18} />
+                              </button>
+                              <button onClick={() => setIsAddingAttribute(false)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', display: 'flex', padding: '4px' }} title="Отмена">
+                                <X size={18} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+
+                    </div>
                   )}
                 </div>
+
               </div>
             </div>
           )}

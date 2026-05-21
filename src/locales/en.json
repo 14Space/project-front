@@ -12,12 +12,10 @@
     },
     "actions": {
       "addEditDelete": "Add, edit, delete",
-      "specs": "Specifications Management",
-      "categoriesAndSubcategories": "Categories & Subcategories",
+      "categoriesSubcategoriesSpecs": "Categories, Filters, Parameters",
       "categories": "Categories",
       "subcategories": "Subcategories",
       "viewOrders": "All Orders",
-      "returns": "Returns & Cancellations",
       "tradeInRequests": "Trade-In Appraisal Requests",
       "userDatabase": "Customer List",
       "blockUser": "Access Management",
@@ -343,25 +341,25 @@
     "storage": {
       "title": "Storage Devices",
       "groups": [
-        { "title": "HDD Drives", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=HDD Drives" },
-        { "title": "SSD Drives", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD Drives" },
-        { "title": "SSD with PCIe 4.0", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/storage?subcategory=SSD with PCIe 4.0" }
+        { "title": "HDD Drives", "items": [], "image": "/subcategories/SUBCATEGORIES-hdd.png", "path": "/storage?subcategory=HDD Drives" },
+        { "title": "SSD Drives", "items": [], "image": "/subcategories/SUBCATEGORIES-ssd.png", "path": "/storage?subcategory=SSD Drives" },
+        { "title": "SSD with PCIe 4.0", "items": [], "image": "/subcategories/SUBCATEGORIES-ssd-psi4.png", "path": "/storage?subcategory=SSD with PCIe 4.0" }
       ]
     },
     "cases": {
       "title": "PC Cases",
       "groups": [
-        { "title": "With Fans", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=With Fans" },
-        { "title": "Mini ITX Case", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=Mini ITX Case" },
-        { "title": "With Glass Window", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases?subcategory=With Glass Window" }
+        { "title": "With Fans", "items": [], "image": "/subcategories/SUBCATEGORIES-with-culers.png", "path": "/cases?subcategory=With Fans" },
+        { "title": "Mini ITX Case", "items": [], "image": "/subcategories/SUBCATEGORIES-mini-itx.png", "path": "/cases?subcategory=Mini ITX Case" },
+        { "title": "With Glass Window", "items": [], "image": "/subcategories/SUBCATEGORIES-with-glass-panel.png", "path": "/cases?subcategory=With Glass Window" }
       ]
     },
     "cooling": {
       "title": "Cooling Systems",
       "groups": [
-        { "title": "Liquid Cooling", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Liquid Cooling" },
-        { "title": "Air Cooling", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Air Cooling" },
-        { "title": "Fans", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling?subcategory=Fans" }
+        { "title": "Liquid Cooling", "items": [], "image": "/subcategories/SUBCATEGORIES-water.png", "path": "/cooling?subcategory=Liquid Cooling" },
+        { "title": "Air Cooling", "items": [], "image": "/subcategories/SUBCATEGORIES-air.png", "path": "/cooling?subcategory=Air Cooling" },
+        { "title": "Fans", "items": [], "image": "/subcategories/SUBCATEGORIES-culers.png", "path": "/cooling?subcategory=Fans" }
       ]
     },
     "components": {
@@ -380,9 +378,9 @@
     "psus": {
       "title": "Power Supplies",
       "groups": [
-        { "title": "1600W and more", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=1600W and more" },
-        { "title": "80 PLUS Titanium", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=80 PLUS Titanium" },
-        { "title": "ATX", "items": [], "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/psus?subcategory=ATX" }
+        { "title": "1600W and more", "items": [], "image": "/subcategories/SUBCATEGORIES-bp-1600w+.png", "path": "/psus?subcategory=1600W and more" },
+        { "title": "80 PLUS Titanium", "items": [], "image": "/subcategories/SUBCATEGORIES-bp-80-plus-titanium.png", "path": "/psus?subcategory=80 PLUS Titanium" },
+        { "title": "ATX", "items": [], "image": "/subcategories/SUBCATEGORIES-bp-atx.png", "path": "/psus?subcategory=ATX" }
       ]
     }
   },

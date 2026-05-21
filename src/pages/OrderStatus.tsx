@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { HOT_DEALS } from '../constants/products';
 
 export default function OrderStatus() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { orders } = useAppContext();
 
   // Flatten orders: split each order into separate blocks per item
