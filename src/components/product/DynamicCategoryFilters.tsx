@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 import { api } from '../../api';
 import { getBilingualText } from '../../utils/bilingual';
 import Checkbox from '../ui/Checkbox';
@@ -18,26 +19,43 @@ interface DynamicCategoryFiltersProps {
 interface FilterSectionProps {
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
   hasBorder?: boolean;
 }
 
-const FilterSection = ({ title, children, hasBorder = true }: FilterSectionProps) => {
+const FilterSection = ({ title, children, defaultOpen = true, hasBorder = true }: FilterSectionProps) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
   return (
     <div style={{ 
       borderBottom: hasBorder ? '1px solid var(--border-color)' : 'none', 
       paddingTop: '20px',
       paddingBottom: hasBorder ? '20px' : '0'
     }}>
-      <div style={{ 
-        color: 'var(--text-color)',
-        fontSize: '16px',
-        fontWeight: 600,
-        lineHeight: 1.4,
-        marginBottom: '16px'
-      }}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ 
+          width: '100%', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          background: 'none',
+          border: 'none',
+          color: 'var(--text-color)',
+          fontSize: '16px',
+          fontWeight: 600,
+          lineHeight: 1.4,
+          textAlign: 'left',
+          cursor: 'pointer',
+          padding: 0
+        }}
+      >
         {title}
-      </div>
-      <div>{children}</div>
+        <div style={{ transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: 'flex' }}>
+          <ChevronDown size={18} />
+        </div>
+      </button>
+      {isOpen && <div style={{ marginTop: '20px' }}>{children}</div>}
     </div>
   );
 };
@@ -80,9 +98,16 @@ export default function DynamicCategoryFilters({
     fetchAttributes();
   }, [categoryName]);
 
-  // Sync subcategory URL parameter with the checkbox
+  // Track which subcategory URL value we've already applied, to avoid re-applying on every re-render
+  const appliedSubcategoryRef = useRef<string | null>(undefined as any);
+
+  // Sync subcategory URL parameter with the checkbox — only on first attributes load or URL change
   useEffect(() => {
     if (attributes.length === 0) return;
+
+    // If we already applied this exact subcategory value, do nothing
+    if (appliedSubcategoryRef.current === subcategory) return;
+    appliedSubcategoryRef.current = subcategory;
 
     // Find the subcategory attribute (if any)
     const subcatAttr = attributes.find(attr => {
@@ -102,23 +127,13 @@ export default function DynamicCategoryFilters({
       });
 
       if (matchingOption) {
-        // Only trigger update if it is not already the only selected option
-        const currentSelected = selectedFilters[subcatAttr.id] || [];
-        if (currentSelected.length !== 1 || currentSelected[0] !== matchingOption) {
-          onFilterChange({
-            ...selectedFilters,
-            [subcatAttr.id]: [matchingOption]
-          });
-        }
+        onFilterChange({
+          [subcatAttr.id]: [matchingOption]
+        });
       }
     } else {
-      // If subcategory parameter is empty but we have selection in this subcategory attribute, clear it
-      const currentSelected = selectedFilters[subcatAttr.id] || [];
-      if (currentSelected.length > 0) {
-        const nextFilters = { ...selectedFilters };
-        delete nextFilters[subcatAttr.id];
-        onFilterChange(nextFilters);
-      }
+      // subcategory param is absent — start with empty filters
+      onFilterChange({});
     }
   }, [subcategory, attributes]);
 
@@ -134,29 +149,49 @@ export default function DynamicCategoryFilters({
     });
   };
 
+  const isDefaultOpen = (title: string) => {
+    const lower = title.toLowerCase();
+    return (
+      lower.includes('подкатегори') ||
+      lower.includes('subcategory') ||
+      lower.includes('subcategories') ||
+      lower.includes('производител') ||
+      lower.includes('бренд') ||
+      lower.includes('brand') ||
+      lower.includes('brands')
+    );
+  };
+
   return (
-    <div className="sidebar" style={{
-      backgroundColor: 'transparent',
-      border: 'none',
-      borderRadius: '0',
-      padding: '0',
+    <div style={{
+      backgroundColor: '#0c0d0d',
+      border: '1px solid var(--border-color)',
+      borderRadius: '12px',
+      padding: '20px',
       color: 'var(--text-color)',
       display: 'flex',
       flexDirection: 'column'
     }}>
+      <div style={{ 
+        fontSize: '20px', 
+        fontWeight: 700, 
+        lineHeight: 1,
+        paddingBottom: '12px', 
+        borderBottom: '1px solid var(--border-color)',
+        margin: 0
+      }}>{t('filters.title')}</div>
+
       {/* Цена */}
-      <FilterSection title={t('filters.price')} hasBorder={true}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ color: 'var(--text-color)', fontSize: '14px' }}>от</span>
+      <FilterSection title={t('filters.price')} defaultOpen={true}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input 
             type="text" 
-            placeholder="" 
+            placeholder={t('filters.from')} 
             value={minPrice}
             onChange={(e) => onMinPriceChange(e.target.value.replace(/\D/g, ''))}
             style={{ 
-              flex: 1,
-              minWidth: 0,
-              backgroundColor: '#111111', 
+              width: '100%', 
+              backgroundColor: '#1a1a1a', 
               border: '1px solid var(--border-color)', 
               borderRadius: '6px', 
               padding: '8px 12px', 
@@ -164,17 +199,15 @@ export default function DynamicCategoryFilters({
               fontSize: '14px'
             }} 
           />
-          <span style={{ color: 'var(--text-secondary)' }}>-</span>
-          <span style={{ color: 'var(--text-color)', fontSize: '14px' }}>до</span>
+          <span style={{ color: 'var(--text-secondary)' }}>–</span>
           <input 
             type="text" 
-            placeholder="" 
+            placeholder={t('filters.to')} 
             value={maxPrice}
             onChange={(e) => onMaxPriceChange(e.target.value.replace(/\D/g, ''))}
             style={{ 
-              flex: 1,
-              minWidth: 0,
-              backgroundColor: '#111111', 
+              width: '100%', 
+              backgroundColor: '#1a1a1a', 
               border: '1px solid var(--border-color)', 
               borderRadius: '6px', 
               padding: '8px 12px', 
@@ -188,25 +221,30 @@ export default function DynamicCategoryFilters({
       {isLoading ? (
         <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>Загрузка фильтров...</div>
       ) : (
-        attributes.map((attr, index) => (
-          <FilterSection 
-            key={attr.id} 
-            title={getBilingualText(attr.name, i18n.language)}
-            hasBorder={index < attributes.length - 1}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {attr.options?.map((option, idx) => (
-                <Checkbox 
-                  key={idx}
-                  label={getBilingualText(option, i18n.language)}
-                  checked={(selectedFilters[attr.id] || []).includes(option)}
-                  onChange={() => handleOptionToggle(attr.id, option)}
-                />
-              ))}
-            </div>
-          </FilterSection>
-        ))
+        attributes.map((attr, index) => {
+          const titleText = getBilingualText(attr.name, i18n.language);
+          return (
+            <FilterSection 
+              key={attr.id} 
+              title={titleText}
+              defaultOpen={isDefaultOpen(titleText)}
+              hasBorder={index < attributes.length - 1}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {attr.options?.map((option, idx) => (
+                  <Checkbox 
+                    key={idx}
+                    label={getBilingualText(option, i18n.language)}
+                    checked={(selectedFilters[attr.id] || []).includes(option)}
+                    onChange={() => handleOptionToggle(attr.id, option)}
+                  />
+                ))}
+              </div>
+            </FilterSection>
+          );
+        })
       )}
     </div>
   );
 }
+
