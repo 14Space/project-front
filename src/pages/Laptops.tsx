@@ -13,7 +13,7 @@ export default function Laptops() {
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [selectedFilters, setSelectedFilters] = useState<Record<number, string[]>>({});
   
-  const { products: apiProducts, isLoading } = useCategoryProducts('Ноутбуки', {
+  const { products: apiProducts, isLoading, error } = useCategoryProducts('Ноутбуки', {
     minPrice,
     maxPrice,
     selectedFilters
@@ -41,10 +41,8 @@ export default function Laptops() {
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
-        ) : (
-          <ProductGrid 
+        {error && <div style={{ color: 'red', padding: '20px', background: '#330000', marginBottom: '20px' }}>Error: {error}</div>}
+        <ProductGrid isLoading={isLoading} 
             products={filteredAndSortedProducts} 
             sidebar={
               <DynamicCategoryFilters 
@@ -58,7 +56,6 @@ export default function Laptops() {
               />
             } 
           />
-        )}
       </div>
     </div>
   );

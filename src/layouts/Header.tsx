@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Heart, Scale, ShoppingCart, Search, Menu, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import AuthModal from '../components/layout/AuthModal';
 import AuthRequiredModal from '../components/layout/AuthRequiredModal';
 import { useAppContext } from '../context/AppContext';
 import { HOT_DEALS } from '../constants/products';
+import { api } from '../api';
 
 export default function Header() {
   const { t, i18n } = useTranslation();
@@ -21,15 +22,27 @@ export default function Header() {
     i18n.changeLanguage(nextLang);
   };
 
-  const compareItems = HOT_DEALS.filter(p => compareList.includes(p.id));
+  const [compareProducts, setCompareProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCompare = async () => {
+      try {
+        const promises = compareList.map(id => api.get(`/Products/${id}`).catch(() => null));
+        const results = await Promise.all(promises);
+        setCompareProducts(results.filter(p => p !== null));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (compareList.length > 0) fetchCompare();
+    else setCompareProducts([]);
+  }, [compareList]);
+
   const cartItemCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
   // Группировка товаров для сравнения по категориям
-  const groupedCompare = compareItems.reduce((acc, product) => {
-    const localizedCat = product.category === 'gpu' ? t('footer.links.gpus') :
-                        product.category === 'cpu' ? t('footer.links.cpus') :
-                        product.category === 'mb' ? t('catalog.components.groups.0.items.2') : 
-                        t('footer.links.laptops');
+  const groupedCompare = compareProducts.reduce((acc, product) => {
+    const localizedCat = product.categoryName || 'Другое';
     
     if (!acc[localizedCat]) acc[localizedCat] = 0;
     acc[localizedCat]++;

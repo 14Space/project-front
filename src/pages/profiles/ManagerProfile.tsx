@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { LogOut, Edit2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import AdminUsers from '../../components/admin/AdminUsers';
+import AdminDashboard from '../../components/admin/AdminDashboard';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -149,8 +149,19 @@ const ManagerProfile: React.FC = () => {
             )}
           </div>
 
-          {/* User Database Section below */}
-          <AdminUsers hideHeader={true} />
+          {/* Administration section - separate block */}
+          {!isEditing && (
+            <AdminDashboard 
+              onAction={(actionId) => {
+                const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog'];
+                if (allowedViews.includes(actionId)) {
+                  navigate(`/admin?view=${actionId}`);
+                } else {
+                  alert(t('common.featureInProgress'));
+                }
+              }} 
+            />
+          )}
         </div>
       </section>
     </div>

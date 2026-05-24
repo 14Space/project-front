@@ -63,7 +63,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
               <ChevronLeft size={18} /> {t('common.back')}
             </button>
           )}
-          <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{user?.role === 'manager' ? t('adminPage.users.title') : t('adminPage.users.clientList')}</h2>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{user?.role === 'admin' ? t('adminPage.users.title') : t('adminPage.users.clientList')}</h2>
           <div style={{ position: 'absolute', right: 0, width: '300px' }}>
             <input type="text" placeholder={t('adminPage.users.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '10px 15px 10px 40px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: '#111', color: '#fff', fontSize: '14px', outline: 'none' }} />
             <Search size={16} color="#888" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />

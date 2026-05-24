@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout.tsx'
 import Home from './pages/Home.tsx'
+import ProductDetails from './pages/ProductDetails.tsx'
 import Profile from './pages/Profile.tsx'
 import Favorites from './pages/Favorites.tsx'
 import Compare from './pages/Compare.tsx'
@@ -93,6 +94,7 @@ export default function App() {
             <Route path="/furniture" element={<Furniture />} />
             <Route path="/merch" element={<Merch />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
 
           </Route>
         </Routes>

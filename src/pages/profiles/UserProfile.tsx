@@ -3,6 +3,7 @@ import { useAppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, LogOut, Edit2, Plus, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { api } from '../../api';
 
 const UserProfile: React.FC = () => {
   const { user, logout, updateUser } = useAppContext();
@@ -12,6 +13,9 @@ const UserProfile: React.FC = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isCityOpen, setIsCityOpen] = React.useState(false);
   const [emailError, setEmailError] = React.useState(false);
+  const [orders, setOrders] = React.useState<any[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = React.useState(true);
+
   const [formData, setFormData] = React.useState({
     name: '',
     lastName: '',
@@ -31,6 +35,12 @@ const UserProfile: React.FC = () => {
         city: user.city || t('profile.cities.chisinau'),
         street: user.street || ''
       });
+      
+      setIsLoadingOrders(true);
+      api.get('/Orders/my')
+        .then((res: any) => setOrders(res))
+        .catch(err => console.error("Failed to load orders", err))
+        .finally(() => setIsLoadingOrders(false));
     }
   }, [user, t]);
 
@@ -294,9 +304,54 @@ const UserProfile: React.FC = () => {
 
           <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '12px', padding: '20px', border: '1px solid var(--border-color)', marginTop: '20px' }}>
             <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', marginBottom: '20px' }}>{t('profile.orders')}</h2>
-            <div style={{ color: '#888', textAlign: 'center', padding: '40px 0', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
-              {t('profile.noOrders')}
-            </div>
+            
+            {isLoadingOrders ? (
+              <div style={{ color: '#888', textAlign: 'center', padding: '40px 0' }}>{t('common.loading', 'Loading...')}</div>
+            ) : orders.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {orders.map(order => (
+                  <div key={order.id} style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+                      <div>
+                        <span style={{ color: '#fff', fontWeight: 600, fontSize: '16px' }}>{t('profile.order', 'Заказ')} #{order.id}</span>
+                        <div style={{ color: '#888', fontSize: '13px', marginTop: '4px' }}>
+                          {new Date(order.orderDate).toLocaleString()}
+                        </div>
+                      </div>
+                      <div style={{ 
+                        padding: '6px 12px', 
+                        borderRadius: '20px', 
+                        fontSize: '12px', 
+                        fontWeight: 600,
+                        backgroundColor: order.status === 'Pending' ? 'rgba(255, 165, 0, 0.1)' : 
+                                         order.status === 'Returned' ? 'rgba(255, 77, 77, 0.1)' : 'rgba(166, 206, 57, 0.1)',
+                        color: order.status === 'Pending' ? '#ffa500' : 
+                               order.status === 'Returned' ? '#ff4d4d' : '#A6CE39'
+                      }}>
+                        {order.status}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px' }}>
+                      {order.items.map((item: any, idx: number) => (
+                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#ccc' }}>
+                          <span style={{ display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', paddingRight: '10px' }}>
+                            {item.name} <span style={{ color: '#888' }}>x{item.quantity}</span>
+                          </span>
+                          <span style={{ flexShrink: 0 }}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ textAlign: 'right', fontWeight: 700, color: '#fff', fontSize: '18px' }}>
+                      {t('profile.total', 'Итого')}: {order.totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: '#888', textAlign: 'center', padding: '40px 0', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
+                {t('profile.noOrders')}
+              </div>
+            )}
           </div>
         </div>
       </section>

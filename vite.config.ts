@@ -7,4 +7,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/images': {
+        target: 'http://localhost:5036',
+        changeOrigin: true,
+      }
+    }
+  }
 })

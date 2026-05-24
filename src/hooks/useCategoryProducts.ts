@@ -39,7 +39,9 @@ export function useCategoryProducts(categoryName: string, filters?: CategoryFilt
           });
         }
 
+        console.log('Fetching products with URL:', url);
         const data = await api.get(url);
+        console.log('Received data:', data);
         
         const mapped: Product[] = data.map((p: any) => ({
           id: p.id.toString(),

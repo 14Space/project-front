@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Heart, Scale, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 import { getImgUrl } from '../../utils/image';
+import { getBilingualText } from '../../utils/bilingual';
 
 interface ProductCardProps {
   id?: string;
@@ -25,7 +27,8 @@ export default function ProductCard({
   specs = ['16GB GDDR6', 'DLSS 3.0', 'Ray Tracing'], 
   images = ['/products/GPU-zaglushka.png'] 
 }: ProductCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { toggleFavorite, toggleCompare, isInFavorites, isInCompare, toggleCart, isInCart } = useAppContext();
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -86,6 +89,7 @@ export default function ProductCard({
           setIsHovered(false);
           setCurrentImgIndex(0);
         }}
+        onClick={() => navigate(`/product/${id}`)}
       >
         {/* 1. Верхняя панель */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -226,11 +230,20 @@ export default function ProductCard({
             flexDirection: 'column',
             gap: '8px'
           }}>
-            {specs.map((spec, i) => (
-              <div key={i} style={{ fontSize: '13px', color: 'var(--text-color)' }}>
-                {spec}
-              </div>
-            ))}
+            {specs.map((spec, i) => {
+              const parts = spec.split(': ');
+              let displaySpec = spec;
+              if (parts.length === 2) {
+                const name = getBilingualText(parts[0], i18n.language);
+                const val = getBilingualText(parts[1], i18n.language);
+                displaySpec = `${name}: ${val}`;
+              }
+              return (
+                <div key={i} style={{ fontSize: '13px', color: 'var(--text-color)' }}>
+                  {displaySpec}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

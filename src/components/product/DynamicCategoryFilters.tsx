@@ -86,7 +86,18 @@ export default function DynamicCategoryFilters({
         if (cat) {
           // 2. Fetch attributes for this category
           const attrs = await api.get(`/Attributes?categoryId=${cat.id}`);
-          setAttributes(attrs);
+          
+          // Filter out old non-bilingual attributes if a bilingual version exists
+          const filteredAttrs = attrs.filter((attr: any, _index: number, self: any[]) => {
+            if (!attr.name.includes(' / ')) {
+              const ruName = attr.name.trim().toLowerCase();
+              const hasBilingual = self.some(a => a.id !== attr.id && a.name.includes(' / ') && a.name.split(' / ')[0].trim().toLowerCase() === ruName);
+              if (hasBilingual) return false;
+            }
+            return true;
+          });
+          
+          setAttributes(filteredAttrs);
         }
       } catch (err) {
         console.error('Failed to load attributes', err);

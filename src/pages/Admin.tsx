@@ -119,7 +119,14 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     if (categoryId) {
       try {
         const attrs = await api.get(`/Attributes?categoryId=${categoryId}`);
-        setAttributes(attrs);
+        // Filter out duplicate Russian-only attributes if a bilingual version exists
+        const filteredAttrs = attrs.filter((attr: any) => {
+          if (attr.id < 1000) {
+            return !attrs.some((a: any) => a.id >= 1000 && a.name.startsWith(attr.name + ' /'));
+          }
+          return true;
+        });
+        setAttributes(filteredAttrs);
       } catch (err) {
         console.error("Error loading attributes:", err);
       }
@@ -148,9 +155,22 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
 
     let attrs: any[] = [];
     let subcats: string[] = [];
+    const oldToNewMap: Record<number, number> = {};
+
     if (categoryObj) {
       try {
-        attrs = await api.get(`/Attributes?categoryId=${categoryObj.id}`);
+        const fetchedAttrs = await api.get(`/Attributes?categoryId=${categoryObj.id}`);
+        // Filter out duplicate Russian-only attributes if a bilingual version exists
+        attrs = fetchedAttrs.filter((attr: any) => {
+          if (attr.id < 1000) {
+            const newAttr = fetchedAttrs.find((a: any) => a.id >= 1000 && a.name.startsWith(attr.name + ' /'));
+            if (newAttr) {
+              oldToNewMap[attr.id] = newAttr.id;
+              return false;
+            }
+          }
+          return true;
+        });
         setAttributes(attrs);
       } catch (err) {
         console.error("Error loading attributes:", err);
@@ -173,8 +193,13 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     const initialAttrValues: Record<number, string> = {};
     if (p.attributes) {
       p.attributes.forEach((attr: any) => {
-        if (attr.attributeId) {
-          initialAttrValues[attr.attributeId] = attr.value;
+        let currentAttrId = attr.attributeId;
+        if (currentAttrId) {
+          // If this is an old attribute ID that was replaced by a new one, use the new ID
+          if (oldToNewMap[currentAttrId]) {
+            currentAttrId = oldToNewMap[currentAttrId];
+          }
+          initialAttrValues[currentAttrId] = attr.value;
         } else {
           const match = attrs.find(a => a.name === attr.attributeName);
           if (match) {
@@ -210,7 +235,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     }
 
     try {
-      const uploadedUrls: string[] = [...productForm.images];
+      const uploadedUrls: string[] = productForm.images.filter(img => !img.startsWith('data:'));
       for (const file of productForm.imageFiles) {
         const formData = new FormData();
         formData.append('file', file);
@@ -983,26 +1008,62 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
 
 const AdminOrders = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
-  const { orders, updateOrderStatus } = useAppContext();
+  const [orders, setOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusModal, setStatusModal] = useState<{ orderId: string, currentStatus: string } | null>(null);
+  const [userDetailsModal, setUserDetailsModal] = useState<any | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    updateOrderStatus(orderId, newStatus);
-    setStatusModal(null);
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const res: any = await api.get('/Orders');
+      setOrders(res);
+    } catch (err) {
+      console.error("Failed to load admin orders", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      await api.put(`/Orders/${orderId}/status`, { status: newStatus });
+      setOrders(prev => prev.map(o => o.id.toString() === orderId.toString() ? { ...o, status: newStatus } : o));
+      setStatusModal(null);
+    } catch (err) {
+      console.error("Failed to update status", err);
+      alert("Не удалось обновить статус");
+    }
+  };
+
+  const handleUserClick = async (userId: string) => {
+    try {
+      const res = await api.get(`/Users/${userId}`);
+      setUserDetailsModal(res);
+    } catch (err) {
+      console.error("Failed to load user data", err);
+      alert("Не удалось загрузить данные клиента");
+    }
   };
 
   const filteredOrders = orders.filter(order => 
-    order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.userId.toLowerCase().includes(searchQuery.toLowerCase())
+    order.id.toString().includes(searchQuery.toLowerCase()) ||
+    (order.username && order.username.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    const s = status.toLowerCase();
+    switch (s) {
       case 'pending': return '#eab308';
       case 'shipped': return '#3b82f6';
       case 'delivered': return '#A6CE39';
+      case 'returned': return '#ff4d4d';
       default: return '#888';
     }
   };
@@ -1088,11 +1149,11 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                     </button>
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
-                    {new Date(order.date).toLocaleDateString('ru-RU')}
+                    {new Date(order.orderDate || order.date).toLocaleDateString('ru-RU')}
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px' }}>
                     <button 
-                      onClick={() => alert(`Opening profile for ${order.userId}...`)}
+                      onClick={() => handleUserClick(order.userId)}
                       style={{ 
                         background: 'none', 
                         border: 'none', 
@@ -1103,11 +1164,11 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                         textDecoration: 'underline'
                       }}
                     >
-                      {order.userId}
+                      {order.username}
                     </button>
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {order.items.map(i => t(i.title)).join(', ')}
+                    {order.items.map((i: any) => i.name || i.title).join(', ')}
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', fontWeight: 600 }}>
                     {order.totalPrice.toLocaleString()} MDL
@@ -1121,7 +1182,7 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                       color: getStatusColor(order.status),
                       border: `1px solid ${getStatusColor(order.status)}40`
                     }}>
-                      {order.status === 'pending' ? t('adminPage.orders.statusPending') : order.status === 'shipped' ? t('adminPage.orders.statusShipped') : t('adminPage.orders.statusDelivered')}
+                      {order.status}
                     </span>
                   </td>
                   <td style={{ padding: '15px 20px' }}>
@@ -1180,9 +1241,10 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
               {[
-                { id: 'pending', label: 'В обработке' },
-                { id: 'shipped', label: 'Отправлен' },
-                { id: 'delivered', label: 'Доставлен' }
+                { id: 'Pending', label: 'В обработке (Pending)' },
+                { id: 'Shipped', label: 'Отправлен (Shipped)' },
+                { id: 'Delivered', label: 'Доставлен (Delivered)' },
+                { id: 'Returned', label: 'Возврат (Returned)' }
               ].map((status) => (
                 <div 
                   key={status.id}
@@ -1255,6 +1317,85 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                 {t('common.confirm')}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {userDetailsModal && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.85)', 
+          zIndex: 1000, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{ 
+            backgroundColor: '#111', 
+            border: '1px solid var(--border-color)', 
+            borderRadius: '16px', 
+            padding: '30px', 
+            width: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+            position: 'relative'
+          }}>
+            <button 
+              onClick={() => setUserDetailsModal(null)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
+            >
+              <X size={20} />
+            </button>
+
+            <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Данные клиента</h3>
+            <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>ID: {userDetailsModal.id}</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '30px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Email</span>
+                <span style={{ color: '#fff', fontSize: '15px' }}>{userDetailsModal.email || 'Не указано'}</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Имя и Фамилия</span>
+                <span style={{ color: '#fff', fontSize: '15px' }}>
+                  {userDetailsModal.username} {userDetailsModal.lastName || ''}
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Телефон</span>
+                <span style={{ color: '#fff', fontSize: '15px' }}>{userDetailsModal.phone || 'Не указано'}</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Адрес доставки</span>
+                <span style={{ color: '#fff', fontSize: '15px' }}>
+                  {userDetailsModal.city || userDetailsModal.street 
+                    ? `${userDetailsModal.city || ''}, ${userDetailsModal.street || ''}`
+                    : 'Не указан'}
+                </span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setUserDetailsModal(null)}
+              style={{ 
+                width: '100%', 
+                padding: '12px', 
+                borderRadius: '100px', 
+                border: 'none', 
+                backgroundColor: 'var(--primary-color)', 
+                color: '#000', 
+                fontSize: '14px', 
+                fontWeight: 600, 
+                cursor: 'pointer'
+              }}
+            >
+              Закрыть
+            </button>
           </div>
         </div>
       )}
