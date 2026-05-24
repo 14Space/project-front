@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, Edit2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AdminDashboard from '../../components/admin/AdminDashboard';
+import AdminUsers from '../../components/admin/AdminUsers';
 
 const AdminProfile: React.FC = () => {
   const { user, updateUser, logout } = useAppContext();
@@ -148,16 +149,21 @@ const AdminProfile: React.FC = () => {
 
           {/* Administration section - separate block */}
           {!isEditing && (
-            <AdminDashboard 
-              onAction={(actionId) => {
-                const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase'];
-                if (allowedViews.includes(actionId)) {
-                  navigate(`/admin?view=${actionId}`);
-                } else {
-                  alert(t('common.featureInProgress'));
-                }
-              }} 
-            />
+            <>
+              <AdminDashboard 
+                onAction={(actionId) => {
+                  const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase'];
+                  if (allowedViews.includes(actionId)) {
+                    navigate(`/admin?view=${actionId}`);
+                  } else {
+                    alert(t('common.featureInProgress'));
+                  }
+                }} 
+              />
+              <div style={{ marginTop: '30px' }}>
+                <AdminUsers hideHeader={true} />
+              </div>
+            </>
           )}
         </div>
       </section>

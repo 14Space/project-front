@@ -41,10 +41,7 @@ export default function GPUs() {
           <SortButtons onSortChange={setActiveSort} />
         </div>
         
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>Загрузка товаров...</div>
-        ) : (
-          <ProductGrid 
+        <ProductGrid isLoading={isLoading} 
             products={filteredAndSortedProducts} 
             sidebar={
               <DynamicCategoryFilters 
@@ -58,7 +55,6 @@ export default function GPUs() {
               />
             } 
           />
-        )}
       </div>
     </div>
   );

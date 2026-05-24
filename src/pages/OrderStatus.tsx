@@ -1,11 +1,27 @@
 import { PackageSearch, Clock, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAppContext } from '../context/AppContext';
 import { HOT_DEALS } from '../constants/products';
+import { api } from '../api';
+import { useEffect, useState } from 'react';
 
 export default function OrderStatus() {
   const { t, i18n } = useTranslation();
-  const { orders } = useAppContext();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res: any = await api.get('/Orders/my');
+        setOrders(res);
+      } catch (err) {
+        console.error("Failed to load orders", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   // Flatten orders: split each order into separate blocks per item
   const flattenedOrders = orders.flatMap(order => 
@@ -26,11 +42,18 @@ export default function OrderStatus() {
             </h1>
           </div>
 
-          {flattenedOrders.length > 0 ? (
+          {isLoading ? (
+            <div style={{ textAlign: 'center', padding: '100px 0', color: '#888' }}>
+              <p style={{ fontSize: '18px' }}>
+                {t('common.loading', 'Loading...')}
+              </p>
+            </div>
+          ) : flattenedOrders.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {flattenedOrders.map((order, idx) => {
                 const item = order.currentItem;
-                const product = HOT_DEALS.find(p => p.id === item.id);
+                const itemId = item.id || item.productId;
+                const product = HOT_DEALS.find(p => p.id === itemId?.toString());
                 const imagePath = product?.images[0] || item.image;
 
                 // Dynamic Status Translation
@@ -39,8 +62,10 @@ export default function OrderStatus() {
                   displayStatus = t('adminPage.orders.statusPending');
                 } else if (order.status === 'shipped') {
                   displayStatus = t('adminPage.orders.statusShipped');
-                } else if (order.status === 'delivered') {
-                  displayStatus = t('adminPage.orders.statusDelivered');
+                } else if (order.status?.toLowerCase() === 'delivered') {
+                  displayStatus = t('adminPage.orders.statusDelivered', 'Доставлен');
+                } else if (order.status?.toLowerCase() === 'returned') {
+                  displayStatus = t('adminPage.orders.statusReturned', 'Возврат');
                 }
 
                 const getStatusColor = (status: string) => {
@@ -48,28 +73,21 @@ export default function OrderStatus() {
                     case 'pending': return '#eab308'; // Yellow
                     case 'shipped': return '#3b82f6'; // Blue
                     case 'delivered': return '#A6CE39'; // Green
+                    case 'returned': return '#ff4d4d'; // Red
                     default: return '#888';
                   }
                 };
                 const statusColor = getStatusColor(order.status);
 
-                // Dynamic Date Formatting (with legacy support)
-                let displayDate = order.date;
-                const parsedDate = new Date(order.date);
-                if (!isNaN(parsedDate.getTime()) && order.date.includes('-')) { // Basic check for ISO or YYYY-MM-DD
+                // Dynamic Date Formatting
+                let displayDate = order.orderDate || order.date;
+                const parsedDate = new Date(order.orderDate || order.date);
+                if (!isNaN(parsedDate.getTime())) {
                   displayDate = parsedDate.toLocaleDateString(i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric'
                   });
-                } else if (i18n.language.startsWith('en')) {
-                  // Legacy support for hardcoded RU dates (very basic mapping for the screenshot case)
-                  displayDate = displayDate
-                    .replace('января', 'January').replace('февраля', 'February').replace('марта', 'March')
-                    .replace('апреля', 'April').replace('мая', 'May').replace('июня', 'June')
-                    .replace('июля', 'July').replace('августа', 'August').replace('сентября', 'September')
-                    .replace('октября', 'October').replace('ноября', 'November').replace('декабря', 'December')
-                    .replace(' г.', '');
                 }
 
                 return (
@@ -131,7 +149,7 @@ export default function OrderStatus() {
                       </div>
                       <div style={{ marginTop: '16px' }}>
                         <div style={{ color: '#ccc', fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>
-                          {t(item.title)}
+                          {t(item.title || item.name)}
                         </div>
                         <div style={{ color: '#888', fontSize: '13px' }}>
                           {t('orderStatus.quantity')}: {item.quantity}

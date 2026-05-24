@@ -1,21 +1,59 @@
+import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/home/ProductCard';
-import { HOT_DEALS } from '../constants/products';
+import { api } from '../api';
 
 export default function Cart() {
   const { t, i18n } = useTranslation();
 
-  const { cart, clearCart, updateCartQuantity, user, createOrder } = useAppContext();
-  const cartProducts = HOT_DEALS.filter(product => !!cart[product.id]);
+  const { cart, clearCart, updateCartQuantity, user } = useAppContext();
   const navigate = useNavigate();
+
+  const [cartProducts, setCartProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      setIsLoading(true);
+      const cartIds = Object.keys(cart);
+      try {
+        const promises = cartIds.map(id => api.get(`/Products/${id}`).catch(() => null));
+        const results = await Promise.all(promises);
+        const validProducts = results.filter(p => p !== null);
+        
+        const mapped = validProducts.map(p => ({
+          id: p.id.toString(),
+          code: p.id.toString().padStart(6, '0'),
+          title: p.name,
+          price: p.price,
+          oldPrice: p.oldPrice,
+          inStock: p.status === 'InStock' || p.status === 'В наличии' || p.status === 'Available',
+          images: p.images && p.images.length > 0 ? p.images : ['/subcategories/SUBCATEGORIES-zaglushka.png'],
+          specs: p.attributes ? p.attributes.slice(0, 3).map((a: any) => `${a.attributeName.split(' / ')[0]}: ${a.value.split(' / ')[0]}`) : []
+        }));
+        setCartProducts(mapped);
+      } catch (err) {
+        console.error('Failed to load cart', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (Object.keys(cart).length > 0) {
+      fetchCart();
+    } else {
+      setCartProducts([]);
+      setIsLoading(false);
+    }
+  }, [cart]);
 
   const totalPrice = cartProducts.reduce((sum, product) => sum + (product.price * cart[product.id]), 0);
   const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!user) {
       alert(i18n.language.startsWith('ru') ? 'Для оформления заказа необходимо войти в аккаунт.' : 'You must log in to place an order.');
       return;
@@ -29,24 +67,22 @@ export default function Cart() {
       return;
     }
 
-    const orderData = {
-      id: `ORD-${Math.floor(10000000 + Math.random() * 90000000)}`, // 8-digit format as requested
-      userId: user.id,
-      items: cartProducts.map(p => ({ 
-        id: p.id, 
-        quantity: cart[p.id], 
-        title: p.title, 
-        price: p.price,
-        image: p.images[0]
-      })),
-      totalPrice,
-      status: 'pending', // Use 'pending' as default status
-      date: new Date().toISOString()
-    };
+    const productIds: number[] = [];
+    cartProducts.forEach(p => {
+      const qty = cart[p.id];
+      for (let i = 0; i < qty; i++) {
+        productIds.push(parseInt(p.id));
+      }
+    });
 
-    createOrder(orderData);
-    clearCart();
-    navigate('/order-status');
+    try {
+      await api.post('/Orders', productIds);
+      clearCart();
+      navigate('/order-status');
+    } catch (err) {
+      console.error('Failed to create order', err);
+      alert(i18n.language.startsWith('ru') ? 'Не удалось оформить заказ. Попробуйте еще раз.' : 'Failed to place order. Please try again.');
+    }
   };
 
   return (

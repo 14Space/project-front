@@ -57,9 +57,6 @@ interface AppContextType {
   login: (userData: User) => void;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
-  orders: Order[];
-  createOrder: (order: Order) => void;
-  updateOrderStatus: (orderId: string, status: string) => void;
   tradeInRequests: TradeInRequest[];
   createTradeInRequest: (request: TradeInRequest) => void;
   updateTradeInRequest: (requestId: string, updates: Partial<TradeInRequest>) => void;
@@ -127,11 +124,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('app_orders');
-    return saved ? JSON.parse(saved) : [];
-  });
-
   const [tradeInRequests, setTradeInRequests] = useState<TradeInRequest[]>(() => {
     const saved = localStorage.getItem('app_tradein');
     return saved ? JSON.parse(saved) : [];
@@ -148,16 +140,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    const key = user ? `favorites_${user.id}` : 'favorites';
+    localStorage.setItem(key, JSON.stringify(favorites));
+  }, [favorites, user?.id]);
 
   useEffect(() => {
-    localStorage.setItem('compareList', JSON.stringify(compareList));
-  }, [compareList]);
+    const key = user ? `compareList_${user.id}` : 'compareList';
+    localStorage.setItem(key, JSON.stringify(compareList));
+  }, [compareList, user?.id]);
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    const key = user ? `cart_${user.id}` : 'cart';
+    localStorage.setItem(key, JSON.stringify(cart));
+  }, [cart, user?.id]);
+
+  useEffect(() => {
+    if (user) {
+      // Merge guest lists with user-specific lists on login
+      const userFavsStr = localStorage.getItem(`favorites_${user.id}`);
+      const userFavs = userFavsStr ? JSON.parse(userFavsStr) : [];
+      setFavorites(prev => Array.from(new Set([...prev, ...userFavs])));
+
+      const userCompStr = localStorage.getItem(`compareList_${user.id}`);
+      const userComp = userCompStr ? JSON.parse(userCompStr) : [];
+      setCompareList(prev => Array.from(new Set([...prev, ...userComp])));
+
+      const userCartStr = localStorage.getItem(`cart_${user.id}`);
+      const userCart = userCartStr ? JSON.parse(userCartStr) : {};
+      setCart(prev => {
+        const merged = { ...userCart };
+        for (const [id, qty] of Object.entries(prev)) {
+          merged[id] = (merged[id] || 0) + (qty as number);
+        }
+        return merged;
+      });
+    } else {
+      // Clear lists when logging out
+      setFavorites([]);
+      setCompareList([]);
+      setCart({});
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (user) {
@@ -166,10 +189,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.removeItem('user');
     }
   }, [user]);
-
-  useEffect(() => {
-    localStorage.setItem('app_orders', JSON.stringify(orders));
-  }, [orders]);
 
   useEffect(() => {
     localStorage.setItem('app_tradein', JSON.stringify(tradeInRequests));
@@ -275,24 +294,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const createOrder = (order: Order) => {
-    setOrders(prev => [order, ...prev]);
-  };
-
-  const updateOrderStatus = (orderId: string, status: string) => {
-    setOrders(prev => prev.map(order => 
-      order.id === orderId ? { ...order, status } : order
+  const updateTradeInRequest = (requestId: string, updates: Partial<TradeInRequest>) => {
+    setTradeInRequests(prev => prev.map(req => 
+      req.id === requestId ? { ...req, ...updates } : req
     ));
   };
 
   const createTradeInRequest = (request: TradeInRequest) => {
     setTradeInRequests(prev => [request, ...prev]);
-  };
-
-  const updateTradeInRequest = (requestId: string, updates: Partial<TradeInRequest>) => {
-    setTradeInRequests(prev => prev.map(req => 
-      req.id === requestId ? { ...req, ...updates } : req
-    ));
   };
 
   const deleteTradeInRequest = (requestId: string) => {
@@ -331,9 +340,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       login,
       logout,
       updateUser,
-      orders,
-      createOrder,
-      updateOrderStatus,
       tradeInRequests,
       createTradeInRequest,
       updateTradeInRequest,
