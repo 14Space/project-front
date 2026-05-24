@@ -17,11 +17,14 @@ import {
   Trash2,
   X,
   MessageSquare,
-  Check
+  Check,
+  Filter
 } from 'lucide-react';
 
-import AdminProductFilters from '../components/admin/AdminProductFilters';
+
 import AdminUsers from '../components/admin/AdminUsers';
+import AdminBanners from '../components/admin/AdminBanners';
+import AdminProductFilters from '../components/admin/AdminProductFilters';
 import { useAppContext } from '../context/AppContext';
 import { api } from '../api';
 
@@ -76,6 +79,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const [productForm, setProductForm] = useState({
     title: '',
     price: '',
+    oldPrice: '',
+    status: 'Available',
     description: '',
     category: '', // DB Category ID string
     subcategory: '',
@@ -210,8 +215,10 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     }
 
     setProductForm({
-      title: p.name || '',
+      title: p.name,
       price: p.price ? p.price.toString() : '',
+      oldPrice: p.oldPrice ? p.oldPrice.toString() : '',
+      status: p.status || 'Available',
       description: p.description || '',
       category: categoryIdStr,
       subcategory: p.subcategoryName || p.subcategory || '',
@@ -258,6 +265,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
       const productPayload = {
         name: productForm.title.trim(),
         price: Number(productForm.price) || 0,
+        oldPrice: productForm.oldPrice ? Number(productForm.oldPrice) : null,
+        status: productForm.status,
         description: productForm.description.trim(),
         categoryName: categoryName,
         subcategoryName: productForm.subcategory || 'По умолчанию',
@@ -283,6 +292,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
       setProductForm({
         title: '',
         price: '',
+        oldPrice: '',
+        status: 'Available',
         description: '',
         category: '',
         subcategory: '',
@@ -439,7 +450,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                   backgroundColor: 'rgba(0,0,0,0.2)', 
                   border: '1px solid #333', 
                   borderRadius: '8px', 
-                  color: '#fff',
+                  color: '#fff', 
                   outline: 'none'
                 }} 
               />
@@ -456,6 +467,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     setProductForm({
                       title: '',
                       price: '',
+                      oldPrice: '',
+                      status: 'Available',
                       description: '',
                       category: '',
                       subcategory: '',
@@ -701,7 +714,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     onClick={() => {
                       setIsProductModalOpen(false);
                       setEditingProduct(null);
-                      setProductForm({ title: '', price: '', description: '', category: '', subcategory: '', brandId: '', images: [], imageFiles: [], attributes: {} });
+                      setProductForm({ title: '', price: '', oldPrice: '', status: 'Available', description: '', category: '', subcategory: '', brandId: '', images: [], imageFiles: [], attributes: {} });
                     }}
                     style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
                   >
@@ -725,23 +738,38 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     <div style={{ flex: 1 }}>
                       <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>{t('adminPage.products.priceLabel')}</label>
                       <input 
-                        type="text" 
+                        type="number"
                         placeholder="0"
                         value={productForm.price}
-                        onKeyDown={(e) => {
-                          if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
-                            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
-                            (e.keyCode >= 35 && e.keyCode <= 40)) {
-                                 return;
-                          }
-                          if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-                              e.preventDefault();
-                          }
-                        }}
                         onChange={(e) => {
                           const val = e.target.value;
-                          if (val === '' || /^\d+$/.test(val)) {
+                          if (val === '' || Number(val) >= 0) {
                             setProductForm({...productForm, price: val});
+                          }
+                        }}
+                        style={{ 
+                          width: '100%', 
+                          padding: '12px', 
+                          backgroundColor: '#111', 
+                          border: '1px solid #333', 
+                          borderRadius: '8px', 
+                          color: '#fff', 
+                          outline: 'none',
+                          appearance: 'none'
+                        }}
+                      />
+                    </div>
+                    
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Старая цена</label>
+                      <input 
+                        type="number"
+                        placeholder="0"
+                        value={productForm.oldPrice}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || Number(val) >= 0) {
+                            setProductForm({...productForm, oldPrice: val});
                           }
                         }}
                         style={{ 
@@ -829,6 +857,27 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         {brands.map((b) => (
                           <option key={b.id} value={b.id.toString()}>{b.name}</option>
                         ))}
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Наличие</label>
+                      <select 
+                        value={productForm.status}
+                        onChange={(e) => setProductForm({...productForm, status: e.target.value})}
+                        style={{ 
+                          width: '100%', 
+                          padding: '12px', 
+                          backgroundColor: '#111', 
+                          border: '1px solid #333', 
+                          borderRadius: '8px', 
+                          color: '#fff', 
+                          outline: 'none', 
+                          cursor: 'pointer',
+                          height: '45px'
+                        }}
+                      >
+                        <option value="Available">В наличии</option>
+                        <option value="Out of stock">Нет в наличии</option>
                       </select>
                     </div>
                   </div>
@@ -984,7 +1033,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                     onClick={() => {
                       setIsProductModalOpen(false);
                       setEditingProduct(null);
-                      setProductForm({ title: '', price: '', description: '', category: '', subcategory: '', brandId: '', images: [], imageFiles: [], attributes: {} });
+                      setProductForm({ title: '', price: '', oldPrice: '', status: 'Available', description: '', category: '', subcategory: '', brandId: '', images: [], imageFiles: [], attributes: {} });
                     }}
                     style={{ padding: '10px 25px', backgroundColor: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
                   >
@@ -2260,14 +2309,14 @@ export default function Admin() {
       navigate('/');
     }
   }, [user, navigate]);
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'categories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'reviewModeration'>(
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'categories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'editBanners'>(
     user?.role === 'manager' ? 'userDatabase' : 'dashboard'
   );
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view');
-    if (view && ['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(view)) {
+    if (view && ['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'editBanners'].includes(view)) {
       setActiveView(view as any);
     } else if (user?.role === 'admin') {
       // Since dashboard moved to profile, redirect admin to profile if no view is specified
@@ -2502,39 +2551,6 @@ export default function Admin() {
     }
   };
 
-  // const updateSubcategoriesStorage = (newSubcats: string[]) => {
-  //   if (!selectedDbCategory) return;
-  //   setSubcategories(newSubcats);
-  //   localStorage.setItem(`subcategories_${selectedDbCategory.name}`, JSON.stringify(newSubcats));
-  // };
-
-  // const handleAddSubcategory = () => {
-  //   if (!newSubcategoryName.trim() || !selectedDbCategory) return;
-  //   const trimmed = newSubcategoryName.trim();
-  //   if (subcategories.some(s => s.toLowerCase() === trimmed.toLowerCase())) {
-  //     alert("Такая подкатегория уже существует");
-  //     return;
-  //   }
-  //   const updated = [...subcategories, trimmed];
-  //   updateSubcategoriesStorage(updated);
-  //   setNewSubcategoryName('');
-  //   setIsAddingSubcategory(false);
-  // };
-
-  // const handleUpdateSubcategory = (index: number) => {
-  //   if (!editingSubcategoryName.trim() || !selectedDbCategory) return;
-  //   const trimmed = editingSubcategoryName.trim();
-  //   const updated = subcategories.map((s, idx) => idx === index ? trimmed : s);
-  //   updateSubcategoriesStorage(updated);
-  //   setEditingSubcategoryIndex(null);
-  // };
-
-  // const handleDeleteSubcategory = (index: number) => {
-  //   if (!window.confirm("Удалить подкатегорию?") || !selectedDbCategory) return;
-  //   const updated = subcategories.filter((_, idx) => idx !== index);
-  //   updateSubcategoriesStorage(updated);
-  // };
-
   const sections = [
     {
       id: 'catalog',
@@ -2561,13 +2577,13 @@ export default function Admin() {
       actions: [
         { id: 'userDatabase', label: t('admin.actions.userDatabase'), icon: <List size={16} /> },
         { id: 'editBlog', label: t('admin.actions.editBlog'), icon: <FileText size={16} /> },
-        { id: 'reviewModeration', label: t('admin.actions.reviewModeration'), icon: <MessageSquare size={16} /> },
+        { id: 'editBanners', label: t('admin.actions.editBanners'), icon: <Layers size={16} /> },
       ]
     }
   ];
 
   const handleActionClick = (actionId: string) => {
-    if (['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'reviewModeration'].includes(actionId)) {
+    if (['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'editBanners'].includes(actionId)) {
       setActiveView(actionId as any);
       setSelectedDbCategory(null); // Reset category when switching views
       setDbAttributes([]);
@@ -2656,8 +2672,8 @@ export default function Admin() {
             <AdminBlog onBack={() => navigate('/profile')} />
           ) : activeView === 'userDatabase' ? (
             <AdminUsers onBack={() => navigate('/profile')} />
-          ) : activeView === 'reviewModeration' ? (
-            <div style={{ color: '#888', textAlign: 'center', padding: '100px 0' }}>{t('common.featureInProgress')}</div>
+          ) : activeView === 'editBanners' ? (
+            <AdminBanners />
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
               {/* Header */}

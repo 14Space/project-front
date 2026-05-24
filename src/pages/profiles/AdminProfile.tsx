@@ -152,7 +152,7 @@ const AdminProfile: React.FC = () => {
             <>
               <AdminDashboard 
                 onAction={(actionId) => {
-                  const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase'];
+                  const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'editBanners'];
                   if (allowedViews.includes(actionId)) {
                     navigate(`/admin?view=${actionId}`);
                   } else {

@@ -19,8 +19,8 @@
       "tradeInRequests": "Trade-In Appraisal Requests",
       "userDatabase": "Customer List",
       "blockUser": "Access Management",
-      "editBlog": "Edit blog articles",
-      "reviewModeration": "Review Moderation"
+      "editBlog": "Edit Blog Articles",
+      "reviewModeration": "Banner Management"
     }
   },
   "common": {
@@ -127,7 +127,7 @@
       "addParamSubcat": "subcategory"
     },
     "reviews": {
-      "title": "Review Moderation",
+      "title": "Banner Management",
       "idProduct": "Product ID",
       "idClient": "Client ID",
       "rating": "Rating",

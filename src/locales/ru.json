@@ -20,7 +20,7 @@
       "userDatabase": "Список клиентов и управление",
       "blockUser": "Управление доступом",
       "editBlog": "Редактировать статьи блога",
-      "reviewModeration": "Модерация отзывов"
+      "reviewModeration": "Управление баннерами"
     }
   },
   "adminPage": {
@@ -99,7 +99,7 @@
       "addParamSubcat": "подкатегорию"
     },
     "reviews": {
-      "title": "Модерация отзывов",
+      "title": "Управление баннерами",
       "idProduct": "ID Товара",
       "idClient": "ID Клиента",
       "rating": "Рейтинг",
