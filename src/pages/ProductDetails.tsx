@@ -10,7 +10,7 @@ import { api } from '../api';
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toggleFavorite, toggleCompare, isInFavorites, isInCompare, toggleCart, isInCart } = useAppContext();
   
   const [product, setProduct] = useState<any>(null);
@@ -166,8 +166,15 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <div style={{ fontSize: '42px', fontWeight: 800, color: '#fff' }}>
-              {formatPrice(product.price)} MDL
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
+              <div style={{ fontSize: '42px', fontWeight: 800, color: product.oldPrice ? '#A6CE39' : '#fff' }}>
+                {formatPrice(product.price)} MDL
+              </div>
+              {product.oldPrice && (
+                <div style={{ fontSize: '24px', fontWeight: 600, color: '#888', textDecoration: 'line-through' }}>
+                  {formatPrice(product.oldPrice)} MDL
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '16px', marginTop: '10px' }}>

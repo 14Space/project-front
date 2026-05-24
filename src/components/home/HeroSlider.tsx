@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { api } from '../../api';
 
 interface HeroSliderProps {
   height?: string;
 }
 
-const slides = [
+const staticSlides = [
   { id: 1, image: '/hero/HERO-moza.png', alt: 'Moza' },
   { id: 2, image: '/hero/HERO-logitech.png', alt: 'Logitech' },
   { id: 3, image: '/hero/HERO-hator.png', alt: 'Hator' }
@@ -13,19 +14,42 @@ const slides = [
 
 export default function HeroSlider({ height }: HeroSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState<any[]>(staticSlides);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await api.get('/Banners');
+        const apiBanners = Array.isArray(res) ? res : [];
+        if (apiBanners.length > 0) {
+          const apiSlides = apiBanners.map((b: any) => ({
+            id: b.id,
+            image: b.imageUrl.startsWith('http') ? b.imageUrl : `http://localhost:5036${b.imageUrl}`,
+            alt: `Banner ${b.id}`,
+            link: b.link
+          }));
+          setSlides(apiSlides);
+        }
+      } catch (err) {
+        console.error("Failed to fetch banners, using static", err);
+      }
+    };
+    fetchBanners();
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(nextSlide, 7000);
     return () => clearInterval(timer);
-  }, [nextSlide]);
+  }, [nextSlide, slides.length]);
 
   return (
     <div style={{
@@ -49,7 +73,17 @@ export default function HeroSlider({ height }: HeroSliderProps) {
             height: '100%',
             opacity: currentSlide === index ? 1 : 0,
             transition: 'opacity 0.6s ease-in-out',
-            zIndex: currentSlide === index ? 1 : 0
+            zIndex: currentSlide === index ? 1 : 0,
+            cursor: slide.link ? 'pointer' : 'default'
+          }}
+          onClick={() => {
+            if (slide.link) {
+              if (slide.link.startsWith('http')) {
+                window.open(slide.link, '_blank');
+              } else {
+                window.location.href = slide.link;
+              }
+            }
           }}
         >
           <img

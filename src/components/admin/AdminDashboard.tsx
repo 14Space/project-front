@@ -7,8 +7,7 @@ import {
   Plus,
   Layers,
   List,
-  FileText,
-  MessageSquare
+  FileText
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -43,7 +42,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onAction }) => {
       icon: <Users size={24} color="#A6CE39" />,
       actions: [
         { id: 'editBlog', label: t('admin.actions.editBlog'), icon: <FileText size={16} /> },
-        { id: 'reviewModeration', label: t('admin.actions.reviewModeration'), icon: <MessageSquare size={16} /> },
+        { id: 'editBanners', label: t('admin.actions.reviewModeration'), icon: <Layers size={16} /> },
       ]
     }
   ];

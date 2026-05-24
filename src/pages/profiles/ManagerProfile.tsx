@@ -153,7 +153,7 @@ const ManagerProfile: React.FC = () => {
           {!isEditing && (
             <AdminDashboard 
               onAction={(actionId) => {
-                const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog'];
+                const allowedViews = ['products', 'specs', 'categories', 'subcategories', 'viewOrders', 'tradeInRequests', 'editBlog', 'editBanners'];
                 if (allowedViews.includes(actionId)) {
                   navigate(`/admin?view=${actionId}`);
                 } else {
