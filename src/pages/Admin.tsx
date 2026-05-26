@@ -18,7 +18,9 @@ import {
   X,
   MessageSquare,
   Check,
-  Filter
+  Filter,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 
 
@@ -28,27 +30,46 @@ import AdminProductFilters from '../components/admin/AdminProductFilters';
 import { useAppContext } from '../context/AppContext';
 import { api } from '../api';
 
-// Categories mapping
 const CATEGORIES_DATA = {
-  'PCs': {
+  'computers': {
     label: 'Компьютеры',
     subcategories: ['Игровые', 'Мини-ПК', 'Моноблоки', 'Рабочие станции']
   },
-  'Laptops': {
+  'laptops': {
     label: 'Ноутбуки',
-    subcategories: ['Игровые', 'Для учёбы', 'MacBook', 'Ультрабуки']
+    subcategories: ['Игровые', 'Для учёбы', 'MacBook']
   },
-  'Components': {
-    label: 'Комплектующие',
-    subcategories: ['Процессоры', 'Видеокарты', 'Материнские платы', 'Оперативная память', 'Накопители', 'Блоки питания', 'Корпуса', 'Охлаждение']
+  'cpus': {
+    label: 'Процессоры',
+    subcategories: ['Процессоры AMD с 3D V-Cache', 'Производительная iGPU', 'Процессор для игровых ПК', 'Процессор для рабочих станций']
   },
-  'Monitors': {
-    label: 'Мониторы',
-    subcategories: ['Игровые', '4K', 'Ultrawide', 'Офисные']
+  'gpus': {
+    label: 'Видеокарты',
+    subcategories: ['Игровая видеокарта NVIDIA', 'Игровая видеокарта AMD', 'Профессиональная видеокарта']
   },
-  'Peripherals': {
-    label: 'Периферия',
-    subcategories: ['Клавиатуры', 'Мыши', 'Наушники', 'Коврики']
+  'motherboards': {
+    label: 'Материнские платы',
+    subcategories: ['Для AMD', 'Для Intel', 'С Wi-Fi']
+  },
+  'ram': {
+    label: 'Оперативная память',
+    subcategories: ['Комплект 2x16 ГБ DDR5', 'Комплект 2x8 ГБ DDR5', 'DDR5 6000 МТ/с CL30']
+  },
+  'storage': {
+    label: 'Дисковые накопители',
+    subcategories: ['HDD накопитель', 'SSD накопитель', 'SSD с интерфейсом PCIe 4.0']
+  },
+  'cases': {
+    label: 'Корпуса',
+    subcategories: ['Корпус с предустановленными вентиляторами', 'Компактный Mini ITX корпус', 'Корпус с окном из закаленного стекла']
+  },
+  'cooling': {
+    label: 'Системы охлаждения',
+    subcategories: ['Водяное охлаждение для Intel 1700/AMD AM5', 'Воздушный кулер для Intel 1700/AMD AM5', 'Вентиляторы с подсветкой']
+  },
+  'psus': {
+    label: 'Блоки питания',
+    subcategories: ['1600 Вт и более', '80 PLUS Titanium', 'ATX']
   }
 };
 
@@ -93,6 +114,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const [products, setProducts] = useState<any[]>([]);
   const [brands, setBrands] = useState<{ id: number; name: string }[]>([]);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [topLevelCategories, setTopLevelCategories] = useState<{ id: number; name: string }[]>([]);
   const [attributes, setAttributes] = useState<{ id: number; name: string; options?: string[]; Options?: string[] }[]>([]);
   const [subcategories, setSubcategories] = useState<string[]>([]);
 
@@ -106,6 +128,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
       setProducts(prodData);
       setBrands(brandData);
       setCategories(catData);
+      setTopLevelCategories(catData.filter((c: any) => Object.values(CATEGORIES_DATA).some(cd => cd.label === c.name)));
     } catch (err) {
       console.error("Failed to fetch initial admin products data:", err);
     }
@@ -126,10 +149,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
         const attrs = await api.get(`/Attributes?categoryId=${categoryId}`);
         // Filter out duplicate Russian-only attributes if a bilingual version exists
         const filteredAttrs = attrs.filter((attr: any) => {
-          if (attr.id < 1000) {
-            return !attrs.some((a: any) => a.id >= 1000 && a.name.startsWith(attr.name + ' /'));
-          }
-          return true;
+          return !attrs.some((a: any) => a.id !== attr.id && a.name.startsWith(attr.name + ' /'));
         });
         setAttributes(filteredAttrs);
       } catch (err) {
@@ -140,11 +160,17 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
       if (categoryObj) {
         const localKey = `subcategories_${categoryObj.name}`;
         const stored = localStorage.getItem(localKey);
+        
+        const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
+        const initialSubcats = matched ? matched.subcategories : [];
+        
         if (stored) {
-          setSubcategories(JSON.parse(stored));
+          // Merge stored and initial to ensure new defaults always appear
+          const parsedStored = JSON.parse(stored);
+          const merged = Array.from(new Set([...initialSubcats, ...parsedStored]));
+          setSubcategories(merged);
+          localStorage.setItem(localKey, JSON.stringify(merged));
         } else {
-          const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
-          const initialSubcats = matched ? matched.subcategories : [];
           setSubcategories(initialSubcats);
           localStorage.setItem(localKey, JSON.stringify(initialSubcats));
         }
@@ -162,17 +188,18 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     let subcats: string[] = [];
     const oldToNewMap: Record<number, number> = {};
 
-    if (categoryObj) {
+    const subcatObj = categories.find(c => c.name === p.subcategoryName || c.name === p.subcategory);
+    const attrCategoryId = subcatObj ? subcatObj.id : (categoryObj ? categoryObj.id : null);
+
+    if (attrCategoryId) {
       try {
-        const fetchedAttrs = await api.get(`/Attributes?categoryId=${categoryObj.id}`);
+        const fetchedAttrs = await api.get(`/Attributes?categoryId=${attrCategoryId}`);
         // Filter out duplicate Russian-only attributes if a bilingual version exists
         attrs = fetchedAttrs.filter((attr: any) => {
-          if (attr.id < 1000) {
-            const newAttr = fetchedAttrs.find((a: any) => a.id >= 1000 && a.name.startsWith(attr.name + ' /'));
-            if (newAttr) {
-              oldToNewMap[attr.id] = newAttr.id;
-              return false;
-            }
+          const newAttr = fetchedAttrs.find((a: any) => a.id !== attr.id && a.name.startsWith(attr.name + ' /'));
+          if (newAttr) {
+            oldToNewMap[attr.id] = newAttr.id;
+            return false;
           }
           return true;
         });
@@ -180,15 +207,22 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
       } catch (err) {
         console.error("Error loading attributes:", err);
       }
+    }
 
+    if (categoryObj) {
       const localKey = `subcategories_${categoryObj.name}`;
       const stored = localStorage.getItem(localKey);
+      
+      const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
+      const initialSubcats = matched ? matched.subcategories : [];
+      
       if (stored) {
-        subcats = JSON.parse(stored);
+        const parsedStored = JSON.parse(stored);
+        const merged = Array.from(new Set([...initialSubcats, ...parsedStored]));
+        subcats = merged;
         setSubcategories(subcats);
+        localStorage.setItem(localKey, JSON.stringify(subcats));
       } else {
-        const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
-        const initialSubcats = matched ? matched.subcategories : [];
         subcats = initialSubcats;
         setSubcategories(subcats);
         localStorage.setItem(localKey, JSON.stringify(subcats));
@@ -229,6 +263,10 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     });
 
     setIsProductModalOpen(true);
+  };
+
+  const handleSubcategoryChange = (subName: string) => {
+    setProductForm(prev => ({ ...prev, subcategory: subName }));
   };
 
   const handleSaveProduct = async () => {
@@ -349,6 +387,34 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     p.id.toString().toLowerCase().includes(searchQuery.toLowerCase()) || 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const filteredBrandsForSelect = (() => {
+    if (!productForm.category) return brands;
+
+    const brandAttr = attributes.find(a => {
+      const lower = a.name.toLowerCase();
+      return lower.includes('производител') || lower.includes('brand') || lower.includes('manufacturer');
+    });
+
+    const opts = brandAttr?.options || (brandAttr as any)?.Options;
+
+    if (brandAttr && opts && opts.length > 0) {
+      const allowedNames = opts.map((opt: string) => opt.split(' / ')[0].trim().toLowerCase());
+      return brands.filter(b => {
+        const bName = b.name.split(' / ')[0].trim().toLowerCase();
+        return allowedNames.includes(bName) || 
+               allowedNames.some((a: string) => {
+                 // only allow includes if it's a multi-word brand name or separated by space
+                 if (bName === a) return true;
+                 if (bName.includes(` ${a} `) || bName.startsWith(`${a} `) || bName.endsWith(` ${a}`)) return true;
+                 if (a.includes(` ${bName} `) || a.startsWith(`${bName} `) || a.endsWith(` ${bName}`)) return true;
+                 return false;
+               });
+      });
+    }
+
+    return brands;
+  })();
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>
@@ -803,7 +869,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         }}
                       >
                         <option value="">Выберите...</option>
-                        {categories.map((c) => (
+                        {topLevelCategories.map((c) => (
                           <option key={c.id} value={c.id.toString()}>{c.name}</option>
                         ))}
                       </select>
@@ -816,7 +882,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                       <select 
                         disabled={!productForm.category}
                         value={productForm.subcategory}
-                        onChange={(e) => setProductForm({...productForm, subcategory: e.target.value})}
+                        onChange={(e) => handleSubcategoryChange(e.target.value)}
                         style={{ 
                           width: '100%', 
                           padding: '12px', 
@@ -854,7 +920,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
                         }}
                       >
                         <option value="">Выберите бренд (опционально)...</option>
-                        {brands.map((b) => (
+                        {filteredBrandsForSelect.map((b) => (
                           <option key={b.id} value={b.id.toString()}>{b.name}</option>
                         ))}
                       </select>
@@ -2551,6 +2617,66 @@ export default function Admin() {
     }
   };
 
+  const handleMoveParam = async (attributeId: number, index: number, direction: 'up' | 'down') => {
+    const attribute = dbAttributes.find(a => a.id === attributeId);
+    if (!attribute) return;
+
+    const currentParams = [...(attributeParams[attributeId] || [])];
+    if (direction === 'up' && index > 0) {
+      const temp = currentParams[index - 1];
+      currentParams[index - 1] = currentParams[index];
+      currentParams[index] = temp;
+    } else if (direction === 'down' && index < currentParams.length - 1) {
+      const temp = currentParams[index + 1];
+      currentParams[index + 1] = currentParams[index];
+      currentParams[index] = temp;
+    } else {
+      return;
+    }
+
+    const updated = currentParams;
+    try {
+      await api.put(`/Attributes/${attributeId}`, {
+        name: attribute.name,
+        categoryId: attribute.categoryId,
+        options: updated
+      });
+      setAttributeParams(prev => ({ ...prev, [attributeId]: updated }));
+    } catch (err) {
+      alert("Ошибка изменения порядка параметра: " + err);
+    }
+  };
+
+  const handleMoveAttribute = async (index: number, direction: 'up' | 'down') => {
+    const current = [...dbAttributes];
+    if (direction === 'up' && index > 0) {
+      const temp = current[index - 1];
+      current[index - 1] = current[index];
+      current[index] = temp;
+    } else if (direction === 'down' && index < current.length - 1) {
+      const temp = current[index + 1];
+      current[index + 1] = current[index];
+      current[index] = temp;
+    } else {
+      return;
+    }
+    
+    setDbAttributes(current);
+
+    try {
+      await Promise.all(current.map((attr, idx) => 
+        api.put(`/Attributes/${attr.id}`, { 
+          name: attr.name, 
+          categoryId: attr.categoryId, 
+          order: idx 
+        })
+      ));
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка изменения порядка характеристик");
+    }
+  };
+
   const sections = [
     {
       id: 'catalog',
@@ -2898,6 +3024,42 @@ export default function Admin() {
                                 {!isEditing && (
                                   <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
                                     <button
+                                      onClick={() => handleMoveAttribute(attrIdx, 'up')}
+                                      disabled={attrIdx === 0}
+                                      style={{ 
+                                        background: 'none', 
+                                        border: 'none', 
+                                        color: attrIdx === 0 ? '#333' : '#555', 
+                                        cursor: attrIdx === 0 ? 'default' : 'pointer', 
+                                        padding: '4px', 
+                                        display: 'flex',
+                                        transition: 'color 0.2s'
+                                      }}
+                                      onMouseEnter={(e) => { if (attrIdx !== 0) e.currentTarget.style.color = '#fff' }}
+                                      onMouseLeave={(e) => { if (attrIdx !== 0) e.currentTarget.style.color = '#555' }}
+                                      title="Поднять выше"
+                                    >
+                                      <ArrowUp size={14} />
+                                    </button>
+                                    <button
+                                      onClick={() => handleMoveAttribute(attrIdx, 'down')}
+                                      disabled={attrIdx === dbAttributes.length - 1}
+                                      style={{ 
+                                        background: 'none', 
+                                        border: 'none', 
+                                        color: attrIdx === dbAttributes.length - 1 ? '#333' : '#555', 
+                                        cursor: attrIdx === dbAttributes.length - 1 ? 'default' : 'pointer', 
+                                        padding: '4px', 
+                                        display: 'flex',
+                                        transition: 'color 0.2s'
+                                      }}
+                                      onMouseEnter={(e) => { if (attrIdx !== dbAttributes.length - 1) e.currentTarget.style.color = '#fff' }}
+                                      onMouseLeave={(e) => { if (attrIdx !== dbAttributes.length - 1) e.currentTarget.style.color = '#555' }}
+                                      title="Опустить ниже"
+                                    >
+                                      <ArrowDown size={14} />
+                                    </button>
+                                    <button
                                       onClick={() => { setEditingAttributeId(attr.id); setEditingAttributeName(attr.name); }}
                                       style={{ 
                                         background: 'none', 
@@ -3016,6 +3178,42 @@ export default function Admin() {
                                         >
                                           <span style={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}>{param}</span>
                                           <div style={{ display: 'flex', gap: '4px' }}>
+                                            <button
+                                              onClick={() => handleMoveParam(attr.id, paramIdx, 'up')}
+                                              disabled={paramIdx === 0}
+                                              style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                color: paramIdx === 0 ? '#333' : '#666', 
+                                                cursor: paramIdx === 0 ? 'default' : 'pointer', 
+                                                display: 'flex', 
+                                                padding: '4px',
+                                                transition: 'color 0.2s'
+                                              }}
+                                              onMouseEnter={(e) => { if (paramIdx !== 0) e.currentTarget.style.color = '#fff' }}
+                                              onMouseLeave={(e) => { if (paramIdx !== 0) e.currentTarget.style.color = '#666' }}
+                                              title="Поднять выше"
+                                            >
+                                              <ArrowUp size={14} />
+                                            </button>
+                                            <button
+                                              onClick={() => handleMoveParam(attr.id, paramIdx, 'down')}
+                                              disabled={paramIdx === (attributeParams[attr.id] || []).length - 1}
+                                              style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                color: paramIdx === (attributeParams[attr.id] || []).length - 1 ? '#333' : '#666', 
+                                                cursor: paramIdx === (attributeParams[attr.id] || []).length - 1 ? 'default' : 'pointer', 
+                                                display: 'flex', 
+                                                padding: '4px',
+                                                transition: 'color 0.2s'
+                                              }}
+                                              onMouseEnter={(e) => { if (paramIdx !== (attributeParams[attr.id] || []).length - 1) e.currentTarget.style.color = '#fff' }}
+                                              onMouseLeave={(e) => { if (paramIdx !== (attributeParams[attr.id] || []).length - 1) e.currentTarget.style.color = '#666' }}
+                                              title="Опустить ниже"
+                                            >
+                                              <ArrowDown size={14} />
+                                            </button>
                                             <button
                                               onClick={() => {
                                                 setEditingParamAttributeId(attr.id);
