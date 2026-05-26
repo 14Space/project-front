@@ -134,7 +134,14 @@ export default function DynamicCategoryFilters({
         const ruPart = getBilingualText(opt, 'ru').toLowerCase();
         const enPart = getBilingualText(opt, 'en').toLowerCase();
         const searchSubcat = subcategory.toLowerCase();
-        return ruPart === searchSubcat || enPart === searchSubcat || opt.toLowerCase() === searchSubcat;
+        
+        return ruPart === searchSubcat || 
+               enPart === searchSubcat || 
+               opt.toLowerCase() === searchSubcat ||
+               ruPart.includes(searchSubcat) ||
+               enPart.includes(searchSubcat) ||
+               searchSubcat.includes(ruPart) ||
+               searchSubcat.includes(enPart);
       });
 
       if (matchingOption) {
