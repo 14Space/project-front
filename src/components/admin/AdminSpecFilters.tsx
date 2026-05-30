@@ -19,7 +19,7 @@ export default function AdminSpecFilters({ selectedCategory, onSelect, hideTitle
     'Оперативная память',
     'Дисковые накопители',
     'Корпуса',
-    'Системы охлаждения',
+    'Охлаждение',
     'Блоки питания'
   ];
 

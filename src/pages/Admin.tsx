@@ -64,8 +64,8 @@ const CATEGORIES_DATA = {
     subcategories: ['Корпус с предустановленными вентиляторами', 'Компактный Mini ITX корпус', 'Корпус с окном из закаленного стекла']
   },
   'cooling': {
-    label: 'Системы охлаждения',
-    subcategories: ['Водяное охлаждение для Intel 1700/AMD AM5', 'Воздушный кулер для Intel 1700/AMD AM5', 'Вентиляторы с подсветкой']
+    label: 'Охлаждение',
+    subcategories: ['Водяное охлаждение', 'Воздушное охлаждение', 'Вентиляторы']
   },
   'psus': {
     label: 'Блоки питания',
@@ -158,22 +158,8 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
 
       const categoryObj = categories.find(c => c.id === categoryId);
       if (categoryObj) {
-        const localKey = `subcategories_${categoryObj.name}`;
-        const stored = localStorage.getItem(localKey);
-        
         const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
-        const initialSubcats = matched ? matched.subcategories : [];
-        
-        if (stored) {
-          // Merge stored and initial to ensure new defaults always appear
-          const parsedStored = JSON.parse(stored);
-          const merged = Array.from(new Set([...initialSubcats, ...parsedStored]));
-          setSubcategories(merged);
-          localStorage.setItem(localKey, JSON.stringify(merged));
-        } else {
-          setSubcategories(initialSubcats);
-          localStorage.setItem(localKey, JSON.stringify(initialSubcats));
-        }
+        setSubcategories(matched ? matched.subcategories : []);
       }
     }
   };
@@ -210,23 +196,9 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     }
 
     if (categoryObj) {
-      const localKey = `subcategories_${categoryObj.name}`;
-      const stored = localStorage.getItem(localKey);
-      
       const matched = Object.values(CATEGORIES_DATA).find(c => c.label === categoryObj.name);
-      const initialSubcats = matched ? matched.subcategories : [];
-      
-      if (stored) {
-        const parsedStored = JSON.parse(stored);
-        const merged = Array.from(new Set([...initialSubcats, ...parsedStored]));
-        subcats = merged;
-        setSubcategories(subcats);
-        localStorage.setItem(localKey, JSON.stringify(subcats));
-      } else {
-        subcats = initialSubcats;
-        setSubcategories(subcats);
-        localStorage.setItem(localKey, JSON.stringify(subcats));
-      }
+      subcats = matched ? matched.subcategories : [];
+      setSubcategories(subcats);
     }
 
     const initialAttrValues: Record<number, string> = {};
@@ -391,26 +363,42 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const filteredBrandsForSelect = (() => {
     if (!productForm.category) return brands;
 
-    const brandAttr = attributes.find(a => {
+    // Priority 1: find a "Manufacturers/Производители" attribute (user-managed list)
+    let brandAttr = attributes.find(a => {
       const lower = a.name.toLowerCase();
-      return lower.includes('производител') || lower.includes('brand') || lower.includes('manufacturer');
+      return lower.includes('производител') || lower.includes('manufacturer');
     });
+
+    // Priority 2: fall back to "Brand/Бренд" attribute
+    if (!brandAttr) {
+      brandAttr = attributes.find(a => {
+        const lower = a.name.toLowerCase();
+        return lower.includes('brand') || lower.includes('бренд');
+      });
+    }
 
     const opts = brandAttr?.options || (brandAttr as any)?.Options;
 
     if (brandAttr && opts && opts.length > 0) {
       const allowedNames = opts.map((opt: string) => opt.split(' / ')[0].trim().toLowerCase());
-      return brands.filter(b => {
+      const filtered = brands.filter(b => {
         const bName = b.name.split(' / ')[0].trim().toLowerCase();
-        return allowedNames.includes(bName) || 
-               allowedNames.some((a: string) => {
-                 // only allow includes if it's a multi-word brand name or separated by space
-                 if (bName === a) return true;
-                 if (bName.includes(` ${a} `) || bName.startsWith(`${a} `) || bName.endsWith(` ${a}`)) return true;
-                 if (a.includes(` ${bName} `) || a.startsWith(`${bName} `) || a.endsWith(` ${bName}`)) return true;
-                 return false;
-               });
+        return allowedNames.includes(bName);
       });
+
+      // Deduplicate by base name (preferring the clean version without slashes)
+      const uniqueBrands: typeof brands = [];
+      const seenNames = new Set<string>();
+      
+      for (const b of filtered) {
+        const bName = b.name.split(' / ')[0].trim().toLowerCase();
+        if (!seenNames.has(bName)) {
+          seenNames.add(bName);
+          const cleanVersion = filtered.find(fb => fb.name.split(' / ')[0].trim().toLowerCase() === bName && !fb.name.includes('/'));
+          uniqueBrands.push(cleanVersion || b);
+        }
+      }
+      return uniqueBrands;
     }
 
     return brands;

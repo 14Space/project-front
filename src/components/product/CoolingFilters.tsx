@@ -179,7 +179,7 @@ export default function CoolingFilters({
 
       {/* Подкатегории */}
       <FilterSection title={t('filters.subcategories')}>
-        {['Водяное охлаждение для Intel 1700/AMD AM5', 'Воздушный кулер для Intel 1700/AMD AM5', 'Вентиляторы с подсветкой'].map(label => (
+        {['Водяное охлаждение', 'Воздушное охлаждение', 'Вентиляторы'].map(label => (
           <Checkbox 
             key={label} 
             label={label} 

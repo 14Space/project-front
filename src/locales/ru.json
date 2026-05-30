@@ -184,7 +184,7 @@
     "ram": "Оперативная память",
     "storage": "Дисковые накопители",
     "cases": "Корпуса",
-    "cooling": "Системы охлаждения",
+    "cooling": "Охлаждение",
     "psus": "Блоки питания"
   },
   "home": {
@@ -418,7 +418,7 @@
       ]
     },
     "cooling": {
-      "title": "Системы охлаждения",
+      "title": "Охлаждение",
       "groups": [
         { "title": "Водяное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-water.png", "path": "/cooling?subcategory=Водяное охлаждение" },
         { "title": "Воздушное охлаждение", "items": [], "image": "/subcategories/SUBCATEGORIES-air.png", "path": "/cooling?subcategory=Воздушное охлаждение" },
@@ -459,7 +459,7 @@
           "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cases"
         },
         {
-          "title": "Системы охлаждения",
+          "title": "Охлаждение",
           "items": [],
           "image": "/subcategories/SUBCATEGORIES-zaglushka.png", "path": "/cooling"
         },
