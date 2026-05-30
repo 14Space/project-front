@@ -138,6 +138,7 @@ export default function PCBuild() {
   
   const [selectedParts, setSelectedParts] = useState<Record<string, Product | null>>({});
   const [activeCategory, setActiveCategory] = useState<{ id: string, name: string } | null>(null);
+  const [needAssembly, setNeedAssembly] = useState(false);
 
   const handleSelect = (product: Product) => {
     if (activeCategory) {
@@ -150,7 +151,7 @@ export default function PCBuild() {
     setSelectedParts(prev => ({ ...prev, [id]: null }));
   };
 
-  const totalPrice = Object.values(selectedParts).reduce((sum, product) => sum + (product ? product.price : 0), 0);
+  const totalPrice = Object.values(selectedParts).reduce((sum, product) => sum + (product ? product.price : 0), 0) + (needAssembly ? 500 : 0);
   const totalCount = Object.values(selectedParts).filter(p => p !== null).length;
 
   const handleAddAllToCart = () => {
@@ -160,6 +161,11 @@ export default function PCBuild() {
         updateCartQuantity(product.id, currentQty + 1);
       }
     });
+    if (needAssembly) {
+      const assemblyProductId = '42';
+      const currentQty = cart[assemblyProductId] || 0;
+      updateCartQuantity(assemblyProductId, currentQty + 1);
+    }
     window.scrollTo(0, 0);
     navigate('/cart');
   };
@@ -280,6 +286,40 @@ export default function PCBuild() {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px', alignItems: 'center' }}>
                 <span style={{ color: '#fff', fontSize: '18px', fontWeight: 600 }}>Общая сумма:</span>
                 <span style={{ color: 'var(--primary-color)', fontSize: '28px', fontWeight: 800 }}>{totalPrice} MDL</span>
+              </div>
+
+              <div 
+                onClick={() => setNeedAssembly(!needAssembly)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '12px',
+                  padding: '15px',
+                  marginBottom: '20px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--primary-color)'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+              >
+                <input 
+                  type="checkbox" 
+                  checked={needAssembly} 
+                  onChange={() => {}} // handled by div click
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    accentColor: 'var(--primary-color)',
+                    cursor: 'pointer'
+                  }} 
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>Сборка компьютера</div>
+                  <div style={{ color: '#888', fontSize: '12px' }}>Профессиональный монтаж и тест (+500 MDL)</div>
+                </div>
               </div>
 
               <button 

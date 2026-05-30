@@ -14,7 +14,7 @@ export default function Cooling() {
   const [selectedFilters, setSelectedFilters] = useState<Record<number, string[]>>({});
   
   // Backend fetching and filtering
-  const { products: apiProducts, isLoading } = useCategoryProducts('Системы охлаждения', {
+  const { products: apiProducts, isLoading } = useCategoryProducts('Охлаждение', {
     minPrice,
     maxPrice,
     selectedFilters
@@ -49,7 +49,7 @@ export default function Cooling() {
           isLoading={isLoading}
           sidebar={
             <DynamicCategoryFilters
-              categoryName="Системы охлаждения"
+              categoryName="Охлаждение"
               selectedFilters={selectedFilters}
               onFilterChange={setSelectedFilters}
               minPrice={minPrice}

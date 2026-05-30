@@ -143,7 +143,7 @@ export default function AdminProductFilters() {
     {
       id: 'cooling',
       title: t('sidebar.cooling'),
-      items: ['Водяное охлаждение для Intel 1700/AMD AM5', 'Воздушный кулер для Intel 1700/AMD AM5', 'Вентиляторы с подсветкой']
+      items: ['Водяное охлаждение', 'Воздушное охлаждение', 'Вентиляторы']
     },
     {
       id: 'psus',
