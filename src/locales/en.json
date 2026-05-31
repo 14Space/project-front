@@ -645,11 +645,14 @@
       "categories": {
         "computers": "Computers",
         "laptops": "Laptops",
-        "components": "PC Components",
-        "monitors": "Monitors",
-        "peripherals": "Peripherals",
-        "consoles": "Consoles",
-        "networking": "Networking Equipment"
+        "cpus": "Processors",
+        "gpus": "Graphics Cards",
+        "motherboards": "Motherboards",
+        "ram": "RAM",
+        "storage": "Storage Devices",
+        "cases": "PC Cases",
+        "cooling": "Cooling Systems",
+        "psus": "PSUs"
       }
     }
   },
