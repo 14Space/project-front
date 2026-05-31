@@ -180,3 +180,28 @@ ul {
 .blog-all-link:hover {
   color: var(--primary-hover) !important;
 }
+
+/* Исправление цвета автозаполнения браузера (autofill) для полей */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Специфичный фон автозаполнения для модального окна входа (под цвет подложки #1a1b1c) */
+.auth-content input:-webkit-autofill,
+.auth-content input:-webkit-autofill:hover, 
+.auth-content input:-webkit-autofill:focus, 
+.auth-content input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1a1b1c inset !important;
+}
+
+/* Специфичный фон автозаполнения для рассылки (делаем полностью прозрачным) */
+form input[type="email"]:-webkit-autofill,
+form input[type="email"]:-webkit-autofill:hover, 
+form input[type="email"]:-webkit-autofill:focus, 
+form input[type="email"]:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+}

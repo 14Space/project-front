@@ -23,10 +23,9 @@ export interface Order {
 }
 
 export interface TradeInRequest {
-  id: string;
-  userId: string;
+  id: number;
+  userId: number;
   category: string;
-  condition: string;
   description: string;
   photos: string[];
   status: 'pending' | 'evaluated' | 'accepted' | 'rejected';
@@ -58,9 +57,10 @@ interface AppContextType {
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   tradeInRequests: TradeInRequest[];
-  createTradeInRequest: (request: TradeInRequest) => void;
-  updateTradeInRequest: (requestId: string, updates: Partial<TradeInRequest>) => void;
-  deleteTradeInRequest: (requestId: string) => void;
+  createTradeInRequest: (dto: { category: string; description: string; photos: string[] }) => Promise<void>;
+  updateTradeInRequest: (requestId: number, updates: { status?: string; offerAmount?: number }) => Promise<void>;
+  deleteTradeInRequest: (requestId: number) => Promise<void>;
+  refreshTradeIn: () => Promise<void>;
   isCatalogOpen: boolean;
   setIsCatalogOpen: (open: boolean) => void;
   catalogCategory: string | null;
@@ -124,10 +124,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  const [tradeInRequests, setTradeInRequests] = useState<TradeInRequest[]>(() => {
-    const saved = localStorage.getItem('app_tradein');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [tradeInRequests, setTradeInRequests] = useState<TradeInRequest[]>([]);
 
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(() => {
     const saved = localStorage.getItem('app_blog_posts');
@@ -191,8 +188,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('app_tradein', JSON.stringify(tradeInRequests));
-  }, [tradeInRequests]);
+    if (user?.id) refreshTradeIn();
+  }, [user?.id]);
+
+  // Загружаем Trade-In заявки с бекенда когда пользователь авторизован
+  const refreshTradeIn = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) { setTradeInRequests([]); return; }
+    try {
+      const data: any[] = await api.get('/TradeIn');
+      const mapped: TradeInRequest[] = data.map((r: any) => ({
+        id: r.id,
+        userId: r.userId,
+        category: r.category,
+        description: r.description,
+        photos: r.photos || [],
+        status: r.status as TradeInRequest['status'],
+        offerAmount: r.offerAmount,
+        date: r.date
+      }));
+      setTradeInRequests(mapped);
+    } catch {
+      setTradeInRequests([]);
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('app_blog_posts', JSON.stringify(blogPosts));
@@ -294,18 +313,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const updateTradeInRequest = (requestId: string, updates: Partial<TradeInRequest>) => {
-    setTradeInRequests(prev => prev.map(req => 
-      req.id === requestId ? { ...req, ...updates } : req
-    ));
+  const createTradeInRequest = async (dto: { category: string; description: string; photos: string[] }) => {
+    try {
+      const created: any = await api.post('/TradeIn', dto);
+      const newReq: TradeInRequest = {
+        id: created.id,
+        userId: created.userId,
+        category: created.category,
+        description: created.description,
+        photos: created.photos || [],
+        status: created.status,
+        offerAmount: created.offerAmount,
+        date: created.date
+      };
+      setTradeInRequests(prev => [newReq, ...prev]);
+    } catch (e: any) {
+      console.error('Failed to create trade-in request', e);
+    }
   };
 
-  const createTradeInRequest = (request: TradeInRequest) => {
-    setTradeInRequests(prev => [request, ...prev]);
+  const updateTradeInRequest = async (requestId: number, updates: { status?: string; offerAmount?: number }) => {
+    try {
+      await api.put(`/TradeIn/${requestId}`, updates);
+      setTradeInRequests(prev => prev.map(req =>
+        req.id === requestId ? { ...req, ...updates } as TradeInRequest : req
+      ));
+    } catch (e: any) {
+      console.error('Failed to update trade-in request', e);
+    }
   };
 
-  const deleteTradeInRequest = (requestId: string) => {
-    setTradeInRequests(prev => prev.filter(req => req.id !== requestId));
+  const deleteTradeInRequest = async (requestId: number) => {
+    try {
+      await api.delete(`/TradeIn/${requestId}`);
+      setTradeInRequests(prev => prev.filter(req => req.id !== requestId));
+    } catch (e: any) {
+      console.error('Failed to delete trade-in request', e);
+    }
   };
 
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -344,6 +388,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createTradeInRequest,
       updateTradeInRequest,
       deleteTradeInRequest,
+      refreshTradeIn,
       isCatalogOpen,
       setIsCatalogOpen,
       catalogCategory,

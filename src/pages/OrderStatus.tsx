@@ -1,4 +1,9 @@
 import { PackageSearch, Clock, ChevronRight } from 'lucide-react';
+
+const formatOrderId = (id: string | number) => {
+  const num = String(id).replace(/^ORD-/i, '');
+  return `ORD-${num.slice(-6).padStart(6, '0')}`;
+};
 import { useTranslation } from 'react-i18next';
 import { HOT_DEALS } from '../constants/products';
 import { api } from '../api';
@@ -130,7 +135,7 @@ export default function OrderStatus() {
 
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                        <span style={{ color: '#fff', fontSize: '18px', fontWeight: 700 }}>#{order.id}</span>
+                        <span style={{ color: '#fff', fontSize: '18px', fontWeight: 700 }}>{formatOrderId(order.id)}</span>
                         <span style={{ 
                           backgroundColor: `${statusColor}20`, 
                           color: statusColor, 

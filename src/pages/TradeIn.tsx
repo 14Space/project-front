@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, Camera, Repeat, Plus, X, Check } from 'lucide-react';
+
 import { useAppContext } from '../context/AppContext';
+import { api } from '../api';
 
 export default function TradeIn() {
   const { t } = useTranslation();
@@ -14,17 +16,28 @@ export default function TradeIn() {
 
   const [formData, setFormData] = useState({
     category: '',
-    condition: 'used',
     description: '',
   });
 
-  const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+  const [requestToDelete, setRequestToDelete] = useState<number | null>(null);
+  // Фото грузятся только при клике на карточку
+  const [photosMap, setPhotosMap] = useState<Record<number, string[]>>({});
+  const [loadingPhotos, setLoadingPhotos] = useState<Record<number, boolean>>({});
+
+  const loadPhotos = (id: number) => {
+    if (photosMap[id] || loadingPhotos[id]) return;
+    setLoadingPhotos(prev => ({ ...prev, [id]: true }));
+    api.get(`/TradeIn/${id}/photos`)
+      .then((photos: string[]) => setPhotosMap(prev => ({ ...prev, [id]: photos })))
+      .catch(() => setPhotosMap(prev => ({ ...prev, [id]: [] })))
+      .finally(() => setLoadingPhotos(prev => ({ ...prev, [id]: false })));
+  };
 
   // Filter requests for the current user
-  const userRequests = tradeInRequests.filter(req => req.userId === user?.id && req.status !== 'rejected');
+  const userRequests = tradeInRequests.filter(req => String(req.userId) === String(user?.id));
 
   const categories = [
-    'computers', 'laptops', 'components', 'monitors', 'peripherals', 'consoles', 'networking'
+    'computers', 'laptops', 'cpus', 'gpus', 'motherboards', 'ram', 'storage', 'cases', 'cooling', 'psus'
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,20 +66,15 @@ export default function TradeIn() {
         base64Photos.push(base64);
       }
 
-      const newRequest = {
-        id: `TRD-${Math.floor(10000000 + Math.random() * 90000000)}`,
-        userId: user?.id || 'guest',
-        ...formData,
+      createTradeInRequest({
+        category: formData.category,
+        description: formData.description,
         photos: base64Photos,
-        status: 'pending' as const,
-        date: new Date().toISOString()
-      };
-
-      createTradeInRequest(newRequest);
+      });
       setIsModalOpen(false);
 
       // Reset form
-      setFormData({ category: '', condition: 'used', description: '' });
+      setFormData({ category: '', description: '' });
       setSelectedFiles([]);
     };
     
@@ -108,129 +116,77 @@ export default function TradeIn() {
 
 
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            {userRequests.map(request => (
-              <div
-                key={request.id}
-                style={{
-                  width: 'calc((100% - 80px) / 5)',
-                  height: '335px',
-                  minWidth: '220px',
-                  backgroundColor: '#111212',
-                  borderRadius: '16px',
-                  border: '1px solid #222',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  transition: 'all 0.3s ease',
-                  position: 'relative'
-                }}
-              >
-                <div style={{ width: '100%', height: '220px', overflow: 'hidden' }}>
-                  <img src={request.photos?.[0] || (request as any).photo} alt="request" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <div style={{ padding: '5px 10px 10px 10px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ color: '#fff', fontSize: '18px', fontWeight: 700, marginBottom: '5px' }}>
-                    {t(`tradeIn.form.categories.${request.category}`)}
-                  </div>
-                  <div style={{
-                    color: '#888',
-                    fontSize: '14px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: '100%'
-                  }}>
-                    {request.description}
-                  </div>
-                  <div style={{
+            {userRequests.map(request => {
+              const photos = photosMap[request.id];
+              if (!photos && !loadingPhotos[request.id]) loadPhotos(request.id);
+              return (
+                <div
+                  key={request.id}
+                  style={{
+                    width: 'calc((100% - 80px) / 5)',
+                    height: '335px',
+                    minWidth: '220px',
+                    backgroundColor: '#111212',
+                    borderRadius: '16px',
+                    border: '1px solid #222',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
-                    marginTop: 'auto'
-                  }}>
-                    {request.status === 'evaluated' && request.offerAmount && (
-                      <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '8px',
-                        padding: '10px',
-                        backgroundColor: 'rgba(166, 206, 57, 0.05)',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(166, 206, 57, 0.2)'
-                      }}>
-                        <div style={{ color: '#fff', fontSize: '13px', textAlign: 'center' }}>
-                          Оценка: <span style={{ color: '#A6CE39', fontWeight: 700, fontSize: '15px' }}>{request.offerAmount.toLocaleString()} MDL</span>
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ width: '100%', height: '200px', overflow: 'hidden', backgroundColor: '#1a1b1c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {photos?.[0] ? (
+                      <img src={photos[0]} alt="request" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <Camera size={40} color="#333" />
+                    )}
+                  </div>
+                  <div style={{ padding: '8px 10px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ color: '#fff', fontSize: '16px', fontWeight: 700 }}>
+                      {t(`tradeIn.form.categories.${request.category}`)}
+                    </div>
+                    <div style={{ color: '#888', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {request.description}
+                    </div>
+
+                    {request.status === 'pending' && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '30px', backgroundColor: 'rgba(255, 171, 0, 0.1)', color: '#FFAB00', fontSize: '12px', fontWeight: 700 }}>
+                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#FFAB00' }} />
+                          В обработке
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button
-                            onClick={() => updateTradeInRequest(request.id, { status: 'accepted' })}
-                            style={{ flex: 1, padding: '6px', borderRadius: '6px', backgroundColor: '#A6CE39', color: '#000', border: 'none', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-                          >
-                            Принять
-                          </button>
-                          <button
-                            onClick={() => updateTradeInRequest(request.id, { status: 'rejected' })}
-                            style={{ flex: 1, padding: '6px', borderRadius: '6px', backgroundColor: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-                          >
-                            Отклонить
-                          </button>
+                        <button onClick={() => setRequestToDelete(request.id)} style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(255, 77, 77, 0.1)', color: '#ff4d4d', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid rgba(255, 77, 77, 0.2)' }}>
+                          <X size={16} />
+                        </button>
+                      </div>
+                    )}
+
+                    {request.status === 'evaluated' && request.offerAmount && (
+                      <div style={{ padding: '8px', backgroundColor: 'rgba(166, 206, 57, 0.05)', borderRadius: '8px', border: '1px solid rgba(166, 206, 57, 0.2)' }}>
+                        <div style={{ color: '#888', fontSize: '11px', textAlign: 'center' }}>Оценка магазина</div>
+                        <div style={{ color: '#A6CE39', fontWeight: 700, fontSize: '15px', textAlign: 'center', margin: '4px 0 6px' }}>{request.offerAmount.toLocaleString()} MDL</div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button onClick={() => updateTradeInRequest(request.id, { status: 'accepted' })} style={{ flex: 1, padding: '5px', borderRadius: '6px', backgroundColor: '#A6CE39', color: '#000', border: 'none', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>Принять</button>
+                          <button onClick={() => updateTradeInRequest(request.id, { status: 'rejected' })} style={{ flex: 1, padding: '5px', borderRadius: '6px', backgroundColor: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>Отклонить</button>
                         </div>
                       </div>
                     )}
 
                     {request.status === 'accepted' && (
-                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px', backgroundColor: 'rgba(166, 206, 57, 0.1)', borderRadius: '8px', color: '#A6CE39', fontSize: '13px', fontWeight: 600 }}>
-                          <Check size={16} /> Сделка подтверждена
-                       </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', backgroundColor: 'rgba(166, 206, 57, 0.1)', borderRadius: '8px', color: '#A6CE39', fontSize: '12px', fontWeight: 600 }}>
+                        <Check size={14} /> Сделка подтверждена
+                      </div>
                     )}
 
                     {request.status === 'rejected' && (
-                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px', backgroundColor: 'rgba(255, 77, 77, 0.1)', borderRadius: '8px', color: '#ff4d4d', fontSize: '13px', fontWeight: 600 }}>
-                          <X size={16} /> Сделка отклонена
-                       </div>
-                    )}
-
-                    {request.status === 'pending' && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          height: '32px',
-                          padding: '0 16px',
-                          borderRadius: '30px',
-                          backgroundColor: 'rgba(255, 171, 0, 0.1)',
-                          color: '#FFAB00',
-                          fontSize: '13px',
-                          fontWeight: 700,
-                          width: 'fit-content'
-                        }}>
-                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#FFAB00' }} />
-                          В обработке
-                        </div>
-                        <button
-                          onClick={() => setRequestToDelete(request.id)}
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(255, 77, 77, 0.1)',
-                            color: '#ff4d4d',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            border: '1px solid rgba(255, 77, 77, 0.2)'
-                          }}
-                        >
-                          <X size={18} />
-                        </button>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', backgroundColor: 'rgba(255, 77, 77, 0.1)', borderRadius: '8px', color: '#ff4d4d', fontSize: '12px', fontWeight: 600 }}>
+                        <X size={14} /> Сделка отклонена
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {/* Карточка "Добавить товар" */}
             <div
               onClick={() => setIsModalOpen(true)}
@@ -335,7 +291,7 @@ export default function TradeIn() {
                     <X size={20} />
                   </button>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '20px', marginBottom: '24px' }}>
+                  <div style={{ marginBottom: '24px' }}>
                     {/* Category */}
                     <div>
                       <label style={{ display: 'block', color: '#fff', marginBottom: '10px', fontSize: '14px', fontWeight: 600 }}>
@@ -423,39 +379,6 @@ export default function TradeIn() {
                             ))}
                           </div>
                         )}
-                      </div>
-                    </div>
-
-                    {/* Condition */}
-                    <div>
-                      <label style={{ display: 'block', color: '#fff', marginBottom: '10px', fontSize: '14px', fontWeight: 600 }}>
-                        {t('tradeIn.form.condition')}
-                      </label>
-                      <div style={{ display: 'flex', gap: '10px', height: '52px' }}>
-                        {['new', 'openBox', 'used'].map(cond => (
-                          <button
-                            key={cond}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, condition: cond })}
-                            style={{
-                              flex: 1,
-                              backgroundColor: formData.condition === cond ? '#A6CE39' : '#1a1b1c',
-                              color: formData.condition === cond ? '#000' : '#fff',
-                              border: '1px solid',
-                              borderColor: formData.condition === cond ? '#A6CE39' : 'var(--border-color)',
-                              borderRadius: '12px',
-                              fontWeight: 700,
-                              fontSize: '14px',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                              padding: '0 4px'
-                            }}
-                          >
-                            {cond === 'new' ? t('tradeIn.form.conditionNew') :
-                              cond === 'openBox' ? t('tradeIn.form.conditionOpenBox') :
-                                t('tradeIn.form.conditionUsed')}
-                          </button>
-                        ))}
                       </div>
                     </div>
                   </div>

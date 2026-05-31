@@ -1,4 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+const formatTradeId = (id: string | number) => {
+  const num = String(id).replace(/^TRD-/i, '');
+  return `TRD-${num.slice(-6).padStart(6, '0')}`;
+};
+const formatUserId = (id: string | number) => {
+  const str = String(id).replace(/^USER-/i, '');
+  if (/^\d+$/.test(str)) {
+    return `USER-${str.slice(-6).padStart(6, '0')}`;
+  }
+  return String(id);
+};
+const formatOrderId = (id: string | number) => {
+  const num = String(id).replace(/^ORD-/i, '');
+  return `ORD-${num.slice(-6).padStart(6, '0')}`;
+};
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -1189,6 +1205,8 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
             position: 'absolute',
             left: 0
           }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
         >
           <ChevronLeft size={18} />
           {t('common.back')}
@@ -1248,7 +1266,7 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                         textDecoration: 'underline'
                       }}
                     >
-                      {order.id}
+                      {formatOrderId(order.id)}
                     </button>
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
@@ -1506,20 +1524,58 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
+const TradeInPhotos = ({ requestId }: { requestId: number }) => {
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    api.get(`/TradeIn/${requestId}/photos`)
+      .then((data: string[]) => setPhotos(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [requestId]);
+  if (loading) return <div style={{ color: '#888', fontSize: '14px', textAlign: 'center', padding: '20px' }}>Загрузка фото...</div>;
+  if (!photos.length) return null;
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ fontSize: '13px', color: '#fff', fontWeight: 600, marginBottom: '10px' }}>Фотографии устройства ({photos.length})</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {photos.map((photo, idx) => (
+          <img key={idx} src={photo} alt={`Item ${idx + 1}`} style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--border-color)' }} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
   const { t } = useTranslation();
-  const { tradeInRequests, updateTradeInRequest } = useAppContext();
+  const [allRequests, setAllRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [evalModal, setEvalModal] = useState<{ id: string, amount: string } | null>(null);
+  const [evalModal, setEvalModal] = useState<{ id: number, amount: string } | null>(null);
   const [detailsModal, setDetailsModal] = useState<any | null>(null);
 
-  const filteredRequests = tradeInRequests.filter(req => 
-    req.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    req.userId.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    setLoading(true);
+    api.get('/TradeIn/all')
+      .then((data: any[]) => setAllRequests(data))
+      .catch(() => setAllRequests([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const handleEvaluate = (id: string, amount: number) => {
-    updateTradeInRequest(id, { status: 'evaluated', offerAmount: amount });
+  const filteredRequests = allRequests.filter(req => {
+    const q = searchQuery.toLowerCase();
+    return formatTradeId(req.id).toLowerCase().includes(q) ||
+      formatUserId(req.userId).toLowerCase().includes(q) ||
+      String(req.id).includes(q) ||
+      String(req.userId).includes(q) ||
+      (req.category || '').toLowerCase().includes(q) ||
+      (req.username || '').toLowerCase().includes(q);
+  });
+
+  const handleEvaluate = async (id: number, amount: number) => {
+    await api.put(`/TradeIn/${id}`, { status: 'evaluated', offerAmount: amount });
+    setAllRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'evaluated', offerAmount: amount } : r));
     setEvalModal(null);
   };
 
@@ -1561,6 +1617,8 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
             position: 'absolute',
             left: 0
           }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
         >
           <ChevronLeft size={18} />
           {t('common.back')}
@@ -1592,21 +1650,28 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
 
       <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '14%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '22%' }} />
+              <col style={{ width: '14%' }} />
+              <col style={{ width: '18%' }} />
+            </colgroup>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '160px' }}>{t('adminPage.tradeIn.idRequest')}</th>
+                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.idRequest')}</th>
                 <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.date')}</th>
                 <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.idClient')}</th>
                 <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.category')}</th>
                 <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.status')}</th>
                 <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500 }}>{t('adminPage.tradeIn.appraisal')}</th>
-                <th style={{ padding: '15px 20px', fontSize: '13px', color: '#888', fontWeight: 500, width: '150px' }}>{t('adminPage.tradeIn.condition')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredRequests.map(req => (
-                <tr key={req.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.01)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                <tr key={req.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <td style={{ padding: '15px 20px', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                     <button 
                       onClick={() => setDetailsModal(req)}
@@ -1621,7 +1686,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                         textDecoration: 'underline'
                       }}
                     >
-                      {req.id}
+                      {formatTradeId(req.id)}
                     </button>
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
@@ -1640,59 +1705,48 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                         textDecoration: 'underline'
                       }}
                     >
-                      {req.userId}
+                      {formatUserId(req.userId)}
                     </button>
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
                     {t(`tradeIn.form.categories.${req.category}`)}
                   </td>
                   <td style={{ padding: '15px 20px' }}>
-                    <span style={{ 
-                      padding: '4px 10px', 
-                      borderRadius: '100px', 
-                      fontSize: '12px', 
-                      backgroundColor: `${getStatusColor(req.status)}20`, 
+                    <span style={{
+                      padding: '4px 10px',
+                      borderRadius: '100px',
+                      fontSize: '12px',
+                      backgroundColor: `${getStatusColor(req.status)}20`,
                       color: getStatusColor(req.status),
                       border: `1px solid ${getStatusColor(req.status)}40`
                     }}>
                       {getStatusText(req.status)}
                     </span>
                   </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', fontWeight: 600 }}>
-                    {req.offerAmount ? `${req.offerAmount.toLocaleString()} MDL` : '—'}
-                  </td>
-                  <td style={{ padding: '15px 20px' }}>
-                    {req.status === 'rejected' ? (
-                      <span style={{ color: '#ff4d4d', fontSize: '13px', fontWeight: 600 }}>{t('adminPage.tradeIn.rejected')}</span>
-                    ) : req.status === 'accepted' ? (
-                      <span style={{ color: '#A6CE39', fontSize: '13px', fontWeight: 600 }}>{t('adminPage.tradeIn.accepted')}</span>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', fontWeight: 600 }}>
+                    {req.offerAmount ? (
+                      <span style={{ color: '#A6CE39' }}>{req.offerAmount.toLocaleString()} MDL</span>
                     ) : (
-                      <button 
-                        onClick={() => setEvalModal({ id: req.id, amount: req.offerAmount ? req.offerAmount.toString() : '' })}
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          color: 'var(--primary-color)', 
-                          cursor: 'pointer', 
-                          fontSize: '13px', 
-                          padding: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          transition: 'opacity 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                      <span
+                        onClick={() => setEvalModal({ id: req.id, amount: '' })}
+                        style={{ color: 'var(--primary-color)', cursor: 'pointer', textDecoration: 'underline' }}
                       >
-                        {req.status === 'pending' ? t('adminPage.tradeIn.evaluate') : t('adminPage.tradeIn.changeAppraisal')}
-                      </button>
+                        Оценить
+                      </span>
                     )}
                   </td>
                 </tr>
               ))}
-              {filteredRequests.length === 0 && (
+              {loading && (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
+                    Загрузка...
+                  </td>
+                </tr>
+              )}
+              {!loading && filteredRequests.length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
                     {t('common.noData')}
                   </td>
                 </tr>
@@ -1726,7 +1780,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
           }}>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>{t('adminPage.tradeIn.evalTitle')}</h3>
             <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>
-              {t('adminPage.tradeIn.evalDesc')} <span style={{ color: 'var(--primary-color)' }}>{evalModal.id}</span>
+              {t('adminPage.tradeIn.evalDesc')} <span style={{ color: 'var(--primary-color)' }}>{formatTradeId(evalModal.id)}</span>
             </p>
 
             <div style={{ marginBottom: '30px' }}>
@@ -1830,7 +1884,7 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <div>
                 <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>{t('adminPage.tradeIn.detailsTitle')}</h3>
-                <p style={{ margin: 0, fontSize: '14px', color: 'var(--primary-color)' }}>{detailsModal.id}</p>
+                <p style={{ margin: 0, fontSize: '14px', color: 'var(--primary-color)' }}>{formatTradeId(detailsModal.id)}</p>
               </div>
               <button 
                 onClick={() => setDetailsModal(null)}
@@ -1840,53 +1894,25 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <div style={{ flex: 1, padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{t('adminPage.tradeIn.category')}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '25px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ fontSize: '13px', color: '#fff', fontWeight: 600 }}>{t('adminPage.tradeIn.category')}</div>
+                <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
                   <div style={{ fontSize: '14px', color: '#fff', fontWeight: 500 }}>{t(`tradeIn.form.categories.${detailsModal.category}`)}</div>
-                </div>
-
-                <div style={{ flex: 1, padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{t('adminPage.tradeIn.condition')}</div>
-                  <div style={{ fontSize: '14px', color: '#fff', fontWeight: 500 }}>
-                    {detailsModal.condition === 'new' ? t('adminPage.tradeIn.conditionNew') : t('adminPage.tradeIn.conditionUsed')}
-                  </div>
                 </div>
               </div>
 
-              <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>{t('adminPage.tradeIn.descLabel')}</div>
-                <div style={{ fontSize: '14px', color: '#fff', lineHeight: '1.5', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
-                  {detailsModal.description || <span style={{ color: '#555', fontStyle: 'italic' }}>{t('adminPage.tradeIn.noDescription')}</span>}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ fontSize: '13px', color: '#fff', fontWeight: 600 }}>{t('adminPage.tradeIn.descLabel')}</div>
+                <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontSize: '14px', color: '#fff', lineHeight: '1.5', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                    {detailsModal.description || <span style={{ color: '#555', fontStyle: 'italic' }}>{t('adminPage.tradeIn.noDescription')}</span>}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {(detailsModal.photos && detailsModal.photos.length > 0) ? (
-              <div style={{ marginBottom: '20px' }}>
-                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>{t('adminPage.tradeIn.photosLabel')} ({detailsModal.photos.length})</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {detailsModal.photos.map((photo: string, idx: number) => (
-                    <img 
-                      key={idx}
-                      src={photo} 
-                      alt={`Item ${idx + 1}`} 
-                      style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--border-color)' }} 
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : detailsModal.photo ? (
-              <div style={{ marginBottom: '20px' }}>
-                <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>{t('adminPage.tradeIn.photosLabel')}</div>
-                <img 
-                  src={detailsModal.photo} 
-                  alt="Item" 
-                  style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--border-color)' }} 
-                />
-              </div>
-            ) : null}
+            <TradeInPhotos requestId={detailsModal.id} />
             
             <button 
               onClick={() => setDetailsModal(null)}
@@ -2357,23 +2383,25 @@ export default function Admin() {
   const { t } = useTranslation();
   const { user } = useAppContext();
   const navigate = useNavigate();
+  const handleBack = useCallback(() => navigate('/profile'), [navigate]);
 
   useEffect(() => {
     if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
       navigate('/');
     }
   }, [user, navigate]);
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'categories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'editBanners'>(
-    user?.role === 'manager' ? 'userDatabase' : 'dashboard'
-  );
+  const validViews = ['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'editBanners'];
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'categories' | 'viewOrders' | 'tradeInRequests' | 'editBlog' | 'userDatabase' | 'editBanners'>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view && validViews.includes(view)) return view as any;
+    return user?.role === 'manager' ? 'userDatabase' : 'dashboard';
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view');
-    if (view && ['products', 'categories', 'viewOrders', 'tradeInRequests', 'editBlog', 'userDatabase', 'editBanners'].includes(view)) {
-      setActiveView(view as any);
-    } else if (user?.role === 'admin') {
-      // Since dashboard moved to profile, redirect admin to profile if no view is specified
+    if (!view && user?.role === 'admin') {
       navigate('/profile');
     }
   }, [user, navigate]);
@@ -2707,6 +2735,8 @@ export default function Admin() {
     }
   };
 
+  if (!user) return null;
+
   return (
     <div style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <section className="section" style={{ padding: '10px 0 40px 0' }}>
@@ -2777,15 +2807,15 @@ export default function Admin() {
               </div>
             </>
           ) : activeView === 'products' ? (
-            <AdminProducts onBack={() => navigate('/profile')} />
+            <AdminProducts onBack={handleBack} />
           ) : activeView === 'viewOrders' ? (
-            <AdminOrders onBack={() => navigate('/profile')} />
+            <AdminOrders onBack={handleBack} />
           ) : activeView === 'tradeInRequests' ? (
-            <AdminTradeIn onBack={() => navigate('/profile')} />
+            <AdminTradeIn onBack={handleBack} />
           ) : activeView === 'editBlog' ? (
-            <AdminBlog onBack={() => navigate('/profile')} />
+            <AdminBlog onBack={handleBack} />
           ) : activeView === 'userDatabase' ? (
-            <AdminUsers onBack={() => navigate('/profile')} />
+            <AdminUsers onBack={handleBack} />
           ) : activeView === 'editBanners' ? (
             <AdminBanners />
           ) : (

@@ -1,4 +1,9 @@
 import React, { useEffect } from 'react';
+
+const formatOrderId = (id: string | number) => {
+  const num = String(id).replace(/^ORD-/i, '');
+  return `ORD-${num.slice(-6).padStart(6, '0')}`;
+};
 import { useAppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, LogOut, Edit2, Plus, ChevronDown } from 'lucide-react';
@@ -313,7 +318,7 @@ const UserProfile: React.FC = () => {
                   <div key={order.id} style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '15px', backgroundColor: 'rgba(255,255,255,0.02)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
                       <div>
-                        <span style={{ color: '#fff', fontWeight: 600, fontSize: '16px' }}>{t('profile.order', 'Заказ')} #{order.id}</span>
+                        <span style={{ color: '#fff', fontWeight: 600, fontSize: '16px' }}>{formatOrderId(order.id)}</span>
                         <div style={{ color: '#888', fontSize: '13px', marginTop: '4px' }}>
                           {new Date(order.orderDate).toLocaleString()}
                         </div>
