@@ -14,10 +14,8 @@ export default function TradeIn() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-  const [formData, setFormData] = useState({
-    category: '',
-    description: '',
-  });
+  const [formData, setFormData] = useState({ category: '', description: '' });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [requestToDelete, setRequestToDelete] = useState<number | null>(null);
   // Фото грузятся только при клике на карточку
@@ -42,16 +40,23 @@ export default function TradeIn() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const errs: Record<string, string> = {};
 
-    if (!formData.category) {
-      setIsCategoryOpen(true);
-      return;
+    if (!formData.category) errs.category = t('validation.tradeInCategory');
+    if (!formData.description.trim()) errs.description = t('validation.tradeInDescRequired');
+    else if (formData.description.trim().length < 10) errs.description = t('validation.tradeInDescMin');
+    else if (formData.description.trim().length > 1000) errs.description = t('validation.tradeInDescMax');
+    if (selectedFiles.length === 0) errs.photos = t('validation.tradeInPhotoRequired');
+
+    const MAX_SIZE = 10 * 1024 * 1024;
+    const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
+    for (const f of selectedFiles) {
+      if (f.size > MAX_SIZE) { errs.photos = t('validation.tradeInFileSize', { name: f.name }); break; }
+      if (!ALLOWED.includes(f.type)) { errs.photos = t('validation.tradeInFileType', { name: f.name }); break; }
     }
 
-    if (selectedFiles.length === 0) {
-      fileInputRef.current?.click();
-      return;
-    }
+    setFormErrors(errs);
+    if (Object.keys(errs).length > 0) return;
 
     const base64Photos: string[] = [];
     
@@ -299,13 +304,13 @@ export default function TradeIn() {
                       </label>
                       <div style={{ position: 'relative' }}>
                         <div
-                          onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                          onClick={() => { setIsCategoryOpen(!isCategoryOpen); setFormErrors(p => { const n={...p}; delete n.category; return n; }); }}
                           style={{
                             width: '100%',
                             height: '52px',
                             backgroundColor: '#1a1b1c',
                             border: '1px solid',
-                            borderColor: isCategoryOpen ? '#A6CE39' : 'var(--border-color)',
+                            borderColor: formErrors.category ? '#ff4d4d' : isCategoryOpen ? '#A6CE39' : 'var(--border-color)',
                             borderRadius: '12px',
                             color: formData.category ? '#fff' : '#666',
                             padding: '0 16px',
@@ -380,6 +385,7 @@ export default function TradeIn() {
                           </div>
                         )}
                       </div>
+                      {formErrors.category && <p style={{ color: '#ff4d4d', fontSize: '11px', margin: '4px 0 0 2px' }}>{formErrors.category}</p>}
                     </div>
                   </div>
 
@@ -389,15 +395,14 @@ export default function TradeIn() {
                       {t('tradeIn.form.description')}
                     </label>
                     <textarea
-                      required
                       placeholder={t('tradeIn.form.descriptionPlaceholder')}
                       value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, description: e.target.value }); setFormErrors(p => { const n={...p}; delete n.description; return n; }); }}
                       style={{
                         width: '100%',
                         minHeight: '120px',
                         backgroundColor: '#1a1b1c',
-                        border: '1px solid var(--border-color)',
+                        border: `1px solid ${formErrors.description ? '#ff4d4d' : 'var(--border-color)'}`,
                         borderRadius: '12px',
                         color: '#fff',
                         padding: '16px',
@@ -408,8 +413,9 @@ export default function TradeIn() {
                         transition: 'border-color 0.2s'
                       }}
                       onFocus={(e) => e.target.style.borderColor = '#A6CE39'}
-                      onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                      onBlur={(e) => e.target.style.borderColor = formErrors.description ? '#ff4d4d' : 'var(--border-color)'}
                     />
+                    {formErrors.description && <p style={{ color: '#ff4d4d', fontSize: '11px', margin: '4px 0 0 2px' }}>{formErrors.description}</p>}
                   </div>
 
                   {/* Photo Upload */}
@@ -585,6 +591,7 @@ export default function TradeIn() {
                         </div>
                       )}
                     </div>
+                    {formErrors.photos && <p style={{ color: '#ff4d4d', fontSize: '11px', margin: '4px 0 0 2px' }}>{formErrors.photos}</p>}
                   </div>
 
                   <button

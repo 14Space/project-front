@@ -84,18 +84,36 @@ const Checkbox = ({ label, checked, onChange }: { label: string; checked: boolea
   );
 };
 
-export default function AdminProductFilters() {
+interface ActiveFilter {
+  categoryName: string;
+  subcategoryName: string;
+}
+
+interface AdminProductFiltersProps {
+  onFilterChange?: (filters: { minPrice: string; maxPrice: string; active: ActiveFilter[] }) => void;
+}
+
+export default function AdminProductFilters({ onFilterChange }: AdminProductFiltersProps) {
   const { t } = useTranslation();
-  
+
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [selections, setSelections] = useState<Record<string, string[]>>({});
 
-  const toggle = (category: string, item: string) => {
+  const buildActive = (sel: Record<string, string[]>, groups: { id: string; title: string; items: string[] }[]): ActiveFilter[] =>
+    groups.flatMap(g => (sel[g.id] || []).map(sub => ({ categoryName: g.title, subcategoryName: sub })));
+
+  const notify = (newMin: string, newMax: string, newSel: Record<string, string[]>, groups: { id: string; title: string; items: string[] }[]) => {
+    onFilterChange?.({ minPrice: newMin, maxPrice: newMax, active: buildActive(newSel, groups) });
+  };
+
+  const toggle = (groupId: string, item: string, groups: { id: string; title: string; items: string[] }[]) => {
     setSelections(prev => {
-      const current = prev[category] || [];
+      const current = prev[groupId] || [];
       const updated = current.includes(item) ? current.filter(i => i !== item) : [...current, item];
-      return { ...prev, [category]: updated };
+      const next = { ...prev, [groupId]: updated };
+      notify(minPrice, maxPrice, next, groups);
+      return next;
     });
   };
 
@@ -180,7 +198,7 @@ export default function AdminProductFilters() {
             type="text" 
             placeholder={t('filters.from')} 
             value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ''))}
+            onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setMinPrice(v); notify(v, maxPrice, selections, filterGroups); }}
             style={{ 
               width: '100%', 
               backgroundColor: '#1a1a1a', 
@@ -196,7 +214,7 @@ export default function AdminProductFilters() {
             type="text" 
             placeholder={t('filters.to')} 
             value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value.replace(/\D/g, ''))}
+            onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setMaxPrice(v); notify(minPrice, v, selections, filterGroups); }}
             style={{ 
               width: '100%', 
               backgroundColor: '#1a1a1a', 
@@ -222,19 +240,19 @@ export default function AdminProductFilters() {
             label={`Все в ${group.title}`}
             checked={(selections[group.id] || []).length === group.items.length} 
             onChange={(checked) => {
-              if (checked) {
-                setSelections(prev => ({ ...prev, [group.id]: [...group.items] }));
-              } else {
-                setSelections(prev => ({ ...prev, [group.id]: [] }));
-              }
-            }} 
+              setSelections(prev => {
+                const next = { ...prev, [group.id]: checked ? [...group.items] : [] };
+                notify(minPrice, maxPrice, next, filterGroups);
+                return next;
+              });
+            }}
           />
           {group.items.map(label => (
             <Checkbox 
               key={label} 
               label={label} 
               checked={(selections[group.id] || []).includes(label)} 
-              onChange={() => toggle(group.id, label)} 
+              onChange={() => toggle(group.id, label, filterGroups)}
             />
           ))}
         </FilterSection>

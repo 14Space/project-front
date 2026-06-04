@@ -35,8 +35,7 @@ import {
   MessageSquare,
   Check,
   Filter,
-  ArrowUp,
-  ArrowDown
+  GripVertical
 } from 'lucide-react';
 
 
@@ -109,6 +108,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'products' | 'brands'>('products');
   const [isAddingBrand, setIsAddingBrand] = useState(false);
+  const [adminFilters, setAdminFilters] = useState<{ minPrice: string; maxPrice: string; active: { categoryName: string; subcategoryName: string }[] }>({ minPrice: '', maxPrice: '', active: [] });
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [newBrandName, setNewBrandName] = useState('');
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -258,13 +258,17 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
   };
 
   const handleSaveProduct = async () => {
-    if (!productForm.title.trim()) {
-      alert(t('adminPage.products.noTitle'));
-      return;
-    }
-    if (!productForm.category) {
-      alert("Выберите категорию");
-      return;
+    if (!productForm.title.trim()) { alert(t('validation.productTitleRequired')); return; }
+    if (productForm.title.trim().length < 3) { alert(t('validation.productTitleMin')); return; }
+    if (!productForm.category) { alert(t('validation.productCategoryRequired')); return; }
+    if (!productForm.subcategory) { alert(t('validation.productSubcategoryRequired')); return; }
+    if (!productForm.price || Number(productForm.price) <= 0) { alert(t('validation.productPriceRequired')); return; }
+    if (productForm.oldPrice && Number(productForm.oldPrice) <= Number(productForm.price)) { alert(t('validation.productOldPrice')); return; }
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    for (const file of productForm.imageFiles) {
+      if (file.size > MAX_FILE_SIZE) { alert(t('validation.fileSizeExceeded', { name: file.name, size: 5 })); return; }
+      if (!ALLOWED_TYPES.includes(file.type)) { alert(t('validation.fileTypeInvalid', { name: file.name })); return; }
     }
 
     try {
@@ -371,10 +375,27 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
-  const filteredProducts = products.filter(p => 
-    p.id.toString().toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.id.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
+    const { minPrice, maxPrice, active } = adminFilters;
+    if (minPrice && p.price < parseFloat(minPrice)) return false;
+    if (maxPrice && p.price > parseFloat(maxPrice)) return false;
+
+    if (active.length > 0) {
+      const pCat = (p.categoryName || p.category || '').toLowerCase();
+      const pSub = (p.subcategoryName || p.subcategory || '').toLowerCase();
+      const matches = active.some(f =>
+        pCat.includes(f.categoryName.toLowerCase()) &&
+        pSub.includes(f.subcategoryName.toLowerCase())
+      );
+      if (!matches) return false;
+    }
+
+    return true;
+  });
 
   const filteredBrandsForSelect = (() => {
     if (!productForm.category) return brands;
@@ -451,7 +472,7 @@ const AdminProducts = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-        <AdminProductFilters />
+        <AdminProductFilters onFilterChange={setAdminFilters} />
         
         <div style={{ 
           backgroundColor: 'var(--card-bg)', 
@@ -1130,9 +1151,9 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
   const [orders, setOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusModal, setStatusModal] = useState<{ orderId: string, currentStatus: string } | null>(null);
-  const [userDetailsModal, setUserDetailsModal] = useState<any | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   const fetchOrders = async () => {
     setIsLoading(true);
@@ -1161,16 +1182,6 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
-  const handleUserClick = async (userId: string) => {
-    try {
-      const res = await api.get(`/Users/${userId}`);
-      setUserDetailsModal(res);
-    } catch (err) {
-      console.error("Failed to load user data", err);
-      alert("Не удалось загрузить данные клиента");
-    }
-  };
-
   const filteredOrders = orders.filter(order => 
     order.id.toString().includes(searchQuery.toLowerCase()) ||
     (order.username && order.username.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -1184,6 +1195,17 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
       case 'delivered': return '#A6CE39';
       case 'returned': return '#ff4d4d';
       default: return '#888';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const s = status.toLowerCase();
+    switch (s) {
+      case 'pending': return 'В обработке';
+      case 'shipped': return 'Отправлен';
+      case 'delivered': return 'Доставлен';
+      case 'returned': return 'Возврат';
+      default: return status;
     }
   };
 
@@ -1250,82 +1272,68 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.01)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', fontWeight: 600 }}>
-                    <button 
-                      onClick={() => alert(`Opening details for ${order.id}...`)}
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: 'var(--primary-color)', 
-                        cursor: 'pointer', 
-                        fontSize: '14px', 
-                        padding: 0,
-                        fontWeight: 600,
-                        textDecoration: 'underline'
-                      }}
+              {filteredOrders.map((order) => {
+                const isExpanded = expandedOrderId === order.id.toString();
+                return (
+                  <>
+                    <tr
+                      key={order.id}
+                      onClick={() => setExpandedOrderId(isExpanded ? null : order.id.toString())}
+                      style={{ borderBottom: isExpanded ? 'none' : '1px solid var(--border-color)', transition: 'background-color 0.2s', cursor: 'pointer' }}
                     >
-                      {formatOrderId(order.id)}
-                    </button>
-                  </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
-                    {new Date(order.orderDate || order.date).toLocaleDateString('ru-RU')}
-                  </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
-                    <button 
-                      onClick={() => handleUserClick(order.userId)}
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: 'var(--primary-color)', 
-                        cursor: 'pointer', 
-                        fontSize: '14px', 
-                        padding: 0,
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      {order.username}
-                    </button>
-                  </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {order.items.map((i: any) => i.name || i.title).join(', ')}
-                  </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', fontWeight: 600 }}>
-                    {order.totalPrice.toLocaleString()} MDL
-                  </td>
-                  <td style={{ padding: '15px 20px' }}>
-                    <span style={{ 
-                      padding: '4px 10px', 
-                      borderRadius: '100px', 
-                      fontSize: '12px', 
-                      backgroundColor: `${getStatusColor(order.status)}20`, 
-                      color: getStatusColor(order.status),
-                      border: `1px solid ${getStatusColor(order.status)}40`
-                    }}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: '15px 20px' }}>
-                    <button 
-                      onClick={() => {
-                        setStatusModal({ orderId: order.id, currentStatus: order.status });
-                        setSelectedStatus(order.status);
-                      }}
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: 'var(--primary-color)', 
-                        cursor: 'pointer', 
-                        fontSize: '14px', 
-                        padding: 0 
-                      }}
-                    >
-                      {t('adminPage.orders.changeStatus')}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      <td style={{ padding: '15px 20px', fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)', textDecoration: 'underline' }}>
+                        {formatOrderId(order.id)}
+                      </td>
+                      <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
+                        {new Date(order.orderDate || order.date).toLocaleDateString('ru-RU')}
+                      </td>
+                      <td style={{ padding: '15px 20px', fontSize: '14px', color: 'var(--primary-color)' }}>
+                        {formatUserId(order.userId)}
+                      </td>
+                      <td style={{ padding: '15px 20px', fontSize: '14px', color: '#888', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {order.items.map((i: any) => i.name || i.title).join(', ')}
+                      </td>
+                      <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', fontWeight: 600 }}>
+                        {order.totalPrice.toLocaleString()} MDL
+                      </td>
+                      <td style={{ padding: '15px 20px' }}>
+                        <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '12px', backgroundColor: `${getStatusColor(order.status)}20`, color: getStatusColor(order.status), border: `1px solid ${getStatusColor(order.status)}40` }}>
+                          {getStatusLabel(order.status)}
+                        </span>
+                      </td>
+                      <td style={{ padding: '15px 20px' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStatusModal({ orderId: order.id, currentStatus: order.status });
+                            setSelectedStatus(order.status);
+                          }}
+                          style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontSize: '14px', padding: 0 }}
+                        >
+                          {t('adminPage.orders.changeStatus')}
+                        </button>
+                      </td>
+                    </tr>
+                    {isExpanded && (
+                      <tr key={`${order.id}-expanded`} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td colSpan={7} style={{ padding: '0 20px 16px 20px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {order.items.map((item: any, idx: number) => (
+                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                <span style={{ color: '#fff', fontSize: '14px' }}>{item.name || item.title}</span>
+                                <div style={{ display: 'flex', gap: '24px', flexShrink: 0 }}>
+                                  <span style={{ color: '#888', fontSize: '13px' }}>x{item.quantity}</span>
+                                  <span style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>{item.price.toLocaleString()} MDL</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -1362,10 +1370,9 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
               {[
-                { id: 'Pending', label: 'В обработке (Pending)' },
-                { id: 'Shipped', label: 'Отправлен (Shipped)' },
-                { id: 'Delivered', label: 'Доставлен (Delivered)' },
-                { id: 'Returned', label: 'Возврат (Returned)' }
+                { id: 'Pending', label: 'В обработке' },
+                { id: 'Shipped', label: 'Отправлен' },
+                { id: 'Delivered', label: 'Доставлен' }
               ].map((status) => (
                 <div 
                   key={status.id}
@@ -1438,85 +1445,6 @@ const AdminOrders = ({ onBack }: { onBack: () => void }) => {
                 {t('common.confirm')}
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {userDetailsModal && (
-        <div style={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0, 
-          backgroundColor: 'rgba(0,0,0,0.85)', 
-          zIndex: 1000, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          animation: 'fadeIn 0.2s ease',
-          backdropFilter: 'blur(4px)'
-        }}>
-          <div style={{ 
-            backgroundColor: '#111', 
-            border: '1px solid var(--border-color)', 
-            borderRadius: '16px', 
-            padding: '30px', 
-            width: '400px',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-            position: 'relative'
-          }}>
-            <button 
-              onClick={() => setUserDetailsModal(null)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
-            >
-              <X size={20} />
-            </button>
-
-            <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Данные клиента</h3>
-            <p style={{ margin: '0 0 25px 0', fontSize: '14px', color: '#888' }}>ID: {userDetailsModal.id}</p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '30px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Email</span>
-                <span style={{ color: '#fff', fontSize: '15px' }}>{userDetailsModal.email || 'Не указано'}</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Имя и Фамилия</span>
-                <span style={{ color: '#fff', fontSize: '15px' }}>
-                  {userDetailsModal.username} {userDetailsModal.lastName || ''}
-                </span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Телефон</span>
-                <span style={{ color: '#fff', fontSize: '15px' }}>{userDetailsModal.phone || 'Не указано'}</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Адрес доставки</span>
-                <span style={{ color: '#fff', fontSize: '15px' }}>
-                  {userDetailsModal.city || userDetailsModal.street 
-                    ? `${userDetailsModal.city || ''}, ${userDetailsModal.street || ''}`
-                    : 'Не указан'}
-                </span>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => setUserDetailsModal(null)}
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                borderRadius: '100px', 
-                border: 'none', 
-                backgroundColor: 'var(--primary-color)', 
-                color: '#000', 
-                fontSize: '14px', 
-                fontWeight: 600, 
-                cursor: 'pointer'
-              }}
-            >
-              Закрыть
-            </button>
           </div>
         </div>
       )}
@@ -1692,21 +1620,8 @@ const AdminTradeIn = ({ onBack }: { onBack: () => void }) => {
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
                     {new Date(req.date).toLocaleDateString('ru-RU')}
                   </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
-                    <button 
-                      onClick={() => alert(`Opening profile for ${req.userId}...`)}
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: 'var(--primary-color)', 
-                        cursor: 'pointer', 
-                        fontSize: '14px', 
-                        padding: 0,
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      {formatUserId(req.userId)}
-                    </button>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: 'var(--primary-color)' }}>
+                    {formatUserId(req.userId)}
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>
                     {t(`tradeIn.form.categories.${req.category}`)}
@@ -2309,22 +2224,8 @@ export const _AdminReviews = ({ onBack }: { onBack: () => void }) => {
                       {review.product}
                     </button>
                   </td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>
-                    <button 
-                      onClick={() => alert(`Opening client profile for ${review.user}...`)}
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: 'var(--primary-color)', 
-                        cursor: 'pointer', 
-                        fontSize: '14px', 
-                        padding: 0,
-                        fontWeight: 600,
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      {review.user}
-                    </button>
+                  <td style={{ padding: '15px 20px', fontSize: '14px', color: 'var(--primary-color)', fontWeight: 600 }}>
+                    {review.user}
                   </td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff' }}>{review.rating}/5</td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#fff', maxWidth: '300px' }}>{review.comment}</td>
@@ -2386,7 +2287,11 @@ export default function Admin() {
   const handleBack = useCallback(() => navigate('/profile'), [navigate]);
 
   useEffect(() => {
-    if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
+    const token = localStorage.getItem('token');
+    if (!token) { navigate('/'); return; }
+    // Если токен есть но user ещё грузится — ждём
+    if (!user) return;
+    if (user.role !== 'admin' && user.role !== 'manager') {
       navigate('/');
     }
   }, [user, navigate]);
@@ -2432,6 +2337,12 @@ export default function Admin() {
   const [editingParamAttributeId, setEditingParamAttributeId] = useState<number | null>(null);
   const [editingParamIndex, setEditingParamIndex] = useState<number | null>(null);
   const [editingParamValue, setEditingParamValue] = useState('');
+
+  // Drag & drop states
+  const [draggingAttrId, setDraggingAttrId] = useState<number | null>(null);
+  const [dragOverAttrId, setDragOverAttrId] = useState<number | null>(null);
+  const [draggingParam, setDraggingParam] = useState<{ attrId: number; idx: number } | null>(null);
+  const [dragOverParam, setDragOverParam] = useState<{ attrId: number; idx: number } | null>(null);
 
   // const [editingSubcategoryIndex, setEditingSubcategoryIndex] = useState<number | null>(null);
   // const [editingSubcategoryName, setEditingSubcategoryName] = useState('');
@@ -2693,6 +2604,46 @@ export default function Admin() {
     }
   };
 
+  const handleDropAttribute = async (toId: number) => {
+    if (draggingAttrId == null || draggingAttrId === toId) return;
+    const from = dbAttributes.findIndex(a => a.id === draggingAttrId);
+    const to = dbAttributes.findIndex(a => a.id === toId);
+    if (from === -1 || to === -1) return;
+    const reordered = [...dbAttributes];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(to, 0, moved);
+    setDbAttributes(reordered);
+    setDraggingAttrId(null);
+    setDragOverAttrId(null);
+    setEditingAttributeId(null);
+    try {
+      await Promise.all(reordered.map((attr, idx) =>
+        api.put(`/Attributes/${attr.id}`, { name: attr.name, categoryId: attr.categoryId, order: idx })
+      ));
+    } catch (err) {
+      alert("Ошибка сохранения порядка: " + err);
+    }
+  };
+
+  const handleDropParam = async (toAttrId: number, toIdx: number) => {
+    if (!draggingParam || draggingParam.attrId !== toAttrId || draggingParam.idx === toIdx) return;
+    const attribute = dbAttributes.find(a => a.id === toAttrId);
+    if (!attribute) return;
+    const params = [...(attributeParams[toAttrId] || [])];
+    const [moved] = params.splice(draggingParam.idx, 1);
+    params.splice(toIdx, 0, moved);
+    setAttributeParams(prev => ({ ...prev, [toAttrId]: params }));
+    setDraggingParam(null);
+    setDragOverParam(null);
+    setEditingParamAttributeId(null);
+    setEditingParamIndex(null);
+    try {
+      await api.put(`/Attributes/${toAttrId}`, { name: attribute.name, categoryId: attribute.categoryId, options: params });
+    } catch (err) {
+      alert("Ошибка сохранения порядка параметров: " + err);
+    }
+  };
+
   const sections = [
     {
       id: 'catalog',
@@ -2817,7 +2768,7 @@ export default function Admin() {
           ) : activeView === 'userDatabase' ? (
             <AdminUsers onBack={handleBack} />
           ) : activeView === 'editBanners' ? (
-            <AdminBanners />
+            <AdminBanners onBack={handleBack} />
           ) : (
             <div style={{ animation: 'fadeIn 0.3s ease', color: '#fff' }}>
               {/* Header */}
@@ -2982,7 +2933,13 @@ export default function Admin() {
                           const isExpanded = expandedFilterId === attr.id;
                           const isEditing = editingAttributeId === attr.id;
                           return (
-                            <div key={attr.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                            <div
+                              key={attr.id}
+                              onDragOver={(e) => { e.preventDefault(); setDragOverAttrId(attr.id); }}
+                              onDragLeave={() => setDragOverAttrId(null)}
+                              onDrop={() => handleDropAttribute(attr.id)}
+                              style={{ borderBottom: '1px solid var(--border-color)', outline: dragOverAttrId === attr.id && draggingAttrId !== attr.id ? '2px solid var(--primary-color)' : 'none', borderRadius: '4px', transition: 'outline 0.15s' }}
+                            >
                               {/* Filter row */}
                               <div style={{
                                 display: 'flex',
@@ -2992,7 +2949,13 @@ export default function Admin() {
                                 paddingBottom: isExpanded ? '10px' : '20px'
                               }}>
                                 {isEditing ? (
-                                  <div style={{ display: 'flex', gap: '6px', flex: 1, alignItems: 'center' }}>
+                                  <div
+                                    draggable
+                                    onDragStart={() => setDraggingAttrId(attr.id)}
+                                    onDragEnd={() => { setDraggingAttrId(null); setDragOverAttrId(null); }}
+                                    style={{ display: 'flex', gap: '6px', flex: 1, alignItems: 'center' }}
+                                  >
+                                    <GripVertical size={20} style={{ cursor: 'grab', color: '#A6CE39', flexShrink: 0 }} />
                                     <input
                                       autoFocus
                                       type="text"
@@ -3040,45 +3003,9 @@ export default function Admin() {
                                   </button>
                                 )}
                                 {!isEditing && (
-                                  <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
+                                  <div style={{ display: 'flex', gap: '4px', marginLeft: '8px', alignItems: 'center' }}>
                                     <button
-                                      onClick={() => handleMoveAttribute(attrIdx, 'up')}
-                                      disabled={attrIdx === 0}
-                                      style={{ 
-                                        background: 'none', 
-                                        border: 'none', 
-                                        color: attrIdx === 0 ? '#333' : '#555', 
-                                        cursor: attrIdx === 0 ? 'default' : 'pointer', 
-                                        padding: '4px', 
-                                        display: 'flex',
-                                        transition: 'color 0.2s'
-                                      }}
-                                      onMouseEnter={(e) => { if (attrIdx !== 0) e.currentTarget.style.color = '#fff' }}
-                                      onMouseLeave={(e) => { if (attrIdx !== 0) e.currentTarget.style.color = '#555' }}
-                                      title="Поднять выше"
-                                    >
-                                      <ArrowUp size={14} />
-                                    </button>
-                                    <button
-                                      onClick={() => handleMoveAttribute(attrIdx, 'down')}
-                                      disabled={attrIdx === dbAttributes.length - 1}
-                                      style={{ 
-                                        background: 'none', 
-                                        border: 'none', 
-                                        color: attrIdx === dbAttributes.length - 1 ? '#333' : '#555', 
-                                        cursor: attrIdx === dbAttributes.length - 1 ? 'default' : 'pointer', 
-                                        padding: '4px', 
-                                        display: 'flex',
-                                        transition: 'color 0.2s'
-                                      }}
-                                      onMouseEnter={(e) => { if (attrIdx !== dbAttributes.length - 1) e.currentTarget.style.color = '#fff' }}
-                                      onMouseLeave={(e) => { if (attrIdx !== dbAttributes.length - 1) e.currentTarget.style.color = '#555' }}
-                                      title="Опустить ниже"
-                                    >
-                                      <ArrowDown size={14} />
-                                    </button>
-                                    <button
-                                      onClick={() => { setEditingAttributeId(attr.id); setEditingAttributeName(attr.name); }}
+                                      onClick={() => { setEditingAttributeId(attr.id); setEditingAttributeName(attr.name); setEditingParamAttributeId(null); setEditingParamIndex(null); }}
                                       style={{ 
                                         background: 'none', 
                                         border: 'none', 
@@ -3129,10 +3056,14 @@ export default function Admin() {
                                     {(attributeParams[attr.id] || []).map((param, paramIdx) => {
                                       const isEditingParam = editingParamAttributeId === attr.id && editingParamIndex === paramIdx;
                                       return isEditingParam ? (
-                                        <div 
-                                          key={paramIdx} 
+                                        <div
+                                          key={paramIdx}
+                                          draggable
+                                          onDragStart={() => setDraggingParam({ attrId: attr.id, idx: paramIdx })}
+                                          onDragEnd={() => { setDraggingParam(null); setDragOverParam(null); }}
                                           style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}
                                         >
+                                          <GripVertical size={16} style={{ cursor: 'grab', color: '#A6CE39', flexShrink: 0 }} />
                                           <input
                                             autoFocus
                                             type="text"
@@ -3179,64 +3110,33 @@ export default function Admin() {
                                           </button>
                                         </div>
                                       ) : (
-                                        <div 
-                                          key={paramIdx} 
-                                          style={{ 
-                                            display: 'flex', 
-                                            justifyContent: 'space-between', 
-                                            alignItems: 'center', 
-                                            padding: '12px 16px', 
-                                            backgroundColor: 'rgba(255,255,255,0.02)', 
-                                            border: '1px solid var(--border-color)', 
+                                        <div
+                                          key={paramIdx}
+                                          onDragOver={(e) => { e.preventDefault(); setDragOverParam({ attrId: attr.id, idx: paramIdx }); }}
+                                          onDragLeave={() => setDragOverParam(null)}
+                                          onDrop={() => handleDropParam(attr.id, paramIdx)}
+                                          style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            padding: '12px 16px',
+                                            backgroundColor: 'rgba(255,255,255,0.02)',
+                                            border: dragOverParam?.attrId === attr.id && dragOverParam?.idx === paramIdx && draggingParam?.idx !== paramIdx ? '1px solid var(--primary-color)' : '1px solid var(--border-color)',
                                             borderRadius: '8px',
                                             width: '50%',
                                             boxSizing: 'border-box',
-                                            height: '46px'
+                                            height: '46px',
+                                            transition: 'border-color 0.15s'
                                           }}
                                         >
                                           <span style={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}>{param}</span>
-                                          <div style={{ display: 'flex', gap: '4px' }}>
-                                            <button
-                                              onClick={() => handleMoveParam(attr.id, paramIdx, 'up')}
-                                              disabled={paramIdx === 0}
-                                              style={{ 
-                                                background: 'none', 
-                                                border: 'none', 
-                                                color: paramIdx === 0 ? '#333' : '#666', 
-                                                cursor: paramIdx === 0 ? 'default' : 'pointer', 
-                                                display: 'flex', 
-                                                padding: '4px',
-                                                transition: 'color 0.2s'
-                                              }}
-                                              onMouseEnter={(e) => { if (paramIdx !== 0) e.currentTarget.style.color = '#fff' }}
-                                              onMouseLeave={(e) => { if (paramIdx !== 0) e.currentTarget.style.color = '#666' }}
-                                              title="Поднять выше"
-                                            >
-                                              <ArrowUp size={14} />
-                                            </button>
-                                            <button
-                                              onClick={() => handleMoveParam(attr.id, paramIdx, 'down')}
-                                              disabled={paramIdx === (attributeParams[attr.id] || []).length - 1}
-                                              style={{ 
-                                                background: 'none', 
-                                                border: 'none', 
-                                                color: paramIdx === (attributeParams[attr.id] || []).length - 1 ? '#333' : '#666', 
-                                                cursor: paramIdx === (attributeParams[attr.id] || []).length - 1 ? 'default' : 'pointer', 
-                                                display: 'flex', 
-                                                padding: '4px',
-                                                transition: 'color 0.2s'
-                                              }}
-                                              onMouseEnter={(e) => { if (paramIdx !== (attributeParams[attr.id] || []).length - 1) e.currentTarget.style.color = '#fff' }}
-                                              onMouseLeave={(e) => { if (paramIdx !== (attributeParams[attr.id] || []).length - 1) e.currentTarget.style.color = '#666' }}
-                                              title="Опустить ниже"
-                                            >
-                                              <ArrowDown size={14} />
-                                            </button>
+                                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                                             <button
                                               onClick={() => {
                                                 setEditingParamAttributeId(attr.id);
                                                 setEditingParamIndex(paramIdx);
                                                 setEditingParamValue(param);
+                                                setEditingAttributeId(null);
                                               }}
                                               style={{ 
                                                 background: 'none', 

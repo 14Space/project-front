@@ -32,7 +32,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
   const filteredUsers = dbUsers
     .filter(u =>
       formatUserId(u.id).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.username || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (u.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (u.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
@@ -117,7 +117,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onBack, hideHeader = false }) =
               {filteredUsers.map((u, idx) => (
                 <tr key={u.id} style={{ borderBottom: idx === filteredUsers.length - 1 ? 'none' : '1px solid var(--border-color)' }}>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: 'var(--primary-color)' }}>{formatUserId(u.id)}</td>
-                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.username || '--'}</td>
+                  <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.name || '--'}</td>
                   <td style={{ padding: '15px 20px', fontSize: '14px' }}>{u.lastName || '--'}</td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#aaa' }}>{u.email}</td>
                   <td style={{ padding: '15px 20px', fontSize: '14px', color: '#aaa' }}>{u.phone || '--'}</td>

@@ -1,11 +1,10 @@
-import { PackageSearch, Clock, ChevronRight } from 'lucide-react';
+import { PackageSearch, Clock } from 'lucide-react';
 
 const formatOrderId = (id: string | number) => {
   const num = String(id).replace(/^ORD-/i, '');
   return `ORD-${num.slice(-6).padStart(6, '0')}`;
 };
 import { useTranslation } from 'react-i18next';
-import { HOT_DEALS } from '../constants/products';
 import { api } from '../api';
 import { useEffect, useState } from 'react';
 
@@ -57,28 +56,22 @@ export default function OrderStatus() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {flattenedOrders.map((order, idx) => {
                 const item = order.currentItem;
-                const itemId = item.id || item.productId;
-                const product = HOT_DEALS.find(p => p.id === itemId?.toString());
-                const imagePath = product?.images[0] || item.image;
+                const imagePath = item.image;
 
                 // Dynamic Status Translation
                 let displayStatus = order.status;
-                if (order.status === 'pending') {
-                  displayStatus = t('adminPage.orders.statusPending');
-                } else if (order.status === 'shipped') {
-                  displayStatus = t('adminPage.orders.statusShipped');
-                } else if (order.status?.toLowerCase() === 'delivered') {
-                  displayStatus = t('adminPage.orders.statusDelivered', 'Доставлен');
-                } else if (order.status?.toLowerCase() === 'returned') {
-                  displayStatus = t('adminPage.orders.statusReturned', 'Возврат');
-                }
+                const s = order.status?.toLowerCase();
+                if (s === 'pending') displayStatus = 'В обработке';
+                else if (s === 'shipped') displayStatus = 'Отправлен';
+                else if (s === 'delivered') displayStatus = 'Доставлен';
+                else if (s === 'returned') displayStatus = 'Возврат';
 
                 const getStatusColor = (status: string) => {
-                  switch (status) {
-                    case 'pending': return '#eab308'; // Yellow
-                    case 'shipped': return '#3b82f6'; // Blue
-                    case 'delivered': return '#A6CE39'; // Green
-                    case 'returned': return '#ff4d4d'; // Red
+                  switch (status?.toLowerCase()) {
+                    case 'pending': return '#eab308';
+                    case 'shipped': return '#3b82f6';
+                    case 'delivered': return '#A6CE39';
+                    case 'returned': return '#ff4d4d';
                     default: return '#888';
                   }
                 };
@@ -123,9 +116,9 @@ export default function OrderStatus() {
                       borderRight: '1px solid #333'
                     }}>
                       {imagePath ? (
-                        <img 
-                           src={imagePath.startsWith('http') ? imagePath : `/products/${imagePath}`} 
-                          alt={item.title} 
+                        <img
+                          src={imagePath.startsWith('http') ? imagePath : imagePath}
+                          alt={item.name}
                           style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                         />
                       ) : (
@@ -163,28 +156,9 @@ export default function OrderStatus() {
                     </div>
                     
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ color: '#fff', fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>
+                      <div style={{ color: '#fff', fontSize: '20px', fontWeight: 700 }}>
                         {(item.price * item.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} MDL
                       </div>
-                      <button style={{ 
-                        backgroundColor: 'transparent', 
-                        border: '1px solid #333', 
-                        color: '#888', 
-                        padding: '8px 16px', 
-                        borderRadius: '8px', 
-                        fontSize: '14px', 
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#A6CE39'; e.currentTarget.style.color = '#A6CE39'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#888'; }}
-                      >
-                        {t('orderStatus.details')}
-                        <ChevronRight size={16} />
-                      </button>
                     </div>
                   </div>
                 );

@@ -107,7 +107,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .then((res: any) => {
           setUser({
             id: res.id.toString(),
-            name: res.username,
+            name: res.name,
             lastName: res.lastName,
             email: res.email,
             phone: res.phone,
@@ -282,7 +282,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     try {
       const response = await api.put('/Auth/update', {
-        username: userData.name,
+        name: userData.name,
         lastName: userData.lastName,
         phone: userData.phone,
         city: userData.city,
@@ -295,7 +295,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       
       const updatedUser = { 
         ...user, 
-        name: response.username,
+        name: response.name,
         lastName: response.lastName,
         phone: response.phone,
         city: response.city,

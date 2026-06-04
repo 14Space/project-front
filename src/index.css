@@ -204,4 +204,9 @@ form input[type="email"]:-webkit-autofill:hover,
 form input[type="email"]:-webkit-autofill:focus, 
 form input[type="email"]:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-}
+}
+/* Hide native Edge/IE password reveal eye */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
