@@ -33,7 +33,7 @@ export const api = {
     const response = await fetch(url, config);
 
     if (!response.ok) {
-      if (response.status === 401) {
+      if (response.status === 401 && !endpoint.startsWith('/Auth/')) {
         console.warn('Unauthorized request');
         localStorage.removeItem('token');
         localStorage.removeItem('user');

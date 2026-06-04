@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const formatOrderId = (id: string | number) => {
   const num = String(id).replace(/^ORD-/i, '');
@@ -16,6 +16,31 @@ const UserProfile: React.FC = () => {
   const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = React.useState(false);
+
+  const nameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const streetRef = useRef<HTMLInputElement>(null);
+
+  const showErr = (ref: React.RefObject<HTMLInputElement | null>, msg: string) => {
+    if (!ref.current) return;
+    ref.current.setCustomValidity(msg);
+    ref.current.reportValidity();
+  };
+  const clearRef = (ref: React.RefObject<HTMLInputElement | null>) => ref.current?.setCustomValidity('');
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (!val.startsWith('+373')) return;
+    const digits = val.slice(4).replace(/\D/g, '').slice(0, 8);
+    setFormData(prev => ({ ...prev, phone: '+373' + digits }));
+  };
+
+  const handleStartEditing = () => {
+    setFormData(prev => ({ ...prev, phone: prev.phone || '+373' }));
+    setIsEditing(true);
+  };
   const [isCityOpen, setIsCityOpen] = React.useState(false);
   const [emailError, setEmailError] = React.useState(false);
   const [orders, setOrders] = React.useState<any[]>([]);
@@ -52,13 +77,23 @@ const UserProfile: React.FC = () => {
   if (!user) return null;
 
   const handleSave = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setEmailError(true);
-      return;
-    }
+    const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    [nameRef, lastNameRef, emailRef, phoneRef, streetRef].forEach(clearRef);
+
+    if (!formData.name.trim()) { showErr(nameRef, t('validation.firstNameRequired')); return; }
+    if (formData.name.trim().length < 2) { showErr(nameRef, t('validation.firstNameMin')); return; }
+    if (!formData.lastName.trim()) { showErr(lastNameRef, t('validation.lastNameRequired')); return; }
+    if (formData.lastName.trim().length < 2) { showErr(lastNameRef, t('validation.lastNameMin')); return; }
+    if (!formData.email.trim()) { showErr(emailRef, t('validation.profileEmailRequired')); setEmailError(true); return; }
+    if (/[^\x00-\x7F]/.test(formData.email)) { showErr(emailRef, t('validation.profileEmailLatin')); setEmailError(true); return; }
+    if (!emailRegex.test(formData.email)) { showErr(emailRef, t('validation.profileEmailFormat')); setEmailError(true); return; }
+    const phone = formData.phone;
+    if (phone && phone !== '+373' && !/^\+373\d{8}$/.test(phone)) { showErr(phoneRef, t('validation.phoneFormat')); return; }
+    if (formData.street && formData.street.length > 100) { showErr(streetRef, t('validation.streetMax')); return; }
+
     setEmailError(false);
-    updateUser(formData);
+    const phoneToSave = phone === '+373' ? '' : phone;
+    updateUser({ ...formData, phone: phoneToSave });
     setIsEditing(false);
   };
 
@@ -153,8 +188,13 @@ const UserProfile: React.FC = () => {
                     const userInput = window.prompt(t('profile.confirmDeletePrompt'));
                     if (userInput !== null) {
                       if (userInput.trim().toUpperCase() === t('profile.confirmKeyword').toUpperCase()) {
-                        logout();
-                        navigate('/');
+                        api.delete(`/Auth/me`).then(() => {
+                          logout();
+                          navigate('/');
+                        }).catch(err => {
+                          console.error(err);
+                          alert('Ошибка при удалении аккаунта');
+                        });
                       } else {
                         alert(t('profile.deleteFailed'));
                       }
@@ -189,7 +229,7 @@ const UserProfile: React.FC = () => {
                     {t('profile.personalData')}
                   </h1>
                   {!isEditing && (
-                    <button onClick={() => setIsEditing(true)} style={{ color: '#A6CE39', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button onClick={handleStartEditing} style={{ color: '#A6CE39', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Edit2 size={16} />
                       {t('common.edit')}
                     </button>
@@ -200,12 +240,9 @@ const UserProfile: React.FC = () => {
                   <div>
                     <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.firstName')}</label>
                     {isEditing ? (
-                      <input 
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value.replace(/\d/g, '') })}
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                      />
+                      <>
+                        <input ref={nameRef} type="text" value={formData.name} onChange={(e) => { setFormData({ ...formData, name: e.target.value.replace(/\d/g, '') }); clearRef(nameRef); }} style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }} />
+                      </>
                     ) : (
                       <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff' }}>{user.name}</div>
                     )}
@@ -213,12 +250,9 @@ const UserProfile: React.FC = () => {
                   <div>
                     <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.lastName')}</label>
                     {isEditing ? (
-                      <input 
-                        type="text"
-                        value={formData.lastName}
-                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value.replace(/\d/g, '') })}
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                      />
+                      <>
+                        <input ref={lastNameRef} type="text" value={formData.lastName} onChange={(e) => { setFormData({ ...formData, lastName: e.target.value.replace(/\d/g, '') }); clearRef(lastNameRef); }} style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }} />
+                      </>
                     ) : (
                       <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff' }}>{user.lastName || '—'}</div>
                     )}
@@ -226,12 +260,9 @@ const UserProfile: React.FC = () => {
                   <div>
                     <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.email')}</label>
                     {isEditing ? (
-                      <input 
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: `1px solid ${emailError ? '#ff4d4d' : '#A6CE39'}`, backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                      />
+                      <>
+                        <input ref={emailRef} type="email" value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); clearRef(emailRef); setEmailError(false); }} style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: `1px solid ${emailError ? '#ff4d4d' : '#A6CE39'}`, backgroundColor: 'transparent', color: '#fff', outline: 'none' }} />
+                      </>
                     ) : (
                       <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff' }}>{user.email}</div>
                     )}
@@ -239,15 +270,12 @@ const UserProfile: React.FC = () => {
                   <div>
                     <label style={{ display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }}>{t('auth.phone')}</label>
                     {isEditing ? (
-                      <input 
-                        type="text"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/[^\d+]/g, '') })}
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
-                      />
+                      <>
+                        <input ref={phoneRef} type="text" value={formData.phone} onChange={(e) => { handlePhoneChange(e); clearRef(phoneRef); }} style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }} />
+                      </>
                     ) : (
                       <div 
-                        onClick={() => setIsEditing(true)}
+                        onClick={handleStartEditing}
                         style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                       >
                         {(!user.phone || user.phone === '+373') && <Plus size={14} />}
@@ -264,34 +292,34 @@ const UserProfile: React.FC = () => {
                         <div style={{ position: 'relative', width: '160px' }}>
                           <div 
                             onClick={() => setIsCityOpen(!isCityOpen)}
-                            style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: '#1a1a1a', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                            style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'var(--card-bg)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                           >
                             {formData.city}
                             <ChevronDown size={16} />
                           </div>
                           {isCityOpen && (
-                            <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', zIndex: 100 }}>
+                            <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', backgroundColor: 'var(--card-bg)', border: '1px solid #333', borderRadius: '8px', zIndex: 100 }}>
                               {cities.map(city => (
                                 <div key={city} onClick={() => { setFormData({ ...formData, city }); setIsCityOpen(false); }} style={{ padding: '10px 16px', color: '#fff', cursor: 'pointer' }}>{city}</div>
                               ))}
                             </div>
                           )}
                         </div>
-                        <input 
+                        <input
+                          ref={streetRef}
                           type="text"
                           value={formData.street}
-                          onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                          onChange={(e) => { setFormData({ ...formData, street: e.target.value }); clearRef(streetRef); }}
                           placeholder={t('auth.street')}
                           style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #A6CE39', backgroundColor: 'transparent', color: '#fff', outline: 'none' }}
                         />
                       </div>
                     ) : (
-                      <div 
-                        onClick={() => setIsEditing(true)}
-                        style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                      <div
+                        style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}
                       >
-                        {!user.street && <Plus size={14} />}
-                        {!user.street ? t('profile.addAddress') : `${user.city}${user.street ? `, ${user.street}` : ''}`}
+                        {!user.street && <Plus size={14} color="#888" />}
+                        {!user.street ? <span style={{ color: '#888' }}>{t('profile.addAddress')}</span> : `${user.city}${user.street ? `, ${user.street}` : ''}`}
                       </div>
                     )}
                   </div>
@@ -320,21 +348,19 @@ const UserProfile: React.FC = () => {
                       <div>
                         <span style={{ color: '#fff', fontWeight: 600, fontSize: '16px' }}>{formatOrderId(order.id)}</span>
                         <div style={{ color: '#888', fontSize: '13px', marginTop: '4px' }}>
-                          {new Date(order.orderDate).toLocaleString()}
+                          {new Date(order.orderDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
-                      <div style={{ 
-                        padding: '6px 12px', 
-                        borderRadius: '20px', 
-                        fontSize: '12px', 
-                        fontWeight: 600,
-                        backgroundColor: order.status === 'Pending' ? 'rgba(255, 165, 0, 0.1)' : 
-                                         order.status === 'Returned' ? 'rgba(255, 77, 77, 0.1)' : 'rgba(166, 206, 57, 0.1)',
-                        color: order.status === 'Pending' ? '#ffa500' : 
-                               order.status === 'Returned' ? '#ff4d4d' : '#A6CE39'
-                      }}>
-                        {order.status}
-                      </div>
+                      {(() => {
+                        const s = order.status?.toLowerCase();
+                        const color = s === 'pending' ? '#eab308' : s === 'shipped' ? '#3b82f6' : s === 'delivered' ? '#A6CE39' : s === 'returned' ? '#ff4d4d' : '#888';
+                        const label = s === 'pending' ? 'В обработке' : s === 'shipped' ? 'Отправлен' : s === 'delivered' ? 'Доставлен' : s === 'returned' ? 'Возврат' : order.status;
+                        return (
+                          <div style={{ padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}>
+                            {label}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px' }}>
                       {order.items.map((item: any, idx: number) => (

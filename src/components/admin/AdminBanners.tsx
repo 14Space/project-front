@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api';
-import { Trash2, Plus, GripVertical, Edit2 } from 'lucide-react';
+import { Trash2, Plus, Edit2, ChevronLeft } from 'lucide-react';
 
 interface Banner {
   id: number;
@@ -10,13 +10,14 @@ interface Banner {
   order: number;
 }
 
-export default function AdminBanners() {
+export default function AdminBanners({ onBack }: { onBack?: () => void }) {
   const { t } = useTranslation();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [newLink, setNewLink] = useState('');
-  const [newOrder, setNewOrder] = useState(0);
+  const [newOrder, setNewOrder] = useState(1);
+  const [fileName, setFileName] = useState('');
 
   const [editingBannerId, setEditingBannerId] = useState<number | null>(null);
   const [editLink, setEditLink] = useState('');
@@ -30,7 +31,9 @@ export default function AdminBanners() {
     setLoading(true);
     try {
       const res = await api.get('/Banners');
-      setBanners(Array.isArray(res) ? res : []);
+      const list = Array.isArray(res) ? res : [];
+      setBanners(list);
+      setNewOrder(list.length > 0 ? Math.max(...list.map((b: Banner) => b.order)) + 1 : 1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -38,9 +41,21 @@ export default function AdminBanners() {
     }
   };
 
+  const validateUrl = (url: string): string | null => {
+    if (!url.trim()) return null;
+    try { new URL(url); return null; } catch { return t('validation.bannerUrlInvalid'); }
+  };
+
   const handleCreate = async () => {
     const file = fileInputRef.current?.files?.[0];
-    if (!file) return alert('Выберите изображение для баннера');
+    if (!file) return alert(t('validation.bannerImageRequired'));
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) return alert(t('validation.bannerFileSize'));
+    if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)) return alert(t('validation.bannerFileType'));
+    if (newOrder < 1) return alert(t('validation.bannerOrderMin'));
+    if (banners.some(b => b.order === newOrder)) return alert(t('validation.bannerOrderExists'));
+    const urlErr = validateUrl(newLink);
+    if (urlErr) return alert(urlErr);
 
     const formData = new FormData();
     formData.append('image', file);
@@ -51,8 +66,10 @@ export default function AdminBanners() {
       await api.upload('/Banners', formData);
       if (fileInputRef.current) fileInputRef.current.value = '';
       setNewLink('');
-      setNewOrder(banners.length > 0 ? Math.max(...banners.map(b => b.order)) + 1 : 0);
-      fetchBanners();
+      setFileName('');
+      const updated: Banner[] = await api.get('/Banners');
+      setBanners(Array.isArray(updated) ? updated : []);
+      setNewOrder(updated.length > 0 ? Math.max(...updated.map((b: Banner) => b.order)) + 1 : 1);
     } catch (err) {
       console.error(err);
       alert('Ошибка при сохранении баннера: ' + ((err as Error)?.message || String(err)));
@@ -87,27 +104,48 @@ export default function AdminBanners() {
   };
 
   return (
-    <div style={{ color: '#fff' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '20px' }}>Управление баннерами</h2>
+    <div style={{ color: '#fff', animation: 'fadeIn 0.3s ease' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px', position: 'relative' }}>
+        {onBack && (
+          <button
+            onClick={onBack}
+            style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', padding: 0, position: 'absolute', left: 0 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-color)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#fff'}
+          >
+            <ChevronLeft size={18} />
+            {t('common.back')}
+          </button>
+        )}
+        <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{t('admin.actions.reviewModeration')}</h2>
+      </div>
       
       {/* Форма добавления */}
       <div style={{ backgroundColor: '#1a1a1a', padding: '20px', borderRadius: '12px', border: '1px solid #333', marginBottom: '30px' }}>
-        <h3 style={{ margin: '0 0 15px 0', fontSize: '18px' }}>Добавить новый баннер</h3>
+        <h3 style={{ margin: '0 0 15px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Добавить новый баннер</h3>
         <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: '200px' }}>
             <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Изображение</label>
-            <input 
-              type="file" 
+            <input
+              type="file"
               accept="image/*"
               ref={fileInputRef}
-              style={{ width: '100%', padding: '10px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff' }}
+              style={{ display: 'none' }}
+              onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
             />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              style={{ width: '100%', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: fileName ? '#fff' : '#888', textAlign: 'left', cursor: 'pointer', fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {fileName || 'Выберите файл...'}
+            </button>
           </div>
           <div style={{ flex: 1, minWidth: '200px' }}>
             <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Ссылка (по клику)</label>
-            <input 
-              type="text" 
-              placeholder="/category/1 или https://..."
+            <input
+              type="text"
+              placeholder="https://..."
               value={newLink}
               onChange={(e) => setNewLink(e.target.value)}
               style={{ width: '100%', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none' }}
@@ -115,11 +153,16 @@ export default function AdminBanners() {
           </div>
           <div style={{ width: '100px' }}>
             <label style={{ display: 'block', color: '#888', marginBottom: '8px', fontSize: '14px' }}>Порядок</label>
-            <input 
-              type="number" 
+            <input
+              type="text"
+              inputMode="numeric"
               value={newOrder}
-              onChange={(e) => setNewOrder(Number(e.target.value))}
-              style={{ width: '100%', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none' }}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '');
+                const num = parseInt(val) || 1;
+                setNewOrder(num < 1 ? 1 : num);
+              }}
+              style={{ width: '100%', padding: '12px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff', outline: 'none', MozAppearance: 'textfield', WebkitAppearance: 'none' } as any}
             />
           </div>
           <button 
@@ -133,7 +176,7 @@ export default function AdminBanners() {
 
       {/* Список баннеров */}
       <div>
-        <h3 style={{ margin: '0 0 15px 0', fontSize: '18px' }}>Текущие баннеры</h3>
+        <h3 style={{ margin: '0 0 15px 0', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Текущие баннеры</h3>
         {loading ? (
           <p>Загрузка...</p>
         ) : banners.length === 0 ? (
@@ -142,7 +185,6 @@ export default function AdminBanners() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {banners.map((b) => (
               <div key={b.id} style={{ display: 'flex', alignItems: 'center', backgroundColor: '#1a1a1a', padding: '15px', borderRadius: '12px', border: '1px solid #333', gap: '20px' }}>
-                <GripVertical size={20} color="#555" style={{ cursor: 'grab' }} />
                 <div style={{ width: '150px', height: '70px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#000' }}>
                   <img src={b.imageUrl.startsWith('http') ? b.imageUrl : `http://localhost:5036${b.imageUrl}`} alt="Banner" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
@@ -151,10 +193,15 @@ export default function AdminBanners() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <label style={{ color: '#888', fontSize: '14px', width: '70px' }}>Порядок:</label>
-                        <input 
-                          type="number" 
+                        <input
+                          type="text"
+                          inputMode="numeric"
                           value={editOrder}
-                          onChange={(e) => setEditOrder(Number(e.target.value))}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            const num = parseInt(val) || 1;
+                            setEditOrder(num < 1 ? 1 : num);
+                          }}
                           style={{ width: '80px', padding: '8px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '6px', color: '#fff', outline: 'none' }}
                         />
                       </div>

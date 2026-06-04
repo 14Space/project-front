@@ -12,7 +12,7 @@ export default function QuickActions() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   const actions = [
-    { icon: <Wrench size={32} />, title: t('home.quickActions.pcBuild'), desc: t('home.quickActions.pcBuildDesc'), path: '/pc-build' },
+    { icon: <Wrench size={32} />, title: t('home.quickActions.pcBuild'), desc: t('home.quickActions.pcBuildDesc'), path: '/pc-build', requireAuth: true },
     { icon: <PackageSearch size={32} />, title: t('home.quickActions.orderStatus'), desc: t('home.quickActions.orderStatusDesc'), path: '/order-status', requireAuth: true },
     { icon: <Repeat size={32} />, title: t('home.quickActions.tradeIn'), desc: t('home.quickActions.tradeInDesc'), path: '/trade-in', requireAuth: true },
     { icon: <Headphones size={32} />, title: t('home.quickActions.support'), desc: t('home.quickActions.supportDesc'), path: 'https://t.me/SX_Warrior' }
