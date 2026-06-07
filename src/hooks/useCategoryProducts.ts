@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api';
 import { getImgUrl } from '../utils/image';
 import type { Product } from '../data/mockProducts';
+import { CATEGORY_CARD_SPECS } from '../constants/categorySpecs';
 
 export interface CategoryFilterParams {
   categoryId?: number;
@@ -50,7 +51,19 @@ export function useCategoryProducts(categoryName: string, filters?: CategoryFilt
           price: p.price,
           oldPrice: p.oldPrice,
           inStock: p.status === 'InStock' || p.status === 'В наличии' || p.status === 'Available',
-          specs: p.attributes ? p.attributes.map((a: any) => `${a.attributeName}: ${a.value}`) : [],
+          specs: (() => {
+            if (!p.attributes) return [];
+            const wantedKeys = CATEGORY_CARD_SPECS[p.categoryName] ?? [];
+            if (wantedKeys.length === 0) {
+              return p.attributes.slice(0, 5).map((a: any) => `${a.attributeName}: ${a.value}`);
+            }
+            return wantedKeys
+              .map((key) => {
+                const attr = p.attributes.find((a: any) => a.attributeName === key);
+                return attr ? `${attr.attributeName}: ${attr.value}` : null;
+              })
+              .filter(Boolean) as string[];
+          })(),
           images: p.images && p.images.length > 0 
             ? p.images.map((img: string) => getImgUrl(img)) 
             : ['/subcategories/SUBCATEGORIES-zaglushka.png'],
